@@ -1,0 +1,68 @@
+<div *ngFor="let unit of match; let i = index">
+    <div *ngIf="unit.genomic" [ngStyle]="getStyle(0)">
+        <jhi-genomic [unit]="unit" [path]="path+','+i" [indent]="1"></jhi-genomic>
+    </div>
+    <div *ngIf="unit.clinical" [ngStyle]="getStyle(0)">
+        <jhi-clinical [unit]="unit" [path]="path+','+i" [indent]="1"></jhi-genomic>
+    </div>
+    <div *ngIf="unit.or">
+        <div [ngStyle]="getStyle(1)">
+            <span>-or:</span>
+            <jhi-node [type]="'add,delete'" [path]="path+','+i"></jhi-node>
+        </div>
+        <div *ngFor="let unit1 of unit.or; let i1 = index">
+            <div [ngStyle]="getStyle(2)">
+                <div *ngIf="unit1.genomic">
+                    <jhi-genomic [unit]="unit1" [path]="path+','+i+','+i1" [indent]="3"></jhi-genomic>
+                </div>
+                <div *ngIf="unit1.clinical">
+                    <jhi-clinical [unit]="unit1" [path]="path+','+i+','+i1" [indent]="3"></jhi-genomic>
+                </div>
+                <div *ngIf="unit1.and">
+                    <div>
+                        -and:
+                        <jhi-node [type]="'add,delete'" [path]="path+','+i+','+i1"></jhi-node>
+                    </div>
+                    <jhi-match [match]="unit1.and" [base]="base+1" [path]="path+','+i+','+i1"></jhi-match>
+                </div>
+                <div *ngIf="unit1.or">
+                    <div>
+                        -or:
+                        <jhi-node [type]="'add,delete'" [path]="path+','+i+','+i1"></jhi-node>
+                    </div>
+                    <jhi-match [match]="unit1.or" [base]="base+1" [path]="path+','+i+','+i1"></jhi-match>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="unit.and">
+        <div [ngStyle]="getStyle(1)">
+            -and:
+            <jhi-node [type]="'add,delete'" [path]="path+','+i"></jhi-node>
+        </div>
+        <div *ngFor="let unit2 of unit.and; let i2 = index">
+            <div [ngStyle]="getStyle(2)">
+                <div *ngIf="unit2.genomic">
+                    <jhi-genomic [unit]="unit2" [path]="path+','+i+','++i2" [indent]="3"></jhi-genomic>
+                </div>
+                <div *ngIf="unit2.clinical">
+                    <jhi-clinical [unit]="unit2" [path]="path+','+i+','++i2" [indent]="3"></jhi-genomic>
+                </div>
+                <div *ngIf="unit2.or">
+                    <div>
+                        -or:
+                        <jhi-node [type]="'add,delete'" [path]="path+','+i+','+i2"></jhi-node>
+                    </div>
+                    <jhi-match [match]="unit2.or" [base]="base+1" [path]="path+','+i+','+i2"></jhi-match>
+                </div>
+                <div *ngIf="unit2.and">
+                    <div>
+                        -and:
+                        <jhi-node [type]="'add,delete'" [path]="path+','+i+','+i2"></jhi-node>
+                    </div>
+                    <jhi-match [match]="unit2.and" [base]="base+1" [path]="path+','+i+','+i2"></jhi-match>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
