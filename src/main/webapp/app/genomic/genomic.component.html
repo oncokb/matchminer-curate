@@ -1,0 +1,76 @@
+<span>-genomic:</span>
+        <jhi-node [type]="'delete,edit'" [unit]="unit" [path]="path"></jhi-node>
+        <br/>
+        <div [ngStyle]="getStyle()" *ngIf="pathPool.indexOf(path) !== -1; else panel">
+            <label>hugo_symbol:</label>
+            <input [(ngModel)]="modificationInput.hugo_symbol" />
+            <br/>
+            <label>oncokb_variant:</label>
+            <input [(ngModel)]="modificationInput.oncokb_variant" />
+            <br/>
+            <label>variant_category:</label>
+            <input [(ngModel)]="modificationInput.variant_category" />
+            <br/>
+            <label>protein_change:</label>
+            <input [(ngModel)]="modificationInput.protein_change" />
+            <br/>
+            <label>wildcard_protein_change:</label>
+            <input [(ngModel)]="modificationInput.wildcard_protein_change" />
+            <br/>
+            <label>variant_classification:</label>
+            <input [(ngModel)]="modificationInput.variant_classification" />
+            <br/>
+            <label>exon:</label>
+            <input [(ngModel)]="modificationInput.exon" />
+            <br/>
+            <label>cnv_call:</label>
+            <input [(ngModel)]="modificationInput.cnv_call" />
+            <br/>
+            <label>wildtype:</label>
+            <input [(ngModel)]="modificationInput.wildtype" />
+            <br/>
+        </div>
+        <ng-template #panel>
+            <div [ngStyle]="getStyle()">
+                <label>hugo_symbol: </label>
+                <span>{{unit.genomic.hugo_symbol}}</span>
+                <br/>
+                <label>oncokb_variant: </label>
+                <span>{{unit.genomic.oncokb_variant}}</span>
+                <br/>
+                <span *ngIf="unit.genomic.variant_category">
+                        <label>variant_category: </label>
+                        <span>{{unit.genomic.variant_category}}</span>
+                        <br/>
+                </span>
+                <span *ngIf="unit.genomic.protein_change">
+                        <label>protein_change: </label>
+                        <span>{{unit.genomic.protein_change}}</span>
+                        <br/>
+                </span> 
+                <span *ngIf="unit.genomic.wildcard_protein_change">
+                        <label>wildcard_protein_change: </label>
+                        <span>{{unit.genomic.wildcard_protein_change}}</span>
+                        <br/>
+                </span>     
+                <span *ngIf="unit.genomic.variant_classification">
+                        <label>variant_classification: </label>
+                        <span>{{unit.genomic.variant_classification}}</span>
+                        <br/>
+                </span>
+                <span *ngIf="unit.genomic.exon">
+                        <label>exon: </label>
+                        <span>{{unit.genomic.exon}}</span>
+                        <br/>
+                </span>
+                <span *ngIf="unit.genomic.cnv_call">
+                        <label>cnv_call: </label>
+                        <span>{{unit.genomic.cnv_call}}</span>
+                        <br/>
+                </span>
+                <span *ngIf="unit.genomic.wildtype">
+                        <label>wildtype: </label>
+                        <span>{{unit.genomic.wildtype}}</span>
+                </span>
+            </div>
+        </ng-template>
