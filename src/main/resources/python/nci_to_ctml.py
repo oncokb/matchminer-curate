@@ -116,7 +116,7 @@ def main(opts):
             print '## INFO: Successfully wrote CTML file for %s' % nctid.upper()
         elif not opts.outpath:
             # Use a service account. Replace private key json file for matchminer-curate firebase
-            cred = credentials.Certificate("src/main/resources/python/matchminercurate-firebase-adminsdk-i01jh-285e2699d1.json")
+            cred = credentials.Certificate("src/main/resources/python/matchminercurate-63c82-firebase-adminsdk-d91wk-90ee4ca677.json")
 
             """
             #store data in Firebase Cloud Store
@@ -128,7 +128,7 @@ def main(opts):
 
             # Initialize the app with a service account, granting admin privileges for Realtime Database
             firebase_admin.initialize_app(cred, {
-                'databaseURL': 'https://matchminercurate.firebaseio.com'
+                'databaseURL': 'https://matchminercurate-63c82.firebaseio.com'
             })
 
             # As an admin, the app has access to read and write all data, regradless of Security Rules
