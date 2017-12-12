@@ -116,7 +116,7 @@ def main(opts):
             print '## INFO: Successfully wrote CTML file for %s' % nctid.upper()
         elif not opts.outpath:
             # Use a service account. Replace private key json file for matchminer-curate firebase
-            cred = credentials.Certificate("src/main/resources/python/matchminercurate-63c82-firebase-adminsdk-d91wk-90ee4ca677.json")
+            cred = credentials.Certificate("src/main/resources/python/matchminercurate-key.json")
 
             """
             #store data in Firebase Cloud Store
