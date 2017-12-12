@@ -74,6 +74,15 @@ def main(opts):
               '##        with the characters "NCT". Aborting script.'
         sys.exit(0)
 
+    # Use a service account. Replace private key json file for matchminer-curate firebase
+    cred = credentials.Certificate("src/main/resources/certificates/matchminercurate-key.json")
+    # Initialize the app with a service account, granting admin privileges for Realtime Database
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://matchminercurate-63c82.firebaseio.com'
+    })
+    # As an admin, the app has access to read and write all data, regradless of Security Rules
+    ref = db.reference('trials')
+
     for nctid in nctids:
 
         if not nctid.upper().startswith('NCT'):
@@ -115,24 +124,6 @@ def main(opts):
 
             print '## INFO: Successfully wrote CTML file for %s' % nctid.upper()
         elif not opts.outpath:
-            # Use a service account. Replace private key json file for matchminer-curate firebase
-            cred = credentials.Certificate("src/main/resources/python/matchminercurate-key.json")
-
-            """
-            #store data in Firebase Cloud Store
-            firebase_admin.initialize_app(cred)
-            db = firestore.client()
-            doc_ref = db.collection(u'trials').document(nctid.upper())
-            doc_ref.set(data)
-            """
-
-            # Initialize the app with a service account, granting admin privileges for Realtime Database
-            firebase_admin.initialize_app(cred, {
-                'databaseURL': 'https://matchminercurate-63c82.firebaseio.com'
-            })
-
-            # As an admin, the app has access to read and write all data, regradless of Security Rules
-            ref = db.reference('trials')
             trials_ref = ref.child(nctid.upper())
             trials_ref.set(data)
             json_data = json.dumps(data)
