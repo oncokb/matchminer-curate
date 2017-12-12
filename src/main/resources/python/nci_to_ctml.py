@@ -5,14 +5,25 @@ SYNOPSIS
 
     This script will accept a clinical trial's NCT ID, a comma-separated list
     of NCT IDs, or a file containing a comma-separated list of NCT IDs,
-    query the NCI Clinical Trials API, and out put a trial's json object or output CTML file in YAML format
-    containing all information returned by the NCI API.
+    query the NCI Clinical Trials API. If users type output path, a CTML file
+    in YAML format containing all information returned by the NCI API.
+    Otherwise, the trial json data will be stored in Firebase.
 
     NCI Clinical Trials API documentation is available here:
     https://clinicaltrialsapi.cancer.gov/
 
 EXAMPLES
-    ./nci_to_ctml.py \
+    - to get NCT trials and store them in Firebase:
+        ./nci_to_ctml.py \
+            -i NCT02194738
+
+    - to remove fields returned by NCI's CT API but that you want excluded from Firebase collection:
+        ./nci_to_ctml.py \
+            -i NCT02194738 \
+            --remove-fields sites,arms
+
+    - to creat a CTML file:
+        ./nci_to_ctml.py \
         -i NCT02194738 \
         -o ${output_directory}
 
@@ -34,10 +45,12 @@ import time
 import requests
 import argparse
 import datetime as dt
-
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from firebase_admin import db
 
 address = 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trials'
-
 
 def main(opts):
 
@@ -102,8 +115,29 @@ def main(opts):
 
             print '## INFO: Successfully wrote CTML file for %s' % nctid.upper()
         elif not opts.outpath:
-            print json.dumps(data)
-            return json.dumps(data)
+            # Use a service account. Replace private key json file for matchminer-curate firebase
+            cred = credentials.Certificate("src/main/resources/python/matchminercurate-firebase-adminsdk-i01jh-285e2699d1.json")
+
+            """
+            #store data in Firebase Cloud Store
+            firebase_admin.initialize_app(cred)
+            db = firestore.client()
+            doc_ref = db.collection(u'trials').document(nctid.upper())
+            doc_ref.set(data)
+            """
+
+            # Initialize the app with a service account, granting admin privileges for Realtime Database
+            firebase_admin.initialize_app(cred, {
+                'databaseURL': 'https://matchminercurate.firebaseio.com'
+            })
+
+            # As an admin, the app has access to read and write all data, regradless of Security Rules
+            ref = db.reference('trials')
+            users_ref = ref.child(nctid.upper())
+            users_ref.set(data)
+            json_data = json.dumps(data)
+            print(json_data)
+            return json_data
 
 
 if __name__ == '__main__':

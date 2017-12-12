@@ -1,6 +1,21 @@
 # API-first development with swagger
 # This file will be used at compile time to generate Spring-MVC endpoint stubs using swagger-codegen
-swagger: "2.0"
+swagger: '2.0'
 info:
+  title: MatchMiner Trials API
   version: 0.0.1
-paths: {}
+schemes:
+- "http"
+paths:
+  '/trials/{nctIds}':
+    get:
+      description: Returns trials from clinicaltrials.gov that the user send their ids
+      operationId: "getTrialById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "nctIds"
+        in: "path"
+        description: "IDs of trials to return"
+        required: true
+        type: "string"

@@ -22,8 +22,8 @@ public class TrialsController {
      */
 
     @RequestMapping(value="/trials/{nctIds}", produces = { "application/json" }, method = RequestMethod.GET)
-    public @ResponseBody String getTrials(
-        @ApiParam(value = "nctIds", required = true)  @PathVariable("nctIds") String nctIds) throws IOException, InterruptedException {
+    public @ResponseBody String getTrialById(
+        @ApiParam(value = "IDs of trials to return", required = true)  @PathVariable("nctIds") String nctIds) throws IOException, InterruptedException {
 
         ProcessBuilder processBuilder = new ProcessBuilder("python", "src/main/resources/python/nci_to_ctml.py", "-i", nctIds);
         //From the DOC:  Initially, this property is false, meaning that the
