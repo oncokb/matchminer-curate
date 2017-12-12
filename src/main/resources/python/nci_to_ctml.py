@@ -133,8 +133,8 @@ def main(opts):
 
             # As an admin, the app has access to read and write all data, regradless of Security Rules
             ref = db.reference('trials')
-            users_ref = ref.child(nctid.upper())
-            users_ref.set(data)
+            trials_ref = ref.child(nctid.upper())
+            trials_ref.set(data)
             json_data = json.dumps(data)
             print(json_data)
             return json_data
