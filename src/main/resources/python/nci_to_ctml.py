@@ -83,6 +83,7 @@ def main(opts):
     # As an admin, the app has access to read and write all data, regradless of Security Rules
     ref = db.reference('trials')
 
+    json_data = {}
     for nctid in nctids:
 
         if not nctid.upper().startswith('NCT'):
@@ -126,9 +127,10 @@ def main(opts):
         elif not opts.outpath:
             trials_ref = ref.child(nctid.upper())
             trials_ref.set(data)
-            json_data = json.dumps(data)
-            print(json_data)
-            return json_data
+            json_data[nctid.upper()] = json.dumps(data)
+            print(json_data[nctid.upper()])
+
+    return json_data
 
 
 if __name__ == '__main__':

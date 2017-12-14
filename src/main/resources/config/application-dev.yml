@@ -34,9 +34,9 @@ spring:
         serialization.indent_output: true
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:mysql://localhost:3306/MatchMinerCurate?useUnicode=true&characterEncoding=utf8&useSSL=false
-        username: root
-        password:
+        url: jdbc:mysql://dashi-dev.cbio.mskcc.org:3306/MatchMinerCurate?useUnicode=true&characterEncoding=utf8&useSSL=false
+        username: cgds_admin
+        password: rye678bob
         hikari:
             data-source-properties:
                 cachePrepStmts: true
