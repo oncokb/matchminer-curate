@@ -42,7 +42,8 @@ public class TrialsController {
         throws IOException, InterruptedException {
 
         ProcessBuilder processBuilder = new ProcessBuilder("python",
-            "src/main/resources/python/nci_to_ctml.py", "-i", nctIds);
+            System.getenv("CATALINA_HOME")+ "/webapps/matchminer-curate/WEB-INF/classes/python/nci_to_ctml.py", "-i", nctIds);
+
 
         return readOutputFromPython(processBuilder);
     }
@@ -62,14 +63,18 @@ public class TrialsController {
         @ApiResponse(code = 404, message = "The trial was not found.", response = Void.class),
         @ApiResponse(code = 200, message = "Unexpected error.", response = Void.class) })
 
-    @RequestMapping(value = "/trials/yaml",
+    @RequestMapping(value = "/trials/convert/{dataType}",
         method = RequestMethod.POST)
-    public String convertJsonToYaml(@ApiParam(value = "a json object of trial" ,required=true )
-                                        @Valid @RequestBody String trialObject)
+    public String convertDataType(@ApiParam(value = "a json/yaml trial string" ,required=true )
+                                      @Valid @RequestBody String trialObject,
+                                  @ApiParam(value = "the data type covert to",required=true )
+                                  @PathVariable("dataType") String dataType)
         throws IOException, InterruptedException {
 
         ProcessBuilder processBuilder = new ProcessBuilder("python",
-            "src/main/resources/python/json_to_yaml.py", "-i", trialObject);
+            System.getenv("CATALINA_HOME")+
+                "/webapps/matchminer-curate/WEB-INF/classes/python/convert_data_type.py",
+            "-i", trialObject, "-t", dataType);
 
         return readOutputFromPython(processBuilder);
     }

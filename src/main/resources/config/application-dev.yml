@@ -58,8 +58,8 @@ spring:
             cluster-nodes:
             properties:
                 path:
-                    logs: target/elasticsearch/log
-                    data: target/elasticsearch/data
+                    logs: /data/matchminer-curate/target/elasticsearch/log
+                    data: /data/matchminer-curate/target/elasticsearch/data
     mail:
         host: localhost
         port: 25
