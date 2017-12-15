@@ -44,7 +44,6 @@ import json
 import time
 import requests
 import argparse
-import datetime as dt
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -140,8 +139,7 @@ if __name__ == '__main__':
                         help='Specify an NCT ID, a comma-separated list of NCT IDs, or the '
                              'path to a file containing a comma-separated list of NCT IDs.')
     parser.add_argument('-o', dest='outpath', required=False,
-                        help='Specify the output path of your CTML files. Defaults to your '
-                             'current working directory.')
+                        help='Specify the output path of your CTML files.')
     parser.add_argument('--remove-fields', dest='remove_fields', required=False,
                         help='Optionally specify a comma-separated list of NCI CT fields'
                              'you would like to exclude from the final CTML.')

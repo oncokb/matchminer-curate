@@ -7,10 +7,10 @@ info:
 schemes:
 - "http"
 paths:
-  '/trials/{nctIds}':
+  '/trials/save/{nctIds}':
     get:
-      description: Returns trials from clinicaltrials.gov that the user send their ids
-      operationId: "getTrialById"
+      description: Returns trials from clinicaltrials.gov that the user send their ids and save them to Firebase
+      operationId: "saveTrialById"
       produces:
       - "application/json"
       parameters:
@@ -19,3 +19,37 @@ paths:
         description: "IDs of trials to return"
         required: true
         type: "string"
+      responses:
+        '200':
+          description: Save trials successfully.
+        '400':
+          description: The specified trial ID(s) is invalid.
+        '404':
+          description: Trial(s) with the specified ID(s) was not found.
+        default:
+          description: Unexpected error.
+  '/trials/yaml':
+    post:
+      description: Covert a  trial from json to yaml format.
+      operationId: "convertJsonToYaml"
+      parameters:
+      - name: "trialObject"
+        in: "body"
+        description: "a json object of trial"
+        required: true
+        schema:
+            $ref: "#/definitions/Trial"
+      responses:
+        '200':
+          description: Covert to yaml successfully.
+        '400':
+          description: The trial object is invalid.
+        '404':
+          description: The trial was not found.
+        default:
+          description: Unexpected error.
+definitions:
+  Trial:
+    type: "string"
+    xml:
+      name: "Trial"
