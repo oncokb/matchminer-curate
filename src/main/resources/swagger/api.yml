@@ -1,6 +1,62 @@
 # API-first development with swagger
 # This file will be used at compile time to generate Spring-MVC endpoint stubs using swagger-codegen
-swagger: "2.0"
+swagger: '2.0'
 info:
+  title: MatchMiner Trials API
   version: 0.0.1
-paths: {}
+schemes:
+- "http"
+paths:
+  '/trials/save/{nctIds}':
+    get:
+      description: Returns trials from clinicaltrials.gov that the user send their ids and save them to Firebase
+      operationId: "saveTrialById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "nctIds"
+        in: "path"
+        description: "IDs of trials to return"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: Save trials successfully.
+        '400':
+          description: The specified trial ID(s) is invalid.
+        '404':
+          description: Trial(s) with the specified ID(s) was not found.
+        default:
+          description: Unexpected error.
+  '/trials/convert':
+    post:
+      description: Covert a  trial from json to yaml format.
+      operationId: "convertJsonToYaml"
+      parameters:
+      - name: "trialObject"
+        in: "body"
+        description: "a json object of trial"
+        required: true
+        schema:
+            $ref: "#/definitions/Trial"
+      responses:
+        '200':
+          description: Covert to yaml successfully.
+        '400':
+          description: The trial object is invalid.
+        '404':
+          description: The trial was not found.
+        default:
+          description: Unexpected error.
+definitions:
+  Trial:
+    properties:
+      content:
+        type: string
+        description: trial object json/yaml string
+      dataType:
+        type: string
+        description: choose one of json/yaml type
+    required:
+      - content
+      - dataType

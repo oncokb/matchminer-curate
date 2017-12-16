@@ -495,6 +495,8 @@
                                     <includes>
                                         <include>**/*.xml</include>
                                         <include>**/*.yml</include>
+                                        <include>**/*.py</include>
+                                        <include>**/*.json</include>
                                     </includes>
                                 </resource>
                                 <resource>
@@ -503,6 +505,8 @@
                                     <excludes>
                                         <exclude>**/*.xml</exclude>
                                         <exclude>**/*.yml</exclude>
+                                        <include>**/*.py</include>
+                                        <include>**/*.json</include>
                                     </excludes>
                                 </resource>
                             </resources>
