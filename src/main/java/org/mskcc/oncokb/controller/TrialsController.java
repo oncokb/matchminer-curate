@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.InterruptedException;
 
+import org.mskcc.oncokb.model.Trial;
+
 /**
  *
  * @author jingsu
@@ -63,18 +65,15 @@ public class TrialsController {
         @ApiResponse(code = 404, message = "The trial was not found.", response = Void.class),
         @ApiResponse(code = 200, message = "Unexpected error.", response = Void.class) })
 
-    @RequestMapping(value = "/trials/convert/{dataType}",
+    @RequestMapping(value = "/trials/convert",
         method = RequestMethod.POST)
-    public String convertDataType(@ApiParam(value = "a json/yaml trial string" ,required=true )
-                                      @Valid @RequestBody String trialObject,
-                                  @ApiParam(value = "the data type covert to",required=true )
-                                  @PathVariable("dataType") String dataType)
+    public String convertDataType(@ApiParam(value = "a json object of trial" ,required=true )  @Valid @RequestBody Trial trialObject)
         throws IOException, InterruptedException {
 
         ProcessBuilder processBuilder = new ProcessBuilder("python",
             System.getenv("CATALINA_HOME")+
                 "/webapps/matchminer-curate/WEB-INF/classes/python/convert_data_type.py",
-            "-i", trialObject, "-t", dataType);
+            "-i", trialObject.getContent(), "-t", trialObject.getDataType());
 
         return readOutputFromPython(processBuilder);
     }

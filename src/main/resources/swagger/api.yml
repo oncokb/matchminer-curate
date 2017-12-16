@@ -28,21 +28,17 @@ paths:
           description: Trial(s) with the specified ID(s) was not found.
         default:
           description: Unexpected error.
-  '/trials/convert/{dataType}':
+  '/trials/convert':
     post:
       description: Covert a  trial from json to yaml format.
-      operationId: "convertDataType"
+      operationId: "convertJsonToYaml"
       parameters:
       - name: "trialObject"
         in: "body"
-        description: "a json/yaml trial string"
+        description: "a json object of trial"
         required: true
         schema:
             $ref: "#/definitions/Trial"
-      - name: "dataType"
-        in: "path"
-        description: "the data type covert to"
-        required: true
       responses:
         '200':
           description: Covert to yaml successfully.
@@ -54,6 +50,13 @@ paths:
           description: Unexpected error.
 definitions:
   Trial:
-    type: "string"
-    xml:
-      name: "Trial"
+    properties:
+      content:
+        type: string
+        description: trial object json/yaml string
+      dataType:
+        type: string
+        description: choose one of json/yaml type
+    required:
+      - content
+      - dataType
