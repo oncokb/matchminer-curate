@@ -1,0 +1,20 @@
+<span>-clinical:</span>
+<jhi-node [type]="'delete,edit'" [unit]="unit" [path]="path"></jhi-node>
+<br/>
+<div [ngStyle]="getStyle()" *ngIf="pathPool.indexOf(path) !== -1; else panel">
+    <label>age_numerical:</label>
+    <input [(ngModel)]="modificationInput.age_numerical" />
+    <br/>
+    <label>oncotree_diagnosis:</label>
+    <input [(ngModel)]="modificationInput.oncotree_diagnosis" />
+    <br/>
+</div>
+<ng-template #panel>
+    <div [ngStyle]="getStyle()">
+        <label>age_numerical:</label>
+        <span>{{unit.clinical.age_numerical}}</span>
+        <br/>
+        <label>oncotree_diagnosis:</label>
+        <span>{{unit.clinical.oncotree_diagnosis}}</span>
+    </div>
+</ng-template>
