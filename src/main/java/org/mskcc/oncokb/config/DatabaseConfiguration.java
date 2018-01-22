@@ -1,56 +1,65 @@
 package org.mskcc.oncokb.config;
 
 import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.liquibase.AsyncSpringLiquibase;
-
-import liquibase.integration.spring.SpringLiquibase;
+import com.github.mongobee.Mongobee;
+import com.mongodb.MongoClient;
+import io.github.jhipster.domain.util.JSR310DateConverters.DateToZonedDateTimeConverter;
+import io.github.jhipster.domain.util.JSR310DateConverters.ZonedDateTimeToDateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import javax.sql.DataSource;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.CustomConversions;
+import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
-@EnableJpaRepositories("org.mskcc.oncokb.repository")
-@EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
-@EnableTransactionManagement
-@EnableElasticsearchRepositories("org.mskcc.oncokb.repository.search")
+@EnableMongoRepositories("org.mskcc.oncokb.repository")
+@Profile("!" + JHipsterConstants.SPRING_PROFILE_CLOUD)
+@Import(value = MongoAutoConfiguration.class)
+@EnableMongoAuditing(auditorAwareRef = "springSecurityAuditorAware")
 public class DatabaseConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
 
-    private final Environment env;
-
-    public DatabaseConfiguration(Environment env) {
-        this.env = env;
+    @Bean
+    public ValidatingMongoEventListener validatingMongoEventListener() {
+        return new ValidatingMongoEventListener(validator());
     }
 
     @Bean
-    public SpringLiquibase liquibase(@Qualifier("taskExecutor") TaskExecutor taskExecutor,
-            DataSource dataSource, LiquibaseProperties liquibaseProperties) {
+    public LocalValidatorFactoryBean validator() {
+        return new LocalValidatorFactoryBean();
+    }
 
-        // Use liquibase.integration.spring.SpringLiquibase if you don't want Liquibase to start asynchronously
-        SpringLiquibase liquibase = new AsyncSpringLiquibase(taskExecutor, env);
-        liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:config/liquibase/master.xml");
-        liquibase.setContexts(liquibaseProperties.getContexts());
-        liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
-        liquibase.setDropFirst(liquibaseProperties.isDropFirst());
-        if (env.acceptsProfiles(JHipsterConstants.SPRING_PROFILE_NO_LIQUIBASE)) {
-            liquibase.setShouldRun(false);
-        } else {
-            liquibase.setShouldRun(liquibaseProperties.isEnabled());
-            log.debug("Configuring Liquibase");
-        }
-        return liquibase;
+    @Bean
+    public CustomConversions customConversions() {
+        List<Converter<?, ?>> converters = new ArrayList<>();
+        converters.add(DateToZonedDateTimeConverter.INSTANCE);
+        converters.add(ZonedDateTimeToDateConverter.INSTANCE);
+        return new CustomConversions(converters);
+    }
+
+    @Bean
+    public Mongobee mongobee(MongoClient mongoClient, MongoTemplate mongoTemplate, MongoProperties mongoProperties) {
+        log.debug("Configuring Mongobee");
+        Mongobee mongobee = new Mongobee(mongoClient);
+        mongobee.setDbName(mongoProperties.getDatabase());
+        mongobee.setMongoTemplate(mongoTemplate);
+        // package to scan for migrations
+        mongobee.setChangeLogsScanPackage("org.mskcc.oncokb.config.dbmigrations");
+        mongobee.setEnabled(true);
+        return mongobee;
     }
 }

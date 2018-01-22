@@ -1,6 +1,6 @@
 package org.mskcc.oncokb.web.rest;
 
-import org.mskcc.oncokb.MatchMinerCurateApp;
+import org.mskcc.oncokb.MatchminerCurateApp;
 import org.mskcc.oncokb.web.rest.vm.LoggerVM;
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.LoggerContext;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see LogsResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = MatchMinerCurateApp.class)
+@SpringBootTest(classes = MatchminerCurateApp.class)
 public class LogsResourceIntTest {
 
     private MockMvc restLogsMockMvc;

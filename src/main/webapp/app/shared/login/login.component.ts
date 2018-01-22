@@ -5,7 +5,6 @@ import { JhiEventManager } from 'ng-jhipster';
 
 import { LoginService } from './login.service';
 import { StateStorageService } from '../auth/state-storage.service';
-import { SocialService } from '../social/social.service';
 
 @Component({
     selector: 'jhi-login-modal',
@@ -24,7 +23,6 @@ export class JhiLoginModalComponent implements AfterViewInit {
         private stateStorageService: StateStorageService,
         private elementRef: ElementRef,
         private renderer: Renderer,
-        private socialService: SocialService,
         private router: Router,
         public activeModal: NgbActiveModal
     ) {

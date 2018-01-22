@@ -11,4 +11,4 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     providers: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class MatchMinerCurateEntityModule {}
+export class MatchminerCurateEntityModule {}

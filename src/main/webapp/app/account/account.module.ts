@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { MatchMinerCurateSharedModule } from '../shared';
+import { MatchminerCurateSharedModule } from '../shared';
 
 import {
     Register,
@@ -9,6 +9,8 @@ import {
     PasswordService,
     PasswordResetInitService,
     PasswordResetFinishService,
+    SessionsService,
+    SessionsComponent,
     PasswordStrengthBarComponent,
     RegisterComponent,
     ActivateComponent,
@@ -16,28 +18,26 @@ import {
     PasswordResetInitComponent,
     PasswordResetFinishComponent,
     SettingsComponent,
-    SocialRegisterComponent,
-    SocialAuthComponent,
     accountState
 } from './';
 
 @NgModule({
     imports: [
-        MatchMinerCurateSharedModule,
-        RouterModule.forRoot(accountState, { useHash: true })
+        MatchminerCurateSharedModule,
+        RouterModule.forChild(accountState)
     ],
     declarations: [
-        SocialRegisterComponent,
-        SocialAuthComponent,
         ActivateComponent,
         RegisterComponent,
         PasswordComponent,
         PasswordStrengthBarComponent,
         PasswordResetInitComponent,
         PasswordResetFinishComponent,
+        SessionsComponent,
         SettingsComponent
     ],
     providers: [
+        SessionsService,
         Register,
         ActivateService,
         PasswordService,
@@ -46,4 +46,4 @@ import {
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class MatchMinerCurateAccountModule {}
+export class MatchminerCurateAccountModule {}

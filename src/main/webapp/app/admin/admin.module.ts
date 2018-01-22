@@ -1,8 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { JhiTrackerService } from './../shared/tracker/tracker.service';
 
-import { MatchMinerCurateSharedModule } from '../shared';
+import { MatchminerCurateSharedModule } from '../shared';
 /* jhipster-needle-add-admin-module-import - JHipster will add admin modules imports here */
 
 import {
@@ -25,7 +24,6 @@ import {
     JhiConfigurationService,
     JhiHealthService,
     JhiMetricsService,
-    JhiTrackerComponent,
     LogsService,
     UserResolvePagingParams,
     UserResolve,
@@ -34,8 +32,8 @@ import {
 
 @NgModule({
     imports: [
-        MatchMinerCurateSharedModule,
-        RouterModule.forRoot(adminState, { useHash: true }),
+        MatchminerCurateSharedModule,
+        RouterModule.forChild(adminState),
         /* jhipster-needle-add-admin-module - JHipster will add admin modules here */
     ],
     declarations: [
@@ -51,7 +49,6 @@ import {
         JhiHealthCheckComponent,
         JhiHealthModalComponent,
         JhiDocsComponent,
-        JhiTrackerComponent,
         JhiMetricsMonitoringComponent,
         JhiMetricsMonitoringModalComponent
     ],
@@ -67,11 +64,10 @@ import {
         JhiHealthService,
         JhiMetricsService,
         LogsService,
-        JhiTrackerService,
         UserResolvePagingParams,
         UserResolve,
         UserModalService
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class MatchMinerCurateAdminModule {}
+export class MatchminerCurateAdminModule {}

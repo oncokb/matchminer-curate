@@ -1,6 +1,5 @@
 package org.mskcc.oncokb.config;
 
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 import org.springframework.context.annotation.Bean;
@@ -10,14 +9,6 @@ import org.zalando.problem.validation.ConstraintViolationProblemModule;
 
 @Configuration
 public class JacksonConfiguration {
-
-    /*
-     * Support for Hibernate types in Jackson.
-     */
-    @Bean
-    public Hibernate5Module hibernate5Module() {
-        return new Hibernate5Module();
-    }
 
     /*
      * Jackson Afterburner module to speed up serialization/deserialization.

@@ -1,9 +1,9 @@
 import { TestBed, async, tick, fakeAsync, inject } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs/Rx';
-import { MatchMinerCurateTestModule } from '../../../test.module';
+import { Observable } from 'rxjs/Observable';
+
+import { MatchminerCurateTestModule } from '../../../test.module';
 import { MockActivatedRoute } from '../../../helpers/mock-route.service';
-import { LoginModalService } from '../../../../../../main/webapp/app/shared';
 import { ActivateService } from '../../../../../../main/webapp/app/account/activate/activate.service';
 import { ActivateComponent } from '../../../../../../main/webapp/app/account/activate/activate.component';
 
@@ -15,20 +15,17 @@ describe('Component Tests', () => {
 
         beforeEach(async(() => {
             TestBed.configureTestingModule({
-                imports: [MatchMinerCurateTestModule],
+                imports: [MatchminerCurateTestModule],
                 declarations: [ActivateComponent],
                 providers: [
                     ActivateService,
                     {
                         provide: ActivatedRoute,
                         useValue: new MockActivatedRoute({'key': 'ABC123'})
-                    },
-                    {
-                        provide: LoginModalService,
-                        useValue: null
                     }
                 ]
-            }).overrideTemplate(ActivateComponent, '')
+            })
+            .overrideTemplate(ActivateComponent, '')
             .compileComponents();
         }));
 

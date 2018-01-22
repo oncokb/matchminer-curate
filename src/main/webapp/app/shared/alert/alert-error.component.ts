@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { Subscription } from 'rxjs/Rx';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'jhi-alert-error',
@@ -17,11 +17,11 @@ export class JhiAlertErrorComponent implements OnDestroy {
 
     alerts: any[];
     cleanHttpErrorListener: Subscription;
-
+    // tslint:disable-next-line: no-unused-variable
     constructor(private alertService: JhiAlertService, private eventManager: JhiEventManager) {
         this.alerts = [];
 
-        this.cleanHttpErrorListener = eventManager.subscribe('matchMinerCurateApp.httpError', (response) => {
+        this.cleanHttpErrorListener = eventManager.subscribe('matchminerCurateApp.httpError', (response) => {
             let i;
             const httpResponse = response.content;
             switch (httpResponse.status) {

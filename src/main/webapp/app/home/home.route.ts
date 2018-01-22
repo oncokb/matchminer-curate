@@ -1,6 +1,5 @@
 import { Route } from '@angular/router';
 
-import { UserRouteAccessService } from '../shared';
 import { HomeComponent } from './';
 
 export const HOME_ROUTE: Route = {
@@ -8,6 +7,6 @@ export const HOME_ROUTE: Route = {
     component: HomeComponent,
     data: {
         authorities: [],
-        pageTitle: 'MatchMiner Curate'
+        pageTitle: 'Welcome, Java Hipster!'
     }
 };

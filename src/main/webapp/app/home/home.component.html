@@ -1,6 +1,9 @@
 <div class="row">
-    <div class="col-md-12">
-        <h1 class="display-4">MatchMiner Curate</h1>
+    <div class="col-md-3">
+        <span class="hipster img-fluid rounded"></span>
+    </div>
+    <div class="col-md-9">
+        <h1 class="display-4">Welcome, Java Hipster!</h1>
         <p class="lead">This is your homepage</p>
 
         <div [ngSwitch]="isAuthenticated()">
@@ -13,7 +16,6 @@
                 <span>If you want to </span>
                 <a class="alert-link" (click)="login()">sign in</a><span>, you can try the default accounts:<br/>- Administrator (login="admin" and password="admin") <br/>- User (login="user" and password="user").</span>
             </div>
-
             <div class="alert alert-warning" *ngSwitchCase="false">
                 <span>You don't have an account yet?</span>
                 <a class="alert-link" routerLink="register">Register a new account</a>

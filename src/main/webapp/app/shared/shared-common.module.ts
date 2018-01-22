@@ -1,23 +1,23 @@
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { registerLocaleData } from '@angular/common';
+import locale from '@angular/common/locales/en';
 
-import { WindowRef } from './tracker/window.service';
 import {
-    MatchMinerCurateSharedLibsModule,
+    MatchminerCurateSharedLibsModule,
     JhiAlertComponent,
     JhiAlertErrorComponent
 } from './';
 
 @NgModule({
     imports: [
-        MatchMinerCurateSharedLibsModule
+        MatchminerCurateSharedLibsModule
     ],
     declarations: [
         JhiAlertComponent,
         JhiAlertErrorComponent
     ],
     providers: [
-        WindowRef,
         Title,
         {
             provide: LOCALE_ID,
@@ -25,9 +25,13 @@ import {
         },
     ],
     exports: [
-        MatchMinerCurateSharedLibsModule,
+        MatchminerCurateSharedLibsModule,
         JhiAlertComponent,
         JhiAlertErrorComponent
     ]
 })
-export class MatchMinerCurateSharedCommonModule {}
+export class MatchminerCurateSharedCommonModule {
+    constructor() {
+        registerLocaleData(locale);
+    }
+}

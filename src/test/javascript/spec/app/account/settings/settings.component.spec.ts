@@ -1,12 +1,9 @@
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { Observable } from 'rxjs/Rx';
-import { MatchMinerCurateTestModule } from '../../../test.module';
+import { Observable } from 'rxjs/Observable';
+
+import { MatchminerCurateTestModule } from '../../../test.module';
 import { Principal, AccountService } from '../../../../../../main/webapp/app/shared';
 import { SettingsComponent } from '../../../../../../main/webapp/app/account/settings/settings.component';
-import { MockAccountService } from '../../../helpers/mock-account.service';
-import { MockPrincipal } from '../../../helpers/mock-principal.service';
-import { JhiTrackerService } from '../../../../../../main/webapp/app/shared/tracker/tracker.service';
-import { MockTrackerService } from '../../../helpers/mock-tracker.service';
 
 describe('Component Tests', () => {
 
@@ -19,23 +16,12 @@ describe('Component Tests', () => {
 
         beforeEach(async(() => {
             TestBed.configureTestingModule({
-                imports: [MatchMinerCurateTestModule],
+                imports: [MatchminerCurateTestModule],
                 declarations: [SettingsComponent],
                 providers: [
-                    {
-                        provide: Principal,
-                        useClass: MockPrincipal
-                    },
-                    {
-                        provide: AccountService,
-                        useClass: MockAccountService
-                    },
-                    {
-                        provide: JhiTrackerService,
-                        useClass: MockTrackerService
-                    },
                 ]
-            }).overrideTemplate(SettingsComponent, '')
+            })
+            .overrideTemplate(SettingsComponent, '')
             .compileComponents();
         }));
 

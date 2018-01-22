@@ -1,6 +1,6 @@
 package org.mskcc.oncokb.web.rest;
 
-import org.mskcc.oncokb.MatchMinerCurateApp;
+import org.mskcc.oncokb.MatchminerCurateApp;
 import org.mskcc.oncokb.config.audit.AuditEventConverter;
 import org.mskcc.oncokb.domain.PersistentAuditEvent;
 import org.mskcc.oncokb.repository.PersistenceAuditEventRepository;
@@ -18,7 +18,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -33,14 +32,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see AuditResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = MatchMinerCurateApp.class)
-@Transactional
+@SpringBootTest(classes = MatchminerCurateApp.class)
 public class AuditResourceIntTest {
 
     private static final String SAMPLE_PRINCIPAL = "SAMPLE_PRINCIPAL";
     private static final String SAMPLE_TYPE = "SAMPLE_TYPE";
     private static final Instant SAMPLE_TIMESTAMP = Instant.parse("2015-08-04T10:11:30Z");
-    private static final long SECONDS_PER_DAY = 60*60*24;
+    private static final long SECONDS_PER_DAY = 60 * 60 * 24;
 
     @Autowired
     private PersistenceAuditEventRepository auditEventRepository;

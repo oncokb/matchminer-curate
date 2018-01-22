@@ -2,14 +2,14 @@ import './vendor.ts';
 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { Ng2Webstorage } from 'ng2-webstorage';
+import { Ng2Webstorage } from 'ngx-webstorage';
 
-import { MatchMinerCurateSharedModule, UserRouteAccessService } from './shared';
-import { MatchMinerCurateHomeModule } from './home/home.module';
-import { MatchMinerCurateAdminModule } from './admin/admin.module';
-import { MatchMinerCurateAccountModule } from './account/account.module';
-import { MatchMinerCurateEntityModule } from './entities/entity.module';
-
+import { MatchminerCurateSharedModule, UserRouteAccessService } from './shared';
+import { MatchminerCurateAppRoutingModule} from './app-routing.module';
+import { MatchminerCurateHomeModule } from './home/home.module';
+import { MatchminerCurateAdminModule } from './admin/admin.module';
+import { MatchminerCurateAccountModule } from './account/account.module';
+import { MatchminerCurateEntityModule } from './entities/entity.module';
 import { customHttpProvider } from './blocks/interceptor/http.provider';
 import { PaginationConfig } from './blocks/config/uib-pagination.config';
 
@@ -17,7 +17,6 @@ import { PaginationConfig } from './blocks/config/uib-pagination.config';
 
 import {
     JhiMainComponent,
-    LayoutRoutingModule,
     NavbarComponent,
     FooterComponent,
     ProfileService,
@@ -28,13 +27,13 @@ import {
 @NgModule({
     imports: [
         BrowserModule,
-        LayoutRoutingModule,
+        MatchminerCurateAppRoutingModule,
         Ng2Webstorage.forRoot({ prefix: 'jhi', separator: '-'}),
-        MatchMinerCurateSharedModule,
-        MatchMinerCurateHomeModule,
-        MatchMinerCurateAdminModule,
-        MatchMinerCurateAccountModule,
-        MatchMinerCurateEntityModule,
+        MatchminerCurateSharedModule,
+        MatchminerCurateHomeModule,
+        MatchminerCurateAdminModule,
+        MatchminerCurateAccountModule,
+        MatchminerCurateEntityModule,
         // jhipster-needle-angular-add-module JHipster will add new module here
     ],
     declarations: [
@@ -52,4 +51,4 @@ import {
     ],
     bootstrap: [ JhiMainComponent ]
 })
-export class MatchMinerCurateAppModule {}
+export class MatchminerCurateAppModule {}

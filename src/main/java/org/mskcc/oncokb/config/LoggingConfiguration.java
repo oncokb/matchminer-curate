@@ -21,14 +21,13 @@ import net.logstash.logback.stacktrace.ShortenedThrowableConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty("eureka.client.enabled")
 public class LoggingConfiguration {
+
     private static final String LOGSTASH_APPENDER_NAME = "LOGSTASH";
+
     private static final String ASYNC_LOGSTASH_APPENDER_NAME = "ASYNC_LOGSTASH";
 
     private final Logger log = LoggerFactory.getLogger(LoggingConfiguration.class);
@@ -39,19 +38,13 @@ public class LoggingConfiguration {
 
     private final String serverPort;
 
-    private final EurekaInstanceConfigBean eurekaInstanceConfigBean;
-
-    private final String version;
-
     private final JHipsterProperties jHipsterProperties;
 
     public LoggingConfiguration(@Value("${spring.application.name}") String appName, @Value("${server.port}") String serverPort,
-        EurekaInstanceConfigBean eurekaInstanceConfigBean, JHipsterProperties jHipsterProperties, @Value("${info.project.version}") String version) {
+         JHipsterProperties jHipsterProperties) {
         this.appName = appName;
         this.serverPort = serverPort;
-        this.eurekaInstanceConfigBean = eurekaInstanceConfigBean;
         this.jHipsterProperties = jHipsterProperties;
-        this.version = version;
         if (jHipsterProperties.getLogging().getLogstash().isEnabled()) {
             addLogstashAppender(context);
             addContextListener(context);
@@ -71,7 +64,7 @@ public class LoggingConfiguration {
         log.info("Initializing Logstash logging");
 
         LogstashTcpSocketAppender logstashAppender = new LogstashTcpSocketAppender();
-        logstashAppender.setName("LOGSTASH");
+        logstashAppender.setName(LOGSTASH_APPENDER_NAME);
         logstashAppender.setContext(context);
         String customFields = "{\"app_name\":\"" + appName + "\",\"app_port\":\"" + serverPort + "\"}";
 
@@ -93,7 +86,7 @@ public class LoggingConfiguration {
         // Wrap the appender in an Async appender for performance
         AsyncAppender asyncLogstashAppender = new AsyncAppender();
         asyncLogstashAppender.setContext(context);
-        asyncLogstashAppender.setName("ASYNC_LOGSTASH");
+        asyncLogstashAppender.setName(ASYNC_LOGSTASH_APPENDER_NAME);
         asyncLogstashAppender.setQueueSize(jHipsterProperties.getLogging().getLogstash().getQueueSize());
         asyncLogstashAppender.addAppender(logstashAppender);
         asyncLogstashAppender.start();
@@ -115,7 +108,7 @@ public class LoggingConfiguration {
         metricsFilter.start();
 
         for (ch.qos.logback.classic.Logger logger : context.getLoggerList()) {
-            for (Iterator<Appender<ILoggingEvent>> it = logger.iteratorForAppenders(); it.hasNext(); ) {
+            for (Iterator<Appender<ILoggingEvent>> it = logger.iteratorForAppenders(); it.hasNext();) {
                 Appender<ILoggingEvent> appender = it.next();
                 if (!appender.getName().equals(ASYNC_LOGSTASH_APPENDER_NAME)) {
                     log.debug("Filter metrics logs from the {} appender", appender.getName());
