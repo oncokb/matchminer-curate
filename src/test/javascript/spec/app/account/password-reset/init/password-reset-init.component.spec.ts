@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { Renderer, ElementRef } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
-import { MatchMinerCurateTestModule } from '../../../../test.module';
+import { Observable } from 'rxjs/Observable';
+
+import { MatchminerCurateTestModule } from '../../../../test.module';
 import { PasswordResetInitComponent } from '../../../../../../../main/webapp/app/account/password-reset/init/password-reset-init.component';
 import { PasswordResetInitService } from '../../../../../../../main/webapp/app/account/password-reset/init/password-reset-init.service';
+import { EMAIL_NOT_FOUND_TYPE } from '../../../../../../../main/webapp/app/shared';
 
 describe('Component Tests', () => {
 
@@ -13,7 +15,7 @@ describe('Component Tests', () => {
 
         beforeEach(() => {
             fixture = TestBed.configureTestingModule({
-                imports: [MatchMinerCurateTestModule],
+                imports: [MatchminerCurateTestModule],
                 declarations: [PasswordResetInitComponent],
                 providers: [
                     PasswordResetInitService,
@@ -28,7 +30,8 @@ describe('Component Tests', () => {
                         useValue: new ElementRef(null)
                     }
                 ]
-            }).overrideTemplate(PasswordResetInitComponent, '')
+            })
+            .overrideTemplate(PasswordResetInitComponent, '')
             .createComponent(PasswordResetInitComponent);
             comp = fixture.componentInstance;
             comp.ngOnInit();
@@ -77,7 +80,9 @@ describe('Component Tests', () => {
             inject([PasswordResetInitService], (service: PasswordResetInitService) => {
                 spyOn(service, 'save').and.returnValue(Observable.throw({
                     status: 400,
-                    _body: 'email address not registered'
+                    json() {
+                        return {type : EMAIL_NOT_FOUND_TYPE}
+                    }
                 }));
                 comp.resetAccount.email = 'user@domain.com';
 

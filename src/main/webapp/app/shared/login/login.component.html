@@ -5,12 +5,12 @@
 </div>
 <div class="modal-body">
     <div class="row justify-content-center">
-        <div class="col-12">
+        <div class="col-md-8">
             <div class="alert alert-danger" *ngIf="authenticationError">
                 <strong>Failed to sign in!</strong> Please check your credentials and try again.
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
             <form class="form" role="form" (ngSubmit)="login()">
                 <div class="form-group">
                     <label for="username">Login</label>
@@ -38,13 +38,6 @@
                 <span>You don't have an account yet?</span>
                 <a class="alert-link" (click)="register()">Register a new account</a>
             </div>
-        </div>
-        <div class="col-md-6">
-            <br/>
-            <jhi-social provider="google"></jhi-social>
-            <jhi-social provider="facebook"></jhi-social>
-            <jhi-social provider="twitter"></jhi-social>
-            <!-- jhipster-needle-add-social-button -->
         </div>
     </div>
 </div>

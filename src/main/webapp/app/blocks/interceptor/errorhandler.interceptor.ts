@@ -17,7 +17,7 @@ export class ErrorHandlerInterceptor extends JhiHttpInterceptor {
             if (!(error.status === 401 && (error.text() === '' ||
                 (error.json().path && error.json().path.indexOf('/api/account') === 0 )))) {
                 if (this.eventManager !== undefined) {
-                    this.eventManager.broadcast( {name: 'matchMinerCurateApp.httpError', content: error});
+                    this.eventManager.broadcast( {name: 'matchminerCurateApp.httpError', content: error});
                 }
             }
             return Observable.throw(error);

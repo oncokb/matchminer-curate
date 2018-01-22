@@ -1,14 +1,14 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { MatchMinerCurateSharedModule } from '../shared';
+import { MatchminerCurateSharedModule } from '../shared';
 
 import { HOME_ROUTE, HomeComponent } from './';
 
 @NgModule({
     imports: [
-        MatchMinerCurateSharedModule,
-        RouterModule.forRoot([ HOME_ROUTE ], { useHash: true })
+        MatchminerCurateSharedModule,
+        RouterModule.forChild([ HOME_ROUTE ])
     ],
     declarations: [
         HomeComponent,
@@ -19,4 +19,4 @@ import { HOME_ROUTE, HomeComponent } from './';
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class MatchMinerCurateHomeModule {}
+export class MatchminerCurateHomeModule {}

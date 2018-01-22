@@ -2,8 +2,8 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import {
-    MatchMinerCurateSharedLibsModule,
-    MatchMinerCurateSharedCommonModule,
+    MatchminerCurateSharedLibsModule,
+    MatchminerCurateSharedCommonModule,
     CSRFService,
     AuthServerProvider,
     AccountService,
@@ -11,21 +11,17 @@ import {
     StateStorageService,
     LoginService,
     LoginModalService,
+    JhiLoginModalComponent,
     Principal,
-    JhiTrackerService,
     HasAnyAuthorityDirective,
-    JhiSocialComponent,
-    SocialService,
-    JhiLoginModalComponent
 } from './';
 
 @NgModule({
     imports: [
-        MatchMinerCurateSharedLibsModule,
-        MatchMinerCurateSharedCommonModule
+        MatchminerCurateSharedLibsModule,
+        MatchminerCurateSharedCommonModule
     ],
     declarations: [
-        JhiSocialComponent,
         JhiLoginModalComponent,
         HasAnyAuthorityDirective
     ],
@@ -36,16 +32,13 @@ import {
         StateStorageService,
         Principal,
         CSRFService,
-        JhiTrackerService,
         AuthServerProvider,
-        SocialService,
         UserService,
         DatePipe
     ],
     entryComponents: [JhiLoginModalComponent],
     exports: [
-        MatchMinerCurateSharedCommonModule,
-        JhiSocialComponent,
+        MatchminerCurateSharedCommonModule,
         JhiLoginModalComponent,
         HasAnyAuthorityDirective,
         DatePipe
@@ -53,4 +46,4 @@ import {
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 
 })
-export class MatchMinerCurateSharedModule {}
+export class MatchminerCurateSharedModule {}

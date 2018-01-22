@@ -4,9 +4,8 @@
             <i class="fa fa-bars"></i>
         </a>
         <a class="navbar-brand logo float-left" routerLink="/" (click)="collapseNavbar()">
-            <!--Should be enabled once MatchMiner Curate has a logo-->
-            <!--<span class="logo-img"></span>-->
-            <span class="navbar-title">MatchMiner Curate</span> <span class="navbar-version">{{version}}</span>
+            <span class="logo-img"></span>
+            <span class="navbar-title">MatchminerCurate</span> <span class="navbar-version">{{version}}</span>
         </a>
     </div>
     <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed" [ngSwitch]="isAuthenticated()">
@@ -48,12 +47,6 @@
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" routerLink="jhi-tracker" routerLinkActive="active" (click)="collapseNavbar()">
-                            <i class="fa fa-fw fa-eye" aria-hidden="true"></i>
-                            <span>User tracker</span>
-                        </a>
-                    </li>
-                    <li>
                         <a class="dropdown-item" routerLink="jhi-metrics" routerLinkActive="active" (click)="collapseNavbar()">
                             <i class="fa fa-fw fa-tachometer" aria-hidden="true"></i>
                             <span>Metrics</span>
@@ -92,7 +85,7 @@
                     <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
                 </ul>
             </li>
-            <li ngbDropdown class="nav-item dropdown pointer" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <li ngbDropdown class="nav-item dropdown pointer" placement="bottom-right" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
                 <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu">
                   <span *ngIf="!getImageUrl()">
                     <i class="fa fa-user" aria-hidden="true"></i>
@@ -104,7 +97,7 @@
                       <img [src]="getImageUrl()" class="profile-image img-circle" alt="Avatar">
                   </span>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-right" ngbDropdownMenu>
+                <ul class="dropdown-menu" ngbDropdownMenu>
                     <li *ngSwitchCase="true">
                         <a class="dropdown-item" routerLink="settings" routerLinkActive="active" (click)="collapseNavbar()">
                             <i class="fa fa-fw fa-wrench" aria-hidden="true"></i>
@@ -115,6 +108,12 @@
                         <a class="dropdown-item" routerLink="password" routerLinkActive="active" (click)="collapseNavbar()">
                             <i class="fa fa-fw fa-clock-o" aria-hidden="true"></i>
                             <span>Password</span>
+                        </a>
+                    </li>
+                    <li *ngSwitchCase="true">
+                        <a class="dropdown-item" routerLink="sessions" routerLinkActive="active" (click)="collapseNavbar()">
+                            <i class="fa fa-fw fa-cloud" aria-hidden="true"></i>
+                            <span>Sessions</span>
                         </a>
                     </li>
                     <li *ngSwitchCase="true">

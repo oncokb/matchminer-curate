@@ -43,7 +43,7 @@ public class UserMapper {
             user.setActivated(userDTO.isActivated());
             user.setLangKey(userDTO.getLangKey());
             Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
-            if(authorities != null) {
+            if (authorities != null) {
                 user.setAuthorities(authorities);
             }
             return user;
@@ -57,7 +57,7 @@ public class UserMapper {
             .collect(Collectors.toList());
     }
 
-    public User userFromId(Long id) {
+    public User userFromId(String id) {
         if (id == null) {
             return null;
         }
