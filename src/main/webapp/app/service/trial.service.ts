@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 import { Trial } from '../trial/trial.model';
+import { Http, Response } from '@angular/http';
 import * as _ from 'underscore';
 @Injectable()
 export class TrialService {
@@ -24,7 +25,9 @@ export class TrialService {
         age_numerical: '',
         oncotree_diagnosis: ''
     }
-    constructor(public afs: AngularFirestore) {
+    mainTypes = [];
+    oncokb_variants = {};
+    constructor(public afs: AngularFirestore, public http: Http) {
         this.trialsCollection = afs.collection<Trial>('Trials');
         this.trialsCollection.snapshotChanges().map(changes => {
             return changes.map(a => {
@@ -38,6 +41,31 @@ export class TrialService {
                 }
             }
             this.trialList = trials;
+        });
+        // prepare main types list
+        this.http.get('http://oncotree.mskcc.org/oncotree/api/mainTypes')
+        .subscribe((res: Response) => {
+            for (const item of res.json().data) {
+                this.mainTypes.push(item.name);
+            }
+            this.mainTypes = _.uniq(this.mainTypes);
+        });
+        // prepare oncokb variant list
+        this.http.get('http://oncokb.org/api/v1/utils/allAnnotatedVariants')
+        .subscribe((res: Response) => {
+           const allAnnotatedVariants = res.json();
+           for(const item of  allAnnotatedVariants) {
+                if (item['gene']) {
+                    if (this.oncokb_variants[item['gene']]) {
+                        this.oncokb_variants[item['gene']].push(item['variant']);
+                    } else {
+                        this.oncokb_variants[item['gene']] = [item['variant']];
+                    }
+                }     
+           }
+           for(const key of _.keys(this.oncokb_variants)) {
+                this.oncokb_variants[key].sort();
+           }
         });
     }
     getNctIdList() {
@@ -89,5 +117,11 @@ export class TrialService {
     }
     getStyle(indent: number) {
         return { 'margin-left': (indent * 30) + 'px' };
+    }
+    getMainTypes() {
+        return this.mainTypes;
+    }
+    getOncokbVariants() {
+        return this.oncokb_variants;
     }
 }

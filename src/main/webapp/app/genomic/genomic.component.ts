@@ -1,7 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
-import { Http, Response } from '@angular/http';
-import * as _ from 'underscore';
 @Component({
     selector: 'jhi-genomic',
     templateUrl: './genomic.component.html',
@@ -22,24 +20,8 @@ export class GenomicComponent implements OnInit {
     'protein_altering', 'splice site_mutation', 'stop_retained', 'synonymous', "3'UTR", "3_prime_UTR",
     "5'Flank", "5'UTR", "5'UTR_mutation", "5_prime_UTR"];
     wiltypes = [true, false];
-    oncokb_variants = {};
-    constructor(private trialService: TrialService, public http: Http) { 
-        this.http.get('http://oncokb.org/api/v1/utils/allAnnotatedVariants')
-        .subscribe((res: Response) => {
-           const allAnnotatedVariants = res.json();
-           for(const item of  allAnnotatedVariants) {
-                if (item['gene']) {
-                    if (this.oncokb_variants[item['gene']]) {
-                        this.oncokb_variants[item['gene']].push(item['variant']);
-                    } else {
-                        this.oncokb_variants[item['gene']] = [item['variant']];
-                    }
-                }     
-           }
-           for(const key of _.keys(this.oncokb_variants)) {
-                this.oncokb_variants[key].sort();
-           }
-        });
+    oncokb_variants = this.trialService.getOncokbVariants();
+    constructor(private trialService: TrialService) { 
     }
 
     ngOnInit() {

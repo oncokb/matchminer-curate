@@ -11,6 +11,7 @@ export class ClinicalComponent implements OnInit {
     @Input() unit = {};
     pathPool = this.trialService.getPathpool();
     modificationInput = this.trialService.getModificationInput();
+    mainTypes = this.trialService.getMainTypes();
     constructor(private trialService: TrialService) { }
 
     ngOnInit() {

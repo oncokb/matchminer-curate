@@ -2,12 +2,18 @@
 <jhi-node [type]="'delete,edit'" [unit]="unit" [path]="path"></jhi-node>
 <br/>
 <div [ngStyle]="getStyle()" *ngIf="pathPool.indexOf(path) !== -1; else panel">
-    <label>age_numerical:</label>
-    <input [(ngModel)]="modificationInput.age_numerical" />
+    <label class="ageStyle">age_numerical:</label>
+    <input [(ngModel)]="modificationInput.age_numerical" size="35"/>
     <br/>
-    <label>oncotree_diagnosis:</label>
-    <input [(ngModel)]="modificationInput.oncotree_diagnosis" />
-    <br/>
+    <div class="row">
+        <div class="col-sm-3">oncotree_diagnosis:</div>
+        <div class="col-sm-9">
+            <select class="form-control selectStyle" [(ngModel)]="modificationInput.oncotree_diagnosis" >
+                <option *ngFor="let item of mainTypes" [value]="item">{{item}}</option>
+            </select>
+        </div>
+    </div>
+    <!-- <input [(ngModel)]="modificationInput.oncotree_diagnosis" /> -->
 </div>
 <ng-template #panel>
     <div [ngStyle]="getStyle()">
