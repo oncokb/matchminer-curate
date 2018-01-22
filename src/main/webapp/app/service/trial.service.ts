@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
-import { Trial } from '../firebase/trial.model';
+import { Trial } from '../trial/trial.model';
 import * as _ from 'underscore';
 @Injectable()
 export class TrialService {
