@@ -87,4 +87,7 @@ export class TrialService {
             this.modificationInput.oncotree_diagnosis = obj.oncotree_diagnosis;
         }
     }
+    getStyle(indent: number) {
+        return { 'margin-left': (indent * 30) + 'px' };
+    }
 }

@@ -16,6 +16,6 @@ export class ClinicalComponent implements OnInit {
     ngOnInit() {
     }
     getStyle() {
-        return { 'margin-left': (this.indent * 20) + 'px' };
+        return this.trialService.getStyle(this.indent);
     }
 }

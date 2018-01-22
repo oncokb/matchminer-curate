@@ -2,75 +2,65 @@
 <jhi-node [type]="'delete,edit'" [unit]="unit" [path]="path"></jhi-node>
 <br/>
 <div [ngStyle]="getStyle()" *ngIf="pathPool.indexOf(path) !== -1; else panel">
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">hugo_symbol:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
-                <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
-            </select>
+            <input [(ngModel)]="modificationInput.hugo_symbol" size="36"/>
         </div>
     </div>
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">oncokb_variant:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
-                <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
+            <select class="form-control selectStyle" [(ngModel)]="modificationInput.oncokb_variant" >
+                <option *ngFor="let item of oncokb_variants[modificationInput.hugo_symbol]" [value]="item">{{item}}</option>
             </select>
         </div>
     </div>
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">variant_category:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
-                <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
+            <select class="form-control selectStyle" [(ngModel)]="modificationInput.variant_category" >
+                <option *ngFor="let item of variant_categorys" [value]="item">{{item}}</option>
             </select>
         </div>
     </div>
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">protein_change:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
-                <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
-            </select>
+            <input [(ngModel)]="modificationInput.protein_change" size="36"/>
         </div>
     </div>
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">wildcard_protein_change:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
-                <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
-            </select>
+            <input [(ngModel)]="modificationInput.wildcard_protein_change" size="36"/>
         </div>
     </div>
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">variant_classification:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
+            <select class="form-control selectStyle" [(ngModel)]="modificationInput.variant_category" >
                 <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
             </select>
         </div>
     </div>
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">exon:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
-                <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
-            </select>
+            <input [(ngModel)]="modificationInput.exon" size="36"/>
         </div>
     </div>
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">cnv_call:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
-                <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
-            </select>
+            <input [(ngModel)]="modificationInput.cnv_call" size="36"/>
         </div>
     </div>
-    <div class="row">
+    <div class="row borderMargin">
         <div class="col-sm-3">wildtype:</div>
         <div class="col-sm-9">
-            <select id="test" class="form-control" [(ngModel)]="modificationInput.variant_category" style="max-width:400px">
-                <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
+            <select class="form-control selectStyle" [(ngModel)]="modificationInput.wildtype" >
+                <option *ngFor="let item of wiltypes" [value]="item">{{item}}</option>
             </select>
         </div>
     </div>

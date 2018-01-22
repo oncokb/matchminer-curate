@@ -17,7 +17,6 @@ export class MatchComponent implements OnInit {
   ngOnInit() {
   }
   getStyle(indent: number) {
-    return { 'margin-left': ((this.base + indent) * 20) + 'px' };
+    return this.trialService.getStyle(this.base + indent);
   }
-
 }

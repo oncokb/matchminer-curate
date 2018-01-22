@@ -12,11 +12,11 @@ import * as _ from 'underscore';
 import { Trial } from './trial.model';
 
 @Component({
-  selector: 'jhi-firebase',
-  templateUrl: './firebase.component.html',
-  styleUrls: ['firebase.scss']
+  selector: 'jhi-trial',
+  templateUrl: './trial.component.html',
+  styleUrls: ['trial.scss']
 })
-export class FirebaseComponent {
+export class TrialComponent {
   trialsCollection = this.trialService.getTrialsCollection();
   trialChosen: Observable<Trial[]>;
   nctIdList = this.trialService.getNctIdList();

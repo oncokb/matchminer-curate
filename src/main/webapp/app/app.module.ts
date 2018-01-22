@@ -21,7 +21,7 @@ import {
     PageRibbonComponent,
     ErrorComponent
 } from './layouts';
-import { FirebaseComponent } from './firebase/firebase.component';
+import { TrialComponent } from './trial/trial.component';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import { MatchComponent } from './match/match.component';
 import { NodeComponent } from './node/node.component';
@@ -52,7 +52,7 @@ import { environment } from './environments/environment';
         ErrorComponent,
         PageRibbonComponent,
         FooterComponent,
-        FirebaseComponent,
+        TrialComponent,
         MatchComponent,
         NodeComponent,
         GenomicComponent,
