@@ -24,6 +24,19 @@ export class TrialService {
         wildtype: '',
         age_numerical: '',
         oncotree_diagnosis: ''
+    };
+    input = {
+        hugo_symbol: '',
+        oncokb_variant: '',
+        protein_change: '',
+        wildcard_protein_change: '',
+        variant_classification: '',
+        variant_category: '',
+        exon: '',
+        cnv_call: '',
+        wildtype: '',
+        age_numerical: '',
+        oncotree_diagnosis: ''
     }
     mainTypes = [];
     oncokb_variants = {};
@@ -98,6 +111,9 @@ export class TrialService {
     }
     getModificationInput() {
         return this.modificationInput;
+    }
+    getInput() {
+        return this.input;
     }
     setModificationInput(obj: any, type: string) {
         if (type === 'genomic') {

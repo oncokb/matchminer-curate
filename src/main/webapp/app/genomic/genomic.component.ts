@@ -9,8 +9,10 @@ export class GenomicComponent implements OnInit {
     @Input() indent = 0;
     @Input() path = '';
     @Input() unit = {};
+    @Input() type = '';
     pathPool = this.trialService.getPathpool();
     modificationInput = this.trialService.getModificationInput();
+    input = this.trialService.getInput();
     variant_categorys = ['Mutation', 'Copy Number Variation', 'Structural Variation', 'Any Variation'];
     variant_classifications = ['In_Frame_Del', 'In_Frame_Ins', 'Missense_Mutation', 'Nonsense_Mutation', 'Nonstop_Mutation',
     'Del_Ins', 'Frameshift', 'Frame_Shift_Del','Frame_Shift_Ins', 'Frameshift_mutation',

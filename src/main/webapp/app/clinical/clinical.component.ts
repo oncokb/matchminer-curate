@@ -9,8 +9,10 @@ export class ClinicalComponent implements OnInit {
     @Input() indent = 0;
     @Input() path = '';
     @Input() unit = {};
+    @Input() type = '';
     pathPool = this.trialService.getPathpool();
     modificationInput = this.trialService.getModificationInput();
+    input = this.trialService.getInput();
     mainTypes = this.trialService.getMainTypes();
     constructor(private trialService: TrialService) { }
 

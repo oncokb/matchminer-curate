@@ -18,40 +18,16 @@
     </select>
     <br/>
     <div *ngIf="nodeType === 'Genomic'; else section1">
-        <label for="hugo_symbol">hugo_symbol:</label>
-        <input id="hugo_symbol" [(ngModel)]="input.hugo_symbol" />
-        <br/>
-        <label for="oncokb_variant">oncokb_variant:</label>
-        <input id="oncokb_variant" [(ngModel)]="input.oncokb_variant" />
-        <br/>
-        <label for="variant_category">variant_category:</label>
-        <input id="variant_category" [(ngModel)]="input.variant_category" />
-        <br/>
-        <label for="protein_change">protein_change:</label>
-        <input id="protein_change" [(ngModel)]="input.protein_change" />
-        <br/>
-        <label for="wildcard_protein_change">wildcard_protein_change:</label>
-        <input id="wildcard_protein_change" [(ngModel)]="input.wildcard_protein_change" />
-        <br/>
-        <label for="variant_classification">variant_classification:</label>
-        <input id="variant_classification" [(ngModel)]="input.variant_classification" />
-        <br/>
-        <label for="exon">exon:</label>
-        <input id="exon" [(ngModel)]="input.exon" />
-        <br/>
-        <label for="cnv_call">cnv_call:</label>
-        <input id="cnv_call" [(ngModel)]="input.cnv_call" />
-        <br/>
-        <label for="wildtype">wildtype:</label>
-        <input id="wildtype" [(ngModel)]="input.wildtype" />
+        <jhi-genomic [type]="'add'"></jhi-genomic>
     </div>
     <ng-template #section1>
         <div *ngIf="nodeType === 'Clinical'; else section2">
-            <label for="age_numerical">age_numerical:</label>
+            <jhi-clinical [type]="'add'"></jhi-clinical>
+            <!-- <label for="age_numerical">age_numerical:</label>
             <input id="age_numerical" [(ngModel)]="input.age_numerical" />
             <br/>
             <label for="oncotree_diagnosis">oncotree_diagnosis:</label>
-            <input id="oncotree_diagnosis" [(ngModel)]="input.oncotree_diagnosis" />
+            <input id="oncotree_diagnosis" [(ngModel)]="input.oncotree_diagnosis" /> -->
         </div>
     </ng-template>
     <ng-template #section2>
@@ -62,43 +38,17 @@
             <div *ngFor="let x of selectedItems">
                 <div *ngIf="x.itemName == 'Genomic'">
                     <h6>Genomic:</h6>
-                    <label for="logic_hugo_symbol">hugo_symbol:</label>
-                    <input id="logic_hugo_symbol" [(ngModel)]="input.hugo_symbol" />
-                    <br/>
-                    <label for="logic_oncokb_variant">oncokb_variant:</label>
-                    <input id="logic_oncokb_variant" [(ngModel)]="input.oncokb_variant" />
-                    <br/>
-                    <label for="logic_variant_category">variant_category:</label>
-                    <input id="logic_variant_category" [(ngModel)]="input.variant_category" />
-                    <br/>
-                    <label for="logic_protein_change">protein_change:</label>
-                    <input id="logic_protein_change" [(ngModel)]="input.protein_change" />
-                    <br/>
-                    <label for="logic_wildcard_protein_change">wildcard_protein_change:</label>
-                    <input id="logic_wildcard_protein_change" [(ngModel)]="input.wildcard_protein_change"
-                    />
-                    <br/>
-                    <label for="logic_variant_classification">variant_classification:</label>
-                    <input id="logic_variant_classification" [(ngModel)]="input.variant_classification"
-                    />
-                    <br/>
-                    <label for="logic_exon">exon:</label>
-                    <input id="logic_exon" [(ngModel)]="input.exon" />
-                    <br/>
-                    <label for="logic_cnv_call">cnv_call:</label>
-                    <input id="logic_cnv_call" [(ngModel)]="input.cnv_call" />
-                    <br/>
-                    <label for="logic_wildtype">wildtype:</label>
-                    <input id="logic_wildtype" [(ngModel)]="input.wildtype" />
+                    <jhi-genomic [type]="'add'"></jhi-genomic>
                 </div>
                 <div *ngIf="x.itemName == 'Clinical'">
                     <h6>Clinical:</h6>
-                    <label for="logic_age_numerical">age_numerical:</label>
+                    <jhi-clinical [type]="'add'"></jhi-clinical>
+                    <!-- <label for="logic_age_numerical">age_numerical:</label>
                     <input id="logic_age_numerical" [(ngModel)]="input.age_numerical" />
                     <br/>
                     <label for="logic_oncotree_diagnosis">oncotree_diagnosis:</label>
                     <input id="logic_oncotree_diagnosis" [(ngModel)]="input.oncotree_diagnosis"
-                    />
+                    /> -->
                 </div>
             </div>
         </div>

@@ -23,21 +23,21 @@ export class NodeComponent implements OnInit {
         { id: 2, itemName: 'Clinical' },
         { id: 3, itemName: 'And' },
         { id: 4, itemName: 'Or' }];
-    input = {
-        hugo_symbol: '',
-        oncokb_variant: '',
-        protein_change: '',
-        wildcard_protein_change: '',
-        variant_classification: '',
-        variant_category: '',
-        exon: '',
-        cnv_call: '',
-        wildtype: '',
-        age_numerical: '',
-        oncotree_diagnosis: ''
-    }
+    // input = {
+    //     hugo_symbol: '',
+    //     oncokb_variant: '',
+    //     protein_change: '',
+    //     wildcard_protein_change: '',
+    //     variant_classification: '',
+    //     variant_category: '',
+    //     exon: '',
+    //     cnv_call: '',
+    //     wildtype: '',
+    //     age_numerical: '',
+    //     oncotree_diagnosis: ''
+    // }
     modificationInput = this.trialService.getModificationInput();
-
+    input = this.trialService.getInput();
     trialsCollection = this.trialService.getTrialsCollection();
     originalMatch = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step.match;
     originalArms = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step.arms;
