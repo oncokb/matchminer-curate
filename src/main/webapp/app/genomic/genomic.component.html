@@ -1,7 +1,7 @@
 <div *ngIf="type === 'add'; else editPanel">
     <div>
         <div class="row borderMargin">
-            <div class="col-sm-3">hugo_symbol:</div>
+            <div class="col-sm-3">hugo_symbol:<span style="color:red"> *</span></div>
             <div class="col-sm-9">
                 <input [(ngModel)]="input.hugo_symbol" size="36" />
             </div>
@@ -70,7 +70,7 @@
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="pathPool.indexOf(path) !== -1; else panel">
         <div class="row borderMargin">
-            <div class="col-sm-3">hugo_symbol:</div>
+            <div class="col-sm-3">hugo_symbol:<span style="color:red"> *</span></div>
             <div class="col-sm-9">
                 <input [(ngModel)]="modificationInput.hugo_symbol" size="36" />
             </div>
