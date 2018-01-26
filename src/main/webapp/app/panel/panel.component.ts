@@ -293,11 +293,17 @@ export class PanelComponent implements OnInit {
         }
     }
     moveNode() {
-        this.pathPool.splice(0, this.pathPool.length);
-        this.pathPool.push(this.path);
-        this.operationPool.splice(0, this.operationPool.length);
-        this.operationPool.push('move');
-        this.movingPath.from = this.path;
+        if (this.operationPool[0] === 'move') {
+            this.pathPool.splice(0, this.pathPool.length);
+            this.operationPool.splice(0, this.operationPool.length);
+        } else {
+            this.pathPool.splice(0, this.pathPool.length);
+            this.pathPool.push(this.path);
+            this.operationPool.splice(0, this.operationPool.length);
+            this.operationPool.push('move');
+            this.movingPath.from = this.path;
+        }
+        
     }
     cancelModification() {
         this.pathPool.splice(0, this.pathPool.length);
