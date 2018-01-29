@@ -17,12 +17,13 @@ import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 
-//customized coponent
+// customized coponent
 import { TrialComponent } from './trial/trial.component';
 import { GenomicComponent } from './genomic/genomic.component';
 import { ClinicalComponent } from './clinical/clinical.component';
 import { PanelComponent } from './panel/panel.component';
 import { MatchComponent } from './match/match.component';
+import { LoginComponent } from './login/login.component';
 
 import { TrialService } from './service/trial.service';
 import { environment } from './environments/environment';
@@ -60,7 +61,8 @@ import {
         GenomicComponent,
         ClinicalComponent,
         PanelComponent,
-        MatchComponent
+        MatchComponent,
+        LoginComponent
     ],
     providers: [
         ProfileService,

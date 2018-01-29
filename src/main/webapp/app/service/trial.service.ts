@@ -14,6 +14,7 @@ export class TrialService {
     nctIdChosen = '';
     pathPool: Array<string> = [];
     operationPool: Array<string> = [];
+    loginStatus = [false];
     currentPath = '';
     movingPath = {
         from: '',
@@ -175,5 +176,8 @@ export class TrialService {
     }
     getOncokbVariants() {
         return this.oncokb_variants;
+    }
+    getLoginStatus() {
+        return this.loginStatus;
     }
 }

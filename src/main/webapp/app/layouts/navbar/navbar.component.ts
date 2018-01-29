@@ -34,10 +34,10 @@ export class NavbarComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.profileService.getProfileInfo().then((profileInfo) => {
-            this.inProduction = profileInfo.inProduction;
-            this.swaggerEnabled = profileInfo.swaggerEnabled;
-        });
+        // this.profileService.getProfileInfo().then((profileInfo) => {
+        //     this.inProduction = profileInfo.inProduction;
+        //     this.swaggerEnabled = profileInfo.swaggerEnabled;
+        // });
     }
 
     collapseNavbar() {

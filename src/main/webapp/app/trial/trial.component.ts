@@ -6,7 +6,6 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
-// import { AuthService } from '../service/auth.service';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import * as _ from 'underscore';
 import { Trial } from './trial.model';
@@ -24,7 +23,7 @@ export class TrialComponent {
   trialsToImport = '';
   nctIdChosen = '';
   messages: Array<string> = [];
-//   isLoggedIn = this.authService.getIsLoggedIn();
+  isLoggedIn = this.trialService.getLoginStatus();
   constructor(public http: Http, public afs: AngularFirestore, private trialService: TrialService) {}
 
   importTrials() {

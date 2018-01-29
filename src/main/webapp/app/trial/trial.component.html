@@ -1,4 +1,4 @@
-<div class="container" style="min-height:550px">
+<div class="container" style="min-height:550px" *ngIf="isLoggedIn[0]; else permission">
     <div class="input-group">
         <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Trials to be curated in the format of comma seperated nctIds"
             size="100">
@@ -63,3 +63,8 @@
         </div>
     </div>
 </div>
+<ng-template #permission>
+    <div class="container" style="min-height:550px">
+        Matchminer Curation Platform is proprietary resource. If you are not authorized to access this system, please exit immediately.
+    </div>
+</ng-template>
