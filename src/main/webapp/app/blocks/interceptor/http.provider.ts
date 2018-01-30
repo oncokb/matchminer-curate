@@ -4,9 +4,9 @@ import { Http, XHRBackend, RequestOptions } from '@angular/http';
 
 import { LoginModalService } from '../../shared/login/login-modal.service';
 import { StateStorageService } from '../../shared/auth/state-storage.service';
-import { AuthExpiredInterceptor } from './auth-expired.interceptor';
-import { ErrorHandlerInterceptor } from './errorhandler.interceptor';
-import { NotificationInterceptor } from './notification.interceptor';
+// import { AuthExpiredInterceptor } from './auth-expired.interceptor';
+// import { ErrorHandlerInterceptor } from './errorhandler.interceptor';
+// import { NotificationInterceptor } from './notification.interceptor';
 
 export function interceptableFactory(
     backend: XHRBackend,
@@ -20,11 +20,11 @@ export function interceptableFactory(
         backend,
         defaultOptions,
         [
-            new AuthExpiredInterceptor(injector, stateStorageService,
-                loginServiceModal),
+            // new AuthExpiredInterceptor(injector, stateStorageService,
+            //     loginServiceModal),
             // Other interceptors can be added here
-            new ErrorHandlerInterceptor(eventManager),
-            new NotificationInterceptor(injector)
+            // new ErrorHandlerInterceptor(eventManager),
+            // new NotificationInterceptor(injector)
         ]
     );
 }

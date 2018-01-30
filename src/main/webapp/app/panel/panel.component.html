@@ -1,0 +1,47 @@
+<i class="fa fa-plus" aria-hidden="true" style="color: green;margin-right:8px" *ngIf="displayAdd()" (click)="addNode = true"></i>
+<i class="fa fa-trash-o" aria-hidden="true" style="color: red;margin-right:8px" *ngIf="displayTrash()" (click)="modifyNode('delete')"></i>
+<i class="fa fa-pencil" aria-hidden="true" style="margin-right:8px" *ngIf="displayPencil()" (click)="editNode()"></i>
+<i class="fa fa-arrows" aria-hidden="true" style="font-size:14px;color: orange;margin-right:8px" *ngIf="displayMove()" (click)="moveNode()"></i>
+<i class="fa fa-map-marker" aria-hidden="true" style="color: red;margin-right:8px" *ngIf="displayDestination()" (click)="dropDownNode()"></i>
+<span *ngIf="operationPool.indexOf('move') === -1 && pathPool.indexOf(path) !== -1">
+    <button class="btn btn-success" style="font-size:12px;font-weight:bold;padding:4px" (click)="saveModification()">Save</button>
+    <button class="btn btn-warning" style="font-size:12px;font-weight:bold;padding:4px" (click)="cancelModification()">Cancel</button>
+</span>
+
+<div *ngIf="addNode" style="border-style: solid;border-width:1px;margin:10px;padding:10px">
+    <br/>
+    <label>Specify criterion type
+        <button *ngIf="nodeType" class="btn btn-success" style="padding:5px;margin:5px" (click)="modifyNode('add')">Add</button>
+        <button class="btn btn-warning" style="padding:5px;" (click)="clearInput()">Cancel</button>
+    </label>
+    <select class="form-control" [(ngModel)]="nodeType" (change)="clearNodeInput()">
+        <option></option>
+        <option *ngFor="let node of nodeOptions" [value]="node">{{ node }}</option>
+    </select>
+    <br/>
+    <div *ngIf="nodeType === 'Genomic'; else section1">
+        <jhi-genomic [type]="'add'"></jhi-genomic>
+    </div>
+    <ng-template #section1>
+        <div *ngIf="nodeType === 'Clinical'; else section2">
+            <jhi-clinical [type]="'add'"></jhi-clinical>
+        </div>
+    </ng-template>
+    <ng-template #section2>
+        <div *ngIf="nodeType === 'And' || nodeType === 'Or'">
+            <label>Specify nodes in the {{nodeType}} logic</label>
+            <angular2-multiselect [data]="dropdownList" [(ngModel)]="selectedItems"></angular2-multiselect>
+            <br/>
+            <div *ngFor="let x of selectedItems">
+                <div *ngIf="x.itemName == 'Genomic'">
+                    <h6>Genomic:</h6>
+                    <jhi-genomic [type]="'add'"></jhi-genomic>
+                </div>
+                <div *ngIf="x.itemName == 'Clinical'">
+                    <h6>Clinical:</h6>
+                    <jhi-clinical [type]="'add'"></jhi-clinical>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</div>

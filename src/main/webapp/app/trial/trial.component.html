@@ -1,0 +1,70 @@
+<div class="container" style="min-height:550px" *ngIf="isLoggedIn[0]; else permission">
+    <div class="input-group">
+        <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Trials to be curated in the format of comma seperated nctIds"
+            size="100">
+        <span class="input-group-btn">
+            <button class="btn btn-primary" [disabled]="!trialsToImport" (click)="importTrials()">Import New Trials</button>
+        </span>
+    </div>
+    <div *ngIf="messages.length > 0">
+        <br/>
+        <div *ngFor="let message of messages">
+            <span style="color: green;"> {{message}} </span>
+        </div>
+    </div>
+    <br/>
+    <br/>
+    <div class="form-group">
+        <label for="trialToCurate">Select a clinical trial to curate</label>
+        <select class="form-control" id="trialToCurate" (change)="curateTrial()" [(ngModel)]="nctIdChosen">
+            <option *ngFor="let nctId of nctIdList" [value]="nctId">{{nctId}}</option>
+        </select>
+    </div>
+    <br/>
+    <div *ngIf="nctIdChosen" style="margin-bottom: 100px">
+        <div *ngFor="let item of trialChosen | async">
+            <label for="nctId">NctId: </label>
+            <span id="nctId" style="margin-left:10px">
+                <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{item.nct_id}}">{{ item.nct_id }}</a>
+            </span>
+            <br/>
+            <label for="phase">Phase: </label>
+            <span id="phase" style="margin-left:10px">{{ item.phase }}</span>
+            <br/>
+            <label for="status">Status: </label>
+            <span id="status" style="margin-left:10px">{{ item.status }}</span>
+            <br/>
+            <label for="shortTitle">Short Title: </label>
+            <span id="shortTitle" style="margin-left:10px">{{ item.short_title }}</span>
+            <br/>
+            <label for="longTitle">Long Title: </label>
+            <span id="longTitle" style="margin-left:10px">{{ item.long_title }}</span>
+            <br/>
+            <label for="treatmentList">Treatment List:</label>
+            <div id="treatmentList">
+                <div *ngFor="let arm of item.treatment_list.step.arms; let i = index">
+                    <span>-arm: </span>
+                    <br/>
+                    <span class="indent1">-arm name: {{arm.arm_name}}</span>
+                    <br/>
+                    <div class="armDescription">-arm description: {{arm.arm_description}}</div>
+                    <span class="matchTitle2">-match </span>
+                    <jhi-panel [type]="'add'" [path]="'arm,'+i"></jhi-panel>
+                    <div class="indent2 levelIndicator">
+                        <jhi-match [match]="arm.match" [path]="'arm,'+i"></jhi-match>
+                    </div>
+                </div>
+                <span class="matchTitle1">-match </span>
+                <jhi-panel [type]="'add'" [path]="'match'"></jhi-panel>
+                <div class="indent1 levelIndicator">
+                    <jhi-match [match]="item.treatment_list.step.match" [path]="'match'"></jhi-match>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #permission>
+    <div class="container" style="min-height:550px">
+        Matchminer Curation Platform is proprietary resource. If you are not authorized to access this system, please exit immediately.
+    </div>
+</ng-template>
