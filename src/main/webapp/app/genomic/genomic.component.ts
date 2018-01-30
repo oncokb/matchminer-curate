@@ -1,5 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
+import { Http, Response } from '@angular/http';
+import { environment } from '../environments/environment'
 @Component({
     selector: 'jhi-genomic',
     templateUrl: './genomic.component.html',
@@ -23,12 +25,38 @@ export class GenomicComponent implements OnInit {
     "5'Flank", "5'UTR", "5'UTR_mutation", "5_prime_UTR"];
     wiltypes = [true, false];
     oncokb_variants = this.trialService.getOncokbVariants();
-    constructor(private trialService: TrialService) { 
+    oncokb = environment.oncokb ? environment.oncokb : false;
+    validationMessage = '';
+    validGenomic = this.trialService.getValidGenomic();
+    constructor(private trialService: TrialService, public http: Http) { 
     }
 
     ngOnInit() {
     }
     getStyle() {
         return this.trialService.getStyle(this.indent);
+    }
+    // This validation function will be executed the moment the input box lose focus
+    validateGenomicSection() {
+        this.http.get('http://mygene.info/v3/query?species=human&q=symbol:' + this.genomicInput.hugo_symbol)
+        .subscribe((res: Response) => {
+           const result = res.json();
+           if (result.hits.length > 0) {
+                this.validationMessage = 'Valid gene';
+                this.validGenomic.splice(0, this.validGenomic.length);
+                this.validGenomic.push(true);
+           } else {
+                this.validationMessage = 'Invalid gene';
+                this.validGenomic.splice(0, this.validGenomic.length);
+                this.validGenomic.push(false);
+           }  
+        });
+    }
+    getMessageStyle() {
+        if (this.validGenomic[0] === true) {
+            return { 'color': 'green' };
+        } else if (this.validGenomic[0] === false) {
+            return { 'color': 'red' };
+        }
     }
 }

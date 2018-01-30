@@ -1,9 +1,12 @@
 <div *ngIf="type === 'add'; else editPanel">
     <div>
         <div class="row borderMargin">
-            <div class="col-sm-3">hugo_symbol:<span style="color:red"> *</span></div>
+            <div class="col-sm-3">hugo_symbol:
+                <span style="color:red"> *</span>
+                <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
+            </div>
             <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.hugo_symbol" size="36" />
+                <input [(ngModel)]="genomicInput.hugo_symbol" size="36" (change)="validateGenomicSection()" />
             </div>
         </div>
         <div class="row borderMargin">
@@ -14,52 +17,54 @@
                 </select>
             </div>
         </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">variant_category:</div>
-            <div class="col-sm-9">
-                <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
-                    <option *ngFor="let item of variant_categorys" [value]="item">{{item}}</option>
-                </select>
+        <div *ngIf="!oncokb">
+            <div class="row borderMargin">
+                <div class="col-sm-3">variant_category:</div>
+                <div class="col-sm-9">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
+                        <option *ngFor="let item of variant_categorys" [value]="item">{{item}}</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">protein_change:</div>
-            <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.protein_change" size="36" />
+            <div class="row borderMargin">
+                <div class="col-sm-3">protein_change:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.protein_change" size="36" />
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">wildcard_protein_change:</div>
-            <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.wildcard_protein_change" size="36" />
+            <div class="row borderMargin">
+                <div class="col-sm-3">wildcard_protein_change:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.wildcard_protein_change" size="36" />
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">variant_classification:</div>
-            <div class="col-sm-9">
-                <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
-                    <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
-                </select>
+            <div class="row borderMargin">
+                <div class="col-sm-3">variant_classification:</div>
+                <div class="col-sm-9">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
+                        <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">exon:</div>
-            <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.exon" size="36" />
+            <div class="row borderMargin">
+                <div class="col-sm-3">exon:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.exon" size="36" />
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">cnv_call:</div>
-            <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.cnv_call" size="36" />
+            <div class="row borderMargin">
+                <div class="col-sm-3">cnv_call:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.cnv_call" size="36" />
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">wildtype:</div>
-            <div class="col-sm-9">
-                <select class="form-control selectStyle" [(ngModel)]="genomicInput.wildtype">
-                    <option *ngFor="let item of wiltypes" [value]="item">{{item}}</option>
-                </select>
+            <div class="row borderMargin">
+                <div class="col-sm-3">wildtype:</div>
+                <div class="col-sm-9">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.wildtype">
+                        <option *ngFor="let item of wiltypes" [value]="item">{{item}}</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -70,9 +75,12 @@
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="operationPool.indexOf('move') === -1 && pathPool.indexOf(path) !== -1; else panel">
         <div class="row borderMargin">
-            <div class="col-sm-3">hugo_symbol:<span style="color:red"> *</span></div>
+            <div class="col-sm-3">hugo_symbol:
+                <span style="color:red"> *</span>
+                <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
+            </div>
             <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.hugo_symbol" size="36" />
+                <input [(ngModel)]="genomicInput.hugo_symbol" size="36" (change)="validateGenomicSection()" />
             </div>
         </div>
         <div class="row borderMargin">
@@ -83,52 +91,54 @@
                 </select>
             </div>
         </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">variant_category:</div>
-            <div class="col-sm-9">
-                <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
-                    <option *ngFor="let item of variant_categorys" [value]="item">{{item}}</option>
-                </select>
+        <div *ngIf="!oncokb">
+            <div class="row borderMargin">
+                <div class="col-sm-3">variant_category:</div>
+                <div class="col-sm-9">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
+                        <option *ngFor="let item of variant_categorys" [value]="item">{{item}}</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">protein_change:</div>
-            <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.protein_change" size="36" />
+            <div class="row borderMargin">
+                <div class="col-sm-3">protein_change:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.protein_change" size="36" />
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">wildcard_protein_change:</div>
-            <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.wildcard_protein_change" size="36" />
+            <div class="row borderMargin">
+                <div class="col-sm-3">wildcard_protein_change:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.wildcard_protein_change" size="36" />
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">variant_classification:</div>
-            <div class="col-sm-9">
-                <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
-                    <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
-                </select>
+            <div class="row borderMargin">
+                <div class="col-sm-3">variant_classification:</div>
+                <div class="col-sm-9">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
+                        <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">exon:</div>
-            <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.exon" size="36" />
+            <div class="row borderMargin">
+                <div class="col-sm-3">exon:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.exon" size="36" />
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">cnv_call:</div>
-            <div class="col-sm-9">
-                <input [(ngModel)]="genomicInput.cnv_call" size="36" />
+            <div class="row borderMargin">
+                <div class="col-sm-3">cnv_call:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.cnv_call" size="36" />
+                </div>
             </div>
-        </div>
-        <div class="row borderMargin">
-            <div class="col-sm-3">wildtype:</div>
-            <div class="col-sm-9">
-                <select class="form-control selectStyle" [(ngModel)]="genomicInput.wildtype">
-                    <option *ngFor="let item of wiltypes" [value]="item">{{item}}</option>
-                </select>
+            <div class="row borderMargin">
+                <div class="col-sm-3">wildtype:</div>
+                <div class="col-sm-9">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.wildtype">
+                        <option *ngFor="let item of wiltypes" [value]="item">{{item}}</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -140,40 +150,42 @@
             <label>oncokb_variant: </label>
             <span>{{unit.genomic.oncokb_variant}}</span>
             <br/>
-            <span *ngIf="unit.genomic.variant_category">
-                <label>variant_category: </label>
-                <span>{{unit.genomic.variant_category}}</span>
-                <br/>
-            </span>
-            <span *ngIf="unit.genomic.protein_change">
-                <label>protein_change: </label>
-                <span>{{unit.genomic.protein_change}}</span>
-                <br/>
-            </span>
-            <span *ngIf="unit.genomic.wildcard_protein_change">
-                <label>wildcard_protein_change: </label>
-                <span>{{unit.genomic.wildcard_protein_change}}</span>
-                <br/>
-            </span>
-            <span *ngIf="unit.genomic.variant_classification">
-                <label>variant_classification: </label>
-                <span>{{unit.genomic.variant_classification}}</span>
-                <br/>
-            </span>
-            <span *ngIf="unit.genomic.exon">
-                <label>exon: </label>
-                <span>{{unit.genomic.exon}}</span>
-                <br/>
-            </span>
-            <span *ngIf="unit.genomic.cnv_call">
-                <label>cnv_call: </label>
-                <span>{{unit.genomic.cnv_call}}</span>
-                <br/>
-            </span>
-            <span *ngIf="unit.genomic.wildtype">
-                <label>wildtype: </label>
-                <span>{{unit.genomic.wildtype}}</span>
-            </span>
+            <div *ngIf="!oncokb">
+                <span *ngIf="unit.genomic.variant_category">
+                    <label>variant_category: </label>
+                    <span>{{unit.genomic.variant_category}}</span>
+                    <br/>
+                </span>
+                <span *ngIf="unit.genomic.protein_change">
+                    <label>protein_change: </label>
+                    <span>{{unit.genomic.protein_change}}</span>
+                    <br/>
+                </span>
+                <span *ngIf="unit.genomic.wildcard_protein_change">
+                    <label>wildcard_protein_change: </label>
+                    <span>{{unit.genomic.wildcard_protein_change}}</span>
+                    <br/>
+                </span>
+                <span *ngIf="unit.genomic.variant_classification">
+                    <label>variant_classification: </label>
+                    <span>{{unit.genomic.variant_classification}}</span>
+                    <br/>
+                </span>
+                <span *ngIf="unit.genomic.exon">
+                    <label>exon: </label>
+                    <span>{{unit.genomic.exon}}</span>
+                    <br/>
+                </span>
+                <span *ngIf="unit.genomic.cnv_call">
+                    <label>cnv_call: </label>
+                    <span>{{unit.genomic.cnv_call}}</span>
+                    <br/>
+                </span>
+                <span *ngIf="unit.genomic.wildtype">
+                    <label>wildtype: </label>
+                    <span>{{unit.genomic.wildtype}}</span>
+                </span>
+            </div>
         </div>
     </ng-template>
 </ng-template>

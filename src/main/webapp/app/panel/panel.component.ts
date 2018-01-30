@@ -35,6 +35,7 @@ export class PanelComponent implements OnInit {
     originalMatch = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step.match;
     originalArms = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step.arms;
     dataToModify = [];
+    validGenomic = this.trialService.getValidGenomic();
     constructor(private trialService: TrialService) {}
 
     ngOnInit() {
@@ -75,6 +76,7 @@ export class PanelComponent implements OnInit {
     }
     modifyNode(type: string) {
         let result = true;
+        // validate the need to proceed
         if (type === 'delete') {
             result = confirm('Are you sure you want to delte this section?');
         }
@@ -273,6 +275,8 @@ export class PanelComponent implements OnInit {
         return keys.indexOf(Object.keys(a)[0]) - keys.indexOf(Object.keys(b)[0]);
     }
     editNode() {
+        this.validGenomic.splice(0, this.validGenomic.length);
+        this.validGenomic.push(true);
         this.pathPool.splice(0, this.pathPool.length);
         this.pathPool.push(this.path);
         if (this.unit.hasOwnProperty('genomic')) {
@@ -291,6 +295,11 @@ export class PanelComponent implements OnInit {
             this.trialService.setClinicalInput('main_type', this.unit['clinical']['main_type']);
             this.trialService.setClinicalInput('sub_type', this.unit['clinical']['sub_type']);
         }
+    }
+    preAddNode() {
+        this.validGenomic.splice(0, this.validGenomic.length);
+        this.validGenomic.push(false);
+        this.addNode = true;
     }
     moveNode() {
         if (this.operationPool[0] === 'move') {

@@ -15,6 +15,7 @@ export class TrialService {
     pathPool: Array<string> = [];
     operationPool: Array<string> = [];
     loginStatus = [false];
+    validGenomic = [false];
     currentPath = '';
     movingPath = {
         from: '',
@@ -179,5 +180,8 @@ export class TrialService {
     }
     getLoginStatus() {
         return this.loginStatus;
+    }
+    getValidGenomic() {
+        return this.validGenomic;
     }
 }
