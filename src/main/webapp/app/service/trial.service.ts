@@ -92,15 +92,15 @@ export class TrialService {
             });
         });
         // prepare oncokb variant list
-        this.http.get('http://oncokb.org/api/v1/utils/allAnnotatedVariants')
+        this.http.get('http://oncokb.org/api/v1/variants')
         .subscribe((res: Response) => {
            const allAnnotatedVariants = res.json();
            for(const item of  allAnnotatedVariants) {
-                if (item['gene']) {
-                    if (this.oncokb_variants[item['gene']]) {
-                        this.oncokb_variants[item['gene']].push(item['variant']);
+                if (item['gene']['hugoSymbol']) {
+                    if (this.oncokb_variants[item['gene']['hugoSymbol']]) {
+                        this.oncokb_variants[item['gene']['hugoSymbol']].push(item['alteration']);
                     } else {
-                        this.oncokb_variants[item['gene']] = [item['variant']];
+                        this.oncokb_variants[item['gene']['hugoSymbol']] = [item['alteration']];
                     }
                 }     
            }
