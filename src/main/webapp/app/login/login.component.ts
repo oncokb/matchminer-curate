@@ -31,8 +31,7 @@ export class LoginComponent {
         this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then((res) => {
             this.setLoginStatus(true);
         }).catch((err) => {
-            alert('Sorry, you do not have the permission to login');
-            console.log('Failed to log in');
+            alert('Failed to log in');
         });
     }
     logout() {
