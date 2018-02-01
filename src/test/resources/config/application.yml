@@ -67,7 +67,7 @@ jhipster:
             queue-size: 512
     mail:
         from: test@localhost
-        base-url: http://127.0.0.1:8080
+        base-url: http://127.0.0.1:8090
     security:
         remember-me:
             # security key (this key should be unique for your application, and kept secret)

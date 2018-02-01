@@ -62,7 +62,7 @@ spring:
 #        key-alias: matchminerCurate
 # ===================================================================
 server:
-    port: 8080
+    port: 8090
 
 # ===================================================================
 # JHipster specific properties
@@ -91,7 +91,7 @@ jhipster:
             key: 4eb35dbe0a6fca92ed1baf567d70d9028022a272
     mail: # specific JHipster mail property, for standard properties see MailProperties
         from: matchminerCurate@localhost
-        base-url: http://127.0.0.1:8080
+        base-url: http://127.0.0.1:8090
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         jmx.enabled: true
         graphite: # Use the "graphite" Maven profile to have the Graphite dependencies
