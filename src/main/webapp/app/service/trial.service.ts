@@ -5,6 +5,7 @@ import { Trial } from '../trial/trial.model';
 import { Http, Response } from '@angular/http';
 import * as _ from 'underscore';
 import { currentId } from 'async_hooks';
+import { SERVER_API_URL } from '../app.constants';
 @Injectable()
 export class TrialService {
     trialsCollection: AngularFirestoreCollection<Trial>;
@@ -57,7 +58,7 @@ export class TrialService {
             this.trialList = trials;
         });
         // prepare main types list
-        this.http.get('http://oncotree.mskcc.org/oncotree/api/mainTypes')
+        this.http.get(SERVER_API_URL + 'proxy/oncotree.mskcc.org/oncotree/api/mainTypes')
         .subscribe((res: Response) => {
             let mainTypeQueries = [];
             for (const item of res.json().data) {
@@ -73,7 +74,7 @@ export class TrialService {
             let queries =  {
                 "queries": mainTypeQueries
               };
-            this.http.post('http://oncotree.mskcc.org/oncotree/api/tumorTypes/search', queries)
+            this.http.post(SERVER_API_URL + 'proxy/oncotree.mskcc.org/oncotree/api/tumorTypes/search', queries)
             .subscribe((res: Response) => {
                 let tempSubTypes = res.json().data;
                 let currentSubtype = '';
@@ -88,12 +89,12 @@ export class TrialService {
                             this.subTypes[currentMaintype].push(currentSubtype);
                         }
                     }
-                    this.subTypes[currentMaintype].sort();                    
+                    this.subTypes[currentMaintype].sort();
                 }
             });
         });
         // prepare oncokb variant list
-        this.http.get('http://oncokb.org/api/v1/variants')
+        this.http.get(SERVER_API_URL + 'proxy/oncokb.org/api/v1/variants')
         .subscribe((res: Response) => {
            const allAnnotatedVariants = res.json();
            for(const item of  allAnnotatedVariants) {
@@ -103,7 +104,7 @@ export class TrialService {
                     } else {
                         this.oncokb_variants[item['gene']['hugoSymbol']] = [item['alteration']];
                     }
-                }     
+                }
            }
            for(const key of _.keys(this.oncokb_variants)) {
                 this.oncokb_variants[key].sort();
