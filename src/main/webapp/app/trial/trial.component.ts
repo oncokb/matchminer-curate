@@ -14,12 +14,14 @@ import "../../../../../node_modules/jquery/dist/jquery.js";
 import "../../../../../node_modules/datatables.net/js/jquery.dataTables.js";
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
+import { ConnectionService } from '../service/connection.service';
+
 @Component({
     selector: 'jhi-trial',
     templateUrl: './trial.component.html',
     styleUrls: ['trial.scss']
 })
-export class TrialComponent implements OnInit, AfterViewInit{
+export class TrialComponent implements OnInit, AfterViewInit {
     @ViewChild(DataTableDirective)
     dtElement: DataTableDirective;
     trialsToImport = '';
@@ -31,17 +33,23 @@ export class TrialComponent implements OnInit, AfterViewInit{
     dtOptions: DataTables.Settings = {};
     dtTrigger: Subject<any> = new Subject();
     hideArchived = 'Yes';
-    constructor(public http: Http, private trialService: TrialService, public db: AngularFireDatabase) {
+    mongoMessage: string;
+    mongoMessageColor: string;
+    production: boolean;
+
+    constructor(private connectionService: ConnectionService, private trialService: TrialService, public db: AngularFireDatabase) {
+        this.production = this.connectionService.getProduction();
         this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);
         this.trialService.trialListObs.subscribe(message => {
             this.trialList = message;
-            this.nctIdList = _.map(this.trialList, function(trial){
+            this.nctIdList = _.map(this.trialList, function (trial) {
                 return trial.nct_id;
             });
             this.rerender();
         });
     }
+
     ngOnInit(): void {
         $.fn['dataTable'].ext.search.push((settings, data, dataIndex) => {
             if (this.hideArchived === 'Yes' && data[4] === 'Yes') {
@@ -55,9 +63,10 @@ export class TrialComponent implements OnInit, AfterViewInit{
             scrollY: '300'
         };
     }
+
     importTrials() {
         this.messages = [];
-        const newTrials: Array<string>  = this.trialsToImport.split(',');
+        const newTrials: Array<string> = this.trialsToImport.split(',');
         let setChosenTrial = false;
         for (const newTrial of newTrials) {
             const tempTrial = newTrial.trim();
@@ -75,8 +84,8 @@ export class TrialComponent implements OnInit, AfterViewInit{
             this.http.get(this.trialService.getAPIUrl('ClinicalTrials') + tempTrial)
                 .subscribe((res: Response) => {
                         const trialInfo = res.json();
-                        let armsInfo:any = [];
-                        _.each(trialInfo.arms, function(arm) {
+                        let armsInfo: any = [];
+                        _.each(trialInfo.arms, function (arm) {
                             if (arm.arm_type !== null && arm.arm_description !== null) {
                                 armsInfo.push({
                                     arm_name: arm.arm_name,
@@ -96,7 +105,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
                             status: trialInfo.current_trial_status,
                             treatment_list: {
                                 step: [{
-                                    arm:  armsInfo,
+                                    arm: armsInfo,
                                     match: []
                                 }]
                             }
@@ -120,6 +129,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
         }
         this.trialsToImport = '';
     }
+
     updateStatus(type: string) {
         if (type === 'curation') {
             this.db.object('Trials/' + this.nctIdChosen).update({
@@ -146,16 +156,21 @@ export class TrialComponent implements OnInit, AfterViewInit{
             });
         }
     }
+
     curateTrial(nctId: string) {
+        this.mongoMessage = "";
         this.trialService.setTrialChosen(nctId);
         document.querySelector('#trialDetail').scrollIntoView();
     }
+
     getStatus(status: string) {
-        return status === 'Completed' ? { 'color': 'green' } : { 'color': 'red' };
+        return status === 'Completed' ? {'color': 'green'} : {'color': 'red'};
     }
+
     ngAfterViewInit(): void {
         this.dtTrigger.next();
     }
+
     rerender(): void {
         if (!_.isUndefined(this.dtElement)) {
             this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
@@ -165,5 +180,23 @@ export class TrialComponent implements OnInit, AfterViewInit{
                 this.dtTrigger.next();
             });
         }
+    }
+
+    loadMongo() {
+        this.mongoMessage = "Loading the trial ......";
+        this.mongoMessageColor = '#ffc107';
+        let trial = {
+            'trial': this.trialChosen
+        }
+        this.connectionService.loadMongo(trial).subscribe((res) => {
+            if (res.status === 200) {
+                this.mongoMessage = 'Send trial ' + this.nctIdChosen + ' successfully!';
+                this.mongoMessageColor = 'green';
+            }
+        }, (error) => {
+            this.mongoMessage = 'Request for sending trial ' + this.nctIdChosen + ' failed!';
+            this.mongoMessageColor = 'red';
+            return Observable.throw(error);
+        });
     }
 }
