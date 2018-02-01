@@ -1,7 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Http, Response } from '@angular/http';
-import { environment } from '../environments/environment'
+import { environment } from '../environments/environment';
+import { SERVER_API_URL } from '../app.constants';
+
 @Component({
     selector: 'jhi-genomic',
     templateUrl: './genomic.component.html',
@@ -38,7 +40,7 @@ export class GenomicComponent implements OnInit {
     }
     // This validation function will be executed the moment the input box lose focus
     validateGenomicSection() {
-        this.http.get('http://mygene.info/v3/query?species=human&q=symbol:' + this.genomicInput.hugo_symbol)
+        this.http.get(SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:' + this.genomicInput.hugo_symbol)
         .subscribe((res: Response) => {
            const result = res.json();
            if (result.hits.length > 0) {
