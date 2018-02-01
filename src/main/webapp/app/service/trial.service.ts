@@ -25,6 +25,7 @@ export class TrialService {
     genomicInput = {
         hugo_symbol: '',
         oncokb_variant: '',
+        matching_examples: '',
         protein_change: '',
         wildcard_protein_change: '',
         variant_classification: '',

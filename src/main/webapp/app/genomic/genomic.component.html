@@ -17,6 +17,12 @@
                 </select>
             </div>
         </div>
+        <div class="row borderMargin" *ngIf="oncokb">
+                <div class="col-sm-3">matching_examples:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.matching_examples" size="36" />
+                </div>
+        </div>
         <div *ngIf="!oncokb">
             <div class="row borderMargin">
                 <div class="col-sm-3">variant_category:</div>
@@ -91,6 +97,12 @@
                 </select>
             </div>
         </div>
+        <div class="row borderMargin" *ngIf="oncokb">
+                <div class="col-sm-3">matching_examples:</div>
+                <div class="col-sm-9">
+                    <input [(ngModel)]="genomicInput.matching_examples" size="36" />
+                </div>
+        </div>
         <div *ngIf="!oncokb">
             <div class="row borderMargin">
                 <div class="col-sm-3">variant_category:</div>
@@ -150,6 +162,11 @@
             <label>oncokb_variant: </label>
             <span>{{unit.genomic.oncokb_variant}}</span>
             <br/>
+            <span *ngIf="oncokb">
+                <label>matching_examples: </label>
+                <span>{{unit.genomic.matching_examples}}</span>
+                <br/>
+            </span>
             <div *ngIf="!oncokb">
                 <span *ngIf="unit.genomic.variant_category">
                     <label>variant_category: </label>

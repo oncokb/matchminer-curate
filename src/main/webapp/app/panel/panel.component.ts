@@ -149,6 +149,7 @@ export class PanelComponent implements OnInit {
         if (this.nodeType === 'Genomic') {
             this.trialService.setGenomicInput('hugo_symbol', '');
             this.trialService.setGenomicInput('oncokb_variant', '');
+            this.trialService.setGenomicInput('matching_examples', '');
             this.trialService.setGenomicInput('protein_change', '');
             this.trialService.setGenomicInput('wildcard_protein_change', '');
             this.trialService.setGenomicInput('variant_classification', '');
@@ -171,6 +172,7 @@ export class PanelComponent implements OnInit {
                         genomic: {
                             hugo_symbol: this.genomicInput.hugo_symbol,
                             oncokb_variant: this.genomicInput.oncokb_variant,
+                            matching_examples: this.genomicInput.matching_examples,
                             protein_change: this.genomicInput.protein_change,
                             wildcard_protein_change: this.genomicInput.wildcard_protein_change,
                             variant_classification: this.genomicInput.variant_classification,
@@ -201,6 +203,7 @@ export class PanelComponent implements OnInit {
                                     genomic: {
                                         hugo_symbol: this.genomicInput.hugo_symbol,
                                         oncokb_variant: this.genomicInput.oncokb_variant,
+                                        matching_examples: this.genomicInput.matching_examples,
                                         protein_change: this.genomicInput.protein_change,
                                         wildcard_protein_change: this.genomicInput.wildcard_protein_change,
                                         variant_classification: this.genomicInput.variant_classification,
@@ -253,6 +256,7 @@ export class PanelComponent implements OnInit {
             obj['genomic'] = {
                 hugo_symbol: this.genomicInput.hugo_symbol,
                 oncokb_variant: this.genomicInput.oncokb_variant,
+                matching_examples: this.genomicInput.matching_examples,
                 protein_change: this.genomicInput.protein_change,
                 wildcard_protein_change: this.genomicInput.wildcard_protein_change,
                 variant_classification: this.genomicInput.variant_classification,
@@ -282,6 +286,7 @@ export class PanelComponent implements OnInit {
         if (this.unit.hasOwnProperty('genomic')) {
             this.trialService.setGenomicInput('hugo_symbol', this.unit['genomic']['hugo_symbol']);
             this.trialService.setGenomicInput('oncokb_variant', this.unit['genomic']['oncokb_variant']);
+            this.trialService.setGenomicInput('matching_examples', this.unit['genomic']['matching_examples']);
             this.trialService.setGenomicInput('protein_change', this.unit['genomic']['protein_change']);
             this.trialService.setGenomicInput('wildcard_protein_change', this.unit['genomic']['wildcard_protein_change']);
             this.trialService.setGenomicInput('variant_classification', this.unit['genomic']['variant_classification']);
