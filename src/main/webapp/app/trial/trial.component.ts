@@ -9,6 +9,7 @@ import { TrialService } from '../service/trial.service';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import * as _ from 'underscore';
 import { Trial } from './trial.model';
+import { SERVER_API_URL } from '../app.constants';
 
 @Component({
   selector: 'jhi-trial',
@@ -38,7 +39,7 @@ export class TrialComponent {
             this.messages.push(tempTrial + ' already imported');
             continue;
         }
-        this.http.get('https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/' + tempTrial)
+        this.http.get(SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/' + tempTrial)
         .subscribe((res: Response) => {
            const trialInfo = res.json();
            let armsInfo:any = [];
