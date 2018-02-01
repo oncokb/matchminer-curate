@@ -58,7 +58,7 @@ export class TrialService {
             this.trialList = trials;
         });
         // prepare main types list
-        this.http.get(SERVER_API_URL + 'proxy/oncotree.mskcc.org/oncotree/api/mainTypes')
+        this.http.get(SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/mainTypes')
         .subscribe((res: Response) => {
             let mainTypeQueries = [];
             for (const item of res.json().data) {
@@ -74,7 +74,7 @@ export class TrialService {
             let queries =  {
                 "queries": mainTypeQueries
               };
-            this.http.post(SERVER_API_URL + 'proxy/oncotree.mskcc.org/oncotree/api/tumorTypes/search', queries)
+            this.http.post(SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/tumorTypes/search', queries)
             .subscribe((res: Response) => {
                 let tempSubTypes = res.json().data;
                 let currentSubtype = '';
@@ -94,7 +94,7 @@ export class TrialService {
             });
         });
         // prepare oncokb variant list
-        this.http.get(SERVER_API_URL + 'proxy/oncokb.org/api/v1/variants')
+        this.http.get(SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants')
         .subscribe((res: Response) => {
            const allAnnotatedVariants = res.json();
            for(const item of  allAnnotatedVariants) {

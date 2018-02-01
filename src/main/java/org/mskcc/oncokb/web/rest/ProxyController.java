@@ -5,10 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,15 +24,20 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/proxy")
 public class ProxyController {
 
-    @RequestMapping(value = "/**", method = { RequestMethod.GET, RequestMethod.POST })
-    public String proxy(@RequestBody(required = false) String body, HttpMethod method, HttpServletRequest request)
+    @RequestMapping(value = "/{protocol}/**", method = {RequestMethod.GET, RequestMethod.POST})
+    public String proxy(
+        @PathVariable String protocol,
+        @RequestBody(required = false) String body, HttpMethod method, HttpServletRequest request)
         throws URISyntaxException {
 
         String queryString = request.getQueryString();
 
         // In the original code, we jse getPathInfo. But for some reason, we get null.
         // This needs to be updated.
-        URI uri = new URI("http://" + request.getRequestURI().replaceFirst("/proxy/", "") + (queryString == null ? "" : "?" + queryString));
+        if (protocol == null) {
+            protocol = "http";
+        }
+        URI uri = new URI(protocol + "://" + request.getRequestURI().replaceFirst("/proxy/" + protocol + "/", "") + (queryString == null ? "" : "?" + queryString));
 
         HttpHeaders httpHeaders = new HttpHeaders();
         String contentType = request.getHeader("Content-Type");
