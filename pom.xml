@@ -363,6 +363,8 @@
                                     <filtering>true</filtering>
                                     <includes>
                                         <include>config/*.yml</include>
+                                        <include>matchminerengine/*.py</include>
+                                        <include>matchminerengine/**/*.py</include>
                                     </includes>
                                 </resource>
                                 <resource>
@@ -370,6 +372,8 @@
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>config/*.yml</exclude>
+                                        <include>matchminerengine/*.py</include>
+                                        <include>matchminerengine/**/*.py</include>
                                     </excludes>
                                 </resource>
                             </resources>

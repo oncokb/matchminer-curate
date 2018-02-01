@@ -1,6 +1,37 @@
 # API-first development with swagger
 # This file will be used at compile time to generate Spring-MVC endpoint stubs using swagger-codegen
-swagger: "2.0"
+swagger: '2.0'
 info:
+  title: Matchminer Curate API
   version: 0.0.1
-paths: {}
+schemes:
+- "http"
+paths:
+  '/mongo/load':
+    post:
+      description: Load trial or clinical or genomic data into Mongo DB.
+      operationId: "load"
+      parameters:
+      - name: "LoadData"
+        in: "body"
+        description: "a json object with dataType(trial/clinical/genomic)"
+        required: true
+        schema:
+          type: object
+          required:
+            - dataType
+            - content
+          properties:
+            dataType:
+              type: string
+            content:
+              type: object
+      responses:
+        '200':
+          description: Load to Mongo DB successfully.
+        '400':
+          description: The json object is invalid.
+        '404':
+          description: The json object was not found.
+        default:
+          description: Unexpected error.

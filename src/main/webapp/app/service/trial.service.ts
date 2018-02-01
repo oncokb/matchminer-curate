@@ -63,9 +63,9 @@ export class TrialService {
     allSubTypesOptions = [];
     subToMainMapping = {};
     mainTypesOptions = [{value: 'All Solid Tumors', label: 'All Solid Tumors'},
-    {value: 'All Liquid Tumors', label: 'All Liquid Tumors'},
-    {value: 'All Tumors', label: 'All Tumors'},
-    {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
+        {value: 'All Liquid Tumors', label: 'All Liquid Tumors'},
+        {value: 'All Tumors', label: 'All Tumors'},
+        {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
     annotated_variants = {};
     trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
@@ -73,76 +73,76 @@ export class TrialService {
     constructor(public http: Http, public db: AngularFireDatabase) {
         this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
-        
+
         // prepare main types list
         this.http.get(this.getAPIUrl('MainType'))
-        .subscribe((res: Response) => {
-            let mainTypeQueries = [];
-            for (const item of res.json().data) {
-                mainTypeQueries.push({
-                    "exactMatch": true,
-                    "query": item.name,
-                    "type": "mainType"
-                });
-                this.mainTypesOptions.push({
-                    value: item.name,
-                    label: item.name
-                });
-            }
-            // prepare subtypes by maintype
-            let queries =  {
-                "queries": mainTypeQueries
-              };
-            this.http.post(this.getAPIUrl('SubType'), queries)
             .subscribe((res: Response) => {
-                let tempSubTypes = res.json().data;
-                let currentSubtype = '';
-                let currentMaintype = '';
-                for (const items of tempSubTypes) {
-                    for (const item of items) {
-                        currentMaintype = item.mainType.name;
-                        currentSubtype = item.name;
-                        this.allSubTypesOptions.push({
-                            value: currentSubtype,
-                            label: currentSubtype
-                        });
-                        this.subToMainMapping[currentSubtype] = currentMaintype;
-                        if (this.subTypesOptions[currentMaintype] == undefined) {
-                            this.subTypesOptions[currentMaintype] = [{
-                                value: currentSubtype,
-                                label: currentSubtype
-                            }];
-                        } else {
-                            this.subTypesOptions[currentMaintype].push({
-                                value: currentSubtype,
-                                label: currentSubtype
-                            });
-                        }
-                    }
-                    this.subTypesOptions[currentMaintype].sort(function(a, b) {
-                        return a.value > b.value;
+                let mainTypeQueries = [];
+                for (const item of res.json().data) {
+                    mainTypeQueries.push({
+                        "exactMatch": true,
+                        "query": item.name,
+                        "type": "mainType"
                     });
-                    this.subTypesOptions[''] = this.allSubTypesOptions;
+                    this.mainTypesOptions.push({
+                        value: item.name,
+                        label: item.name
+                    });
                 }
+                // prepare subtypes by maintype
+                let queries =  {
+                    "queries": mainTypeQueries
+                };
+                this.http.post(this.getAPIUrl('SubType'), queries)
+                    .subscribe((res: Response) => {
+                        let tempSubTypes = res.json().data;
+                        let currentSubtype = '';
+                        let currentMaintype = '';
+                        for (const items of tempSubTypes) {
+                            for (const item of items) {
+                                currentMaintype = item.mainType.name;
+                                currentSubtype = item.name;
+                                this.allSubTypesOptions.push({
+                                    value: currentSubtype,
+                                    label: currentSubtype
+                                });
+                                this.subToMainMapping[currentSubtype] = currentMaintype;
+                                if (this.subTypesOptions[currentMaintype] == undefined) {
+                                    this.subTypesOptions[currentMaintype] = [{
+                                        value: currentSubtype,
+                                        label: currentSubtype
+                                    }];
+                                } else {
+                                    this.subTypesOptions[currentMaintype].push({
+                                        value: currentSubtype,
+                                        label: currentSubtype
+                                    });
+                                }
+                            }
+                            this.subTypesOptions[currentMaintype].sort(function(a, b) {
+                                return a.value > b.value;
+                            });
+                            this.subTypesOptions[''] = this.allSubTypesOptions;
+                        }
+                    });
             });
-        });
         // prepare oncokb variant list
         this.http.get(this.getAPIUrl('OncoKBVariant'))
-        .subscribe((res: Response) => {
-           const allAnnotatedVariants = res.json();
-           for(const item of  allAnnotatedVariants) {
-                if (item['gene']['hugoSymbol']) {
-                    if (this.annotated_variants[item['gene']['hugoSymbol']]) {
-                        this.annotated_variants[item['gene']['hugoSymbol']].push(item['alteration']);
-                    } else {
-                        this.annotated_variants[item['gene']['hugoSymbol']] = [item['alteration']];
+            .subscribe((res: Response) => {
+                const allAnnotatedVariants = res.json();
+                for(const item of  allAnnotatedVariants) {
+                    if (item['gene']['hugoSymbol']) {
+                        if (this.annotated_variants[item['gene']['hugoSymbol']]) {
+                            this.annotated_variants[item['gene']['hugoSymbol']].push(item['alteration']);
+                        } else {
+                            this.annotated_variants[item['gene']['hugoSymbol']] = [item['alteration']];
+                        }
                     }
                 }
-           }
-           for(const key of _.keys(this.annotated_variants)) {
-                this.annotated_variants[key].sort();
-           }
-        });
+                for(const key of _.keys(this.annotated_variants)) {
+                    this.annotated_variants[key].sort();
+                }
+            });
     }
     createGenomic() {
         let genomicInput: Genomic;
@@ -208,7 +208,7 @@ export class TrialService {
             this.authorizedSource.next(true);
             this.trialList = [];
             for (const nctId of _.keys(action.payload.val())) {
-                this.trialList.push(action.payload.val()[nctId]);                
+                this.trialList.push(action.payload.val()[nctId]);
             }
             this.trialListSource.next(this.trialList);
             this.setTrialChosen(this.nctIdChosen);
@@ -277,8 +277,8 @@ export class TrialService {
             switch(type) {
                 case 'MainType':
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/mainTypes';
-                case 'SubType': 
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/tumorTypes/search';  
+                case 'SubType':
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
                 case 'GeneValidation':
@@ -292,8 +292,8 @@ export class TrialService {
             switch(type) {
                 case 'MainType':
                     return 'http://oncotree.mskcc.org/oncotree/api/mainTypes';
-                case 'SubType': 
-                    return 'http://oncotree.mskcc.org/oncotree/api/tumorTypes/search';  
+                case 'SubType':
+                    return 'http://oncotree.mskcc.org/oncotree/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return 'http://oncokb.org/api/v1/variants';
                 case 'GeneValidation':
@@ -301,7 +301,7 @@ export class TrialService {
                 case 'ClinicalTrials':
                     return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
                 case 'ExampleValidation':
-                    return 'http://oncokb.org/api/v1/utils/match/variant?';    
+                    return 'http://oncokb.org/api/v1/utils/match/variant?';
             }
         }
     }

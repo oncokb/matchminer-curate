@@ -71,6 +71,7 @@
             <span id="nctId" style="margin-left:10px">
                 <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{trialChosen.nct_id}}">{{ trialChosen.nct_id }}</a>
             </span>
+            <button class="btn btn-primary" (click)="loadMongo()">Load it to Mongo DB</button>
             <br/>
             <label for="phase">Phase: </label>
             <span id="phase" style="margin-left:10px">{{ trialChosen.phase }}</span>
@@ -110,10 +111,15 @@
                         <i class="fa fa-pencil noteEdit" aria-hidden="true"></i>: Edit
                     </p>
                     <p>Click (<i class="fa fa-exchange noteExchange"></i>) to switch logic between "and" and "or"</p>
-                    <p>Click (<i class="fa fa-arrows noteMove" aria-hidden="true"></i>) to move this section; click again to cancel. 
+                    <p>Click (<i class="fa fa-arrows noteMove" aria-hidden="true"></i>) to move this section; click again to cancel.
                         Click (<i class="fa fa-arrows noteDestination" aria-hidden="true"></i>) to use as your destination.</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<ng-template #permission>
+    <div class="container" style="min-height:550px">
+        Matchminer Curation Platform is proprietary resource. If you are not authorized to access this system, please exit immediately.
+    </div>
+</ng-template>
