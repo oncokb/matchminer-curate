@@ -4,14 +4,14 @@
 <i class="fa fa-arrows moveIcon" aria-hidden="true" *ngIf="displayMove()" (click)="moveNode()" title="Click to choose this section as to be moved"></i>
 <i class="fa fa-map-marker destinationIcon" aria-hidden="true" *ngIf="displayDestination()" (click)="dropDownNode()"  title="Click to choose as destination"></i>
 <span *ngIf="operationPool.indexOf('move') === -1 && pathPool.indexOf(path) !== -1">
-    <button class="btn btn-success editButtonStyle" [disabled]="!validGenomic[0]" (click)="saveModification()">Save</button>
+    <button class="btn btn-success editButtonStyle" (click)="saveModification()">Save</button>
     <button class="btn btn-warning editButtonStyle" (click)="cancelModification()">Cancel</button>
 </span>
 
 <div *ngIf="addNode" style="border-style: solid;border-width:1px;margin:10px;padding:10px">
     <br/>
     <label>Specify criterion type
-        <button *ngIf="nodeType" class="btn btn-success addButon" [disabled]="!validGenomic[0]" (click)="modifyNode('add')">Add</button>
+        <button *ngIf="nodeType" class="btn btn-success addButon" (click)="modifyNode('add')">Add</button>
         <button class="btn btn-warning cancelButton" (click)="clearInput()">Cancel</button>
     </label>
     <select class="form-control" [(ngModel)]="nodeType" (change)="clearNodeInput()">

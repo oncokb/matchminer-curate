@@ -39,7 +39,7 @@ export class TrialComponent {
             this.messages.push(tempTrial + ' already imported');
             continue;
         }
-        this.http.get(SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/' + tempTrial)
+        this.http.get(this.trialService.getAPIUrl('ClinicalTrials') + tempTrial)
         .subscribe((res: Response) => {
            const trialInfo = res.json();
            let armsInfo:any = [];
