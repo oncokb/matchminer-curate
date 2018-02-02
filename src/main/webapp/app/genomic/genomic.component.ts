@@ -40,7 +40,7 @@ export class GenomicComponent implements OnInit {
     }
     // This validation function will be executed the moment the input box lose focus
     validateGenomicSection() {
-        this.http.get(SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:' + this.genomicInput.hugo_symbol)
+        this.http.get(this.trialService.getAPIUrl('GeneValidation') + this.genomicInput.hugo_symbol)
         .subscribe((res: Response) => {
            const result = res.json();
            if (result.hits.length > 0) {

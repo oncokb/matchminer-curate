@@ -6,8 +6,10 @@ import { Http, Response } from '@angular/http';
 import * as _ from 'underscore';
 import { currentId } from 'async_hooks';
 import { SERVER_API_URL } from '../app.constants';
+import { environment } from '../environments/environment';
 @Injectable()
 export class TrialService {
+    production = environment.production ? environment.production : false;
     trialsCollection: AngularFirestoreCollection<Trial>;
     trialList = [];
     nctIdList: Array<string> = [];
@@ -59,7 +61,7 @@ export class TrialService {
             this.trialList = trials;
         });
         // prepare main types list
-        this.http.get(SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/mainTypes')
+        this.http.get(this.getAPIUrl('MainType'))
         .subscribe((res: Response) => {
             let mainTypeQueries = [];
             for (const item of res.json().data) {
@@ -75,7 +77,7 @@ export class TrialService {
             let queries =  {
                 "queries": mainTypeQueries
               };
-            this.http.post(SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/tumorTypes/search', queries)
+            this.http.post(this.getAPIUrl('SubType'), queries)
             .subscribe((res: Response) => {
                 let tempSubTypes = res.json().data;
                 let currentSubtype = '';
@@ -95,7 +97,7 @@ export class TrialService {
             });
         });
         // prepare oncokb variant list
-        this.http.get(SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants')
+        this.http.get(this.getAPIUrl('OncoKBVariant'))
         .subscribe((res: Response) => {
            const allAnnotatedVariants = res.json();
            for(const item of  allAnnotatedVariants) {
@@ -185,5 +187,35 @@ export class TrialService {
     }
     getValidGenomic() {
         return this.validGenomic;
+    }
+    getAPIUrl(type: string) {
+        if (this.production === true) {
+            switch(type) {
+                case 'MainType':
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/mainTypes';
+                case 'SubType': 
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/tumorTypes/search';  
+                case 'OncoKBVariant':
+                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
+                case 'GeneValidation':
+                    return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
+                case 'ClinicalTrials':
+                    return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
+
+            }
+        } else {
+            switch(type) {
+                case 'MainType':
+                    return 'http://oncotree.mskcc.org/oncotree/api/mainTypes';
+                case 'SubType': 
+                    return 'http://oncotree.mskcc.org/oncotree/api/tumorTypes/search';  
+                case 'OncoKBVariant':
+                    return 'http://oncokb.org/api/v1/variants';
+                case 'GeneValidation':
+                    return 'http://mygene.info/v3/query?species=human&q=symbol:';
+                case 'ClinicalTrials':
+                    return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
+            }
+        }
     }
 }
