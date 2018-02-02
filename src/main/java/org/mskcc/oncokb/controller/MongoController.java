@@ -48,8 +48,6 @@ public class MongoController {
             //Get temporary file path
             String absolutePath = tempFile.getAbsolutePath();
 
-            System.out.format("Canonical filename: %s\n", tempFile.getCanonicalFile());
-
             //write it
             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile));
             bw.write(content);
