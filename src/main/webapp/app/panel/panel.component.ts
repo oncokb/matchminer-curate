@@ -36,7 +36,7 @@ export class PanelComponent implements OnInit {
     originalArms = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step.arms;
     dataToModify = [];
     validGenomic = this.trialService.getValidGenomic();
-    constructor(private trialService: TrialService) {}
+    constructor(private trialService: TrialService) { }
 
     ngOnInit() {
     }
@@ -103,8 +103,8 @@ export class PanelComponent implements OnInit {
                         this.dataBlockToMove = _.clone(obj[path[0]]);
                         obj[path[0]].toBeRemoved = true;
                     } else {
-                        obj.splice(Number(path[0]), 1);                    
-                    }                     
+                        obj.splice(Number(path[0]), 1);
+                    }
                 } else {
                     const index = path.shift();
                     this.modifyData(obj[index], path, type);
@@ -137,7 +137,7 @@ export class PanelComponent implements OnInit {
                 }
                 break;
             default:
-                break;       
+                break;
         }
     }
     clearInput() {
@@ -145,24 +145,51 @@ export class PanelComponent implements OnInit {
         this.addNode = false;
         this.nodeType = '';
     }
+    clearInputForm(keys: Array<string>, type: string) {
+        if (type === 'Genomic') {
+            for (let key of keys) {
+                this.trialService.setGenomicInput(key, '');
+                this.trialService.setGenomicInput('no_'+key, false);
+            }    
+        } else if (type === 'Clinical') {
+            for (let key of keys) {
+                this.trialService.setClinicalInput(key, '');
+                this.trialService.setClinicalInput('no_'+key, false);
+            }    
+        } 
+    }
     clearNodeInput() {
         if (this.nodeType === 'Genomic') {
-            this.trialService.setGenomicInput('hugo_symbol', '');
-            this.trialService.setGenomicInput('oncokb_variant', '');
-            this.trialService.setGenomicInput('matching_examples', '');
-            this.trialService.setGenomicInput('protein_change', '');
-            this.trialService.setGenomicInput('wildcard_protein_change', '');
-            this.trialService.setGenomicInput('variant_classification', '');
-            this.trialService.setGenomicInput('variant_category', '');
-            this.trialService.setGenomicInput('exon', '');
-            this.trialService.setGenomicInput('cnv_call', '');
+            this.clearInputForm(['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change', 'variant_classification', 'variant_category', 'exon', 'cnv_call'], this.nodeType);
             this.trialService.setGenomicInput('wildtype', '');
         } else if (this.nodeType === 'Clinical') {
-            this.trialService.setClinicalInput('age_numerical', '');
-            this.trialService.setClinicalInput('oncotree_diagnosis', '');
+            this.clearInputForm(['age_numerical', 'oncotree_diagnosis'], this.nodeType);
             this.trialService.setClinicalInput('main_type', '');
             this.trialService.setClinicalInput('sub_type', '');
         }
+    }
+    getGenomicValue(key: string) {
+        if (this.genomicInput['no_' + key] === true) {
+            return '!' + this.genomicInput[key];
+        } else {
+            return this.genomicInput[key];
+        }
+    }
+    getClinicalValue(key: string) {
+        if (this.clinicalInput['no_' + key] === true) {
+            return '!' + (key === 'oncotree_diagnosis' ? this.getOncotree() : this.clinicalInput[key]);
+        } else {
+            return (key === 'oncotree_diagnosis' ? this.getOncotree() : this.clinicalInput[key]);
+        }
+    }
+    getOncotree() {
+        let oncotree_diagnosis = '';
+        if (this.clinicalInput.sub_type) {
+            oncotree_diagnosis = this.clinicalInput.sub_type;
+        }else if (this.clinicalInput.main_type) {
+            oncotree_diagnosis = this.clinicalInput.main_type;
+        }
+        return oncotree_diagnosis;
     }
     addNewNode(obj: Array<any>) {
         if (_.isEmpty(this.dataBlockToMove)) {
@@ -170,24 +197,24 @@ export class PanelComponent implements OnInit {
                 case 'Genomic':
                     obj.push({
                         genomic: {
-                            hugo_symbol: this.genomicInput.hugo_symbol,
-                            oncokb_variant: this.genomicInput.oncokb_variant,
-                            matching_examples: this.genomicInput.matching_examples,
-                            protein_change: this.genomicInput.protein_change,
-                            wildcard_protein_change: this.genomicInput.wildcard_protein_change,
-                            variant_classification: this.genomicInput.variant_classification,
-                            variant_category: this.genomicInput.variant_category,
-                            exon: this.genomicInput.exon,
-                            cnv_call: this.genomicInput.cnv_call,
-                            wildtype: this.genomicInput.wildtype
+                            hugo_symbol: this.getGenomicValue('hugo_symbol'),
+                            oncokb_variant: this.getGenomicValue('oncokb_variant'),
+                            matching_examples: this.getGenomicValue('matching_examples'),
+                            protein_change: this.getGenomicValue('protein_change'),
+                            wildcard_protein_change: this.getGenomicValue('wildcard_protein_change'),
+                            variant_classification: this.getGenomicValue('variant_classification'),
+                            variant_category: this.getGenomicValue('variant_category'),
+                            exon: this.getGenomicValue('exon'),
+                            cnv_call: this.getGenomicValue('cnv_call'),
+                            wildtype: this.getGenomicValue('wildtype')
                         }
                     });
                     break;
                 case 'Clinical':
                     obj.push({
                         clinical: {
-                            age_numerical: this.clinicalInput.age_numerical,
-                            oncotree_diagnosis: this.clinicalInput.oncotree_diagnosis,
+                            age_numerical: this.getClinicalValue('age_numerical'),
+                            oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis'),
                             main_type: this.clinicalInput.main_type,
                             sub_type: this.clinicalInput.sub_type
                         }
@@ -201,24 +228,24 @@ export class PanelComponent implements OnInit {
                             case 'Genomic':
                                 tempObj1.push({
                                     genomic: {
-                                        hugo_symbol: this.genomicInput.hugo_symbol,
-                                        oncokb_variant: this.genomicInput.oncokb_variant,
-                                        matching_examples: this.genomicInput.matching_examples,
-                                        protein_change: this.genomicInput.protein_change,
-                                        wildcard_protein_change: this.genomicInput.wildcard_protein_change,
-                                        variant_classification: this.genomicInput.variant_classification,
-                                        variant_category: this.genomicInput.variant_category,
-                                        exon: this.genomicInput.exon,
-                                        cnv_call: this.genomicInput.cnv_call,
-                                        wildtype: this.genomicInput.wildtype
+                                        hugo_symbol: this.getGenomicValue('hugo_symbol'),
+                                        oncokb_variant: this.getGenomicValue('oncokb_variant'),
+                                        matching_examples: this.getGenomicValue('matching_examples'),
+                                        protein_change: this.getGenomicValue('protein_change'),
+                                        wildcard_protein_change: this.getGenomicValue('wildcard_protein_change'),
+                                        variant_classification: this.getGenomicValue('variant_classification'),
+                                        variant_category: this.getGenomicValue('variant_category'),
+                                        exon: this.getGenomicValue('exon'),
+                                        cnv_call: this.getGenomicValue('cnv_call'),
+                                        wildtype: this.getGenomicValue('wildtype')
                                     }
                                 });
                                 break;
                             case 'Clinical':
                                 tempObj1.push({
                                     clinical: {
-                                        age_numerical: this.clinicalInput.age_numerical,
-                                        oncotree_diagnosis: this.clinicalInput.oncotree_diagnosis,
+                                        age_numerical: this.getClinicalValue('age_numerical'),
+                                        oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis'),
                                         main_type: this.clinicalInput.main_type,
                                         sub_type: this.clinicalInput.sub_type
                                     }
@@ -244,7 +271,7 @@ export class PanelComponent implements OnInit {
                     }
                     obj.push(tempObj2);
                     break;
-    
+
             }
         } else {
             obj.push(this.dataBlockToMove);
@@ -254,21 +281,21 @@ export class PanelComponent implements OnInit {
     updateNode(obj: any, type: string) {
         if (type === 'genomic') {
             obj['genomic'] = {
-                hugo_symbol: this.genomicInput.hugo_symbol,
-                oncokb_variant: this.genomicInput.oncokb_variant,
-                matching_examples: this.genomicInput.matching_examples,
-                protein_change: this.genomicInput.protein_change,
-                wildcard_protein_change: this.genomicInput.wildcard_protein_change,
-                variant_classification: this.genomicInput.variant_classification,
-                variant_category: this.genomicInput.variant_category,
-                exon: this.genomicInput.exon,
-                cnv_call: this.genomicInput.cnv_call,
+                hugo_symbol: this.getGenomicValue('hugo_symbol'),
+                oncokb_variant: this.getGenomicValue('oncokb_variant'),
+                matching_examples: this.getGenomicValue('matching_examples'),
+                protein_change: this.getGenomicValue('protein_change'),
+                wildcard_protein_change: this.getGenomicValue('wildcard_protein_change'),
+                variant_classification: this.getGenomicValue('variant_classification'),
+                variant_category: this.getGenomicValue('variant_category'),
+                exon: this.getGenomicValue('exon'),
+                cnv_call: this.getGenomicValue('cnv_call'),
                 wildtype: this.genomicInput.wildtype
             };
         } else if (type === 'clinical') {
             obj['clinical'] = {
-                age_numerical: this.clinicalInput.age_numerical,
-                oncotree_diagnosis: this.clinicalInput.oncotree_diagnosis,
+                age_numerical: this.getClinicalValue('age_numerical'),
+                oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis'),
                 main_type: this.clinicalInput.main_type,
                 sub_type: this.clinicalInput.sub_type,
             }
@@ -278,25 +305,38 @@ export class PanelComponent implements OnInit {
         const keys = ['genomic', 'clinical', 'and', 'or'];
         return keys.indexOf(Object.keys(a)[0]) - keys.indexOf(Object.keys(b)[0]);
     }
+    setEditOriginalValues(keys: Array<any>, type: string) {
+        if (type === 'genomic') {
+            for (let key of keys) {
+                if (this.unit['genomic'][key][0] === '!') {
+                    this.trialService.setGenomicInput(key, this.unit['genomic'][key].slice(1));
+                    this.trialService.setGenomicInput('no_'+key, true);    
+                } else {
+                    this.trialService.setGenomicInput(key, this.unit['genomic'][key]);
+                    this.trialService.setGenomicInput('no_'+key, false);
+                }
+            }
+        } else if (type === 'clinical') {
+            for (let key of keys) {
+                if (this.unit['clinical'][key][0] === '!') {
+                    this.trialService.setClinicalInput(key, this.unit['clinical'][key].slice(1));
+                    this.trialService.setClinicalInput('no_'+key, true);    
+                } else {
+                    this.trialService.setClinicalInput(key, this.unit['clinical'][key]);
+                    this.trialService.setClinicalInput('no_'+key, false);
+                }
+            }
+        }
+    }
     editNode() {
         this.validGenomic.splice(0, this.validGenomic.length);
         this.validGenomic.push(true);
         this.pathPool.splice(0, this.pathPool.length);
         this.pathPool.push(this.path);
         if (this.unit.hasOwnProperty('genomic')) {
-            this.trialService.setGenomicInput('hugo_symbol', this.unit['genomic']['hugo_symbol']);
-            this.trialService.setGenomicInput('oncokb_variant', this.unit['genomic']['oncokb_variant']);
-            this.trialService.setGenomicInput('matching_examples', this.unit['genomic']['matching_examples']);
-            this.trialService.setGenomicInput('protein_change', this.unit['genomic']['protein_change']);
-            this.trialService.setGenomicInput('wildcard_protein_change', this.unit['genomic']['wildcard_protein_change']);
-            this.trialService.setGenomicInput('variant_classification', this.unit['genomic']['variant_classification']);
-            this.trialService.setGenomicInput('variant_category', this.unit['genomic']['variant_category']);
-            this.trialService.setGenomicInput('exon', this.unit['genomic']['exon']);
-            this.trialService.setGenomicInput('cnv_call', this.unit['genomic']['cnv_call']);
-            this.trialService.setGenomicInput('wildtype', this.unit['genomic']['wildtype']);
+            this.setEditOriginalValues(['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change', 'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'], 'genomic');
         } else if (this.unit.hasOwnProperty('clinical')) {
-            this.trialService.setClinicalInput('age_numerical', this.unit['clinical']['age_numerical']);
-            this.trialService.setClinicalInput('oncotree_diagnosis', this.unit['clinical']['oncotree_diagnosis']);
+            this.setEditOriginalValues(['age_numerical', 'oncotree_diagnosis'], 'clinical');
             this.trialService.setClinicalInput('main_type', this.unit['clinical']['main_type']);
             this.trialService.setClinicalInput('sub_type', this.unit['clinical']['sub_type']);
         }
@@ -317,7 +357,7 @@ export class PanelComponent implements OnInit {
             this.operationPool.push('move');
             this.movingPath.from = this.path;
         }
-        
+
     }
     cancelModification() {
         this.pathPool.splice(0, this.pathPool.length);
@@ -339,7 +379,7 @@ export class PanelComponent implements OnInit {
         this.modifyData(this.dataToModify, this.finalPath, 'add');
         //remove the original data that has been moved to the destination
         this.removeOriginalNode(this.originalMatch);
-        for(let arm of this.originalArms) {
+        for (let arm of this.originalArms) {
             this.removeOriginalNode(arm.match);
         }
         this.dataBlockToMove = {};
@@ -375,7 +415,7 @@ export class PanelComponent implements OnInit {
         let result = tempResult;
         if (tempResult) {
             this.preparePath();
-            result = (['and', 'or'].indexOf(this.finalPath[this.finalPath.length-1]) !== -1);
+            result = (['and', 'or'].indexOf(this.finalPath[this.finalPath.length - 1]) !== -1);
         }
         return result;
     }

@@ -34,13 +34,24 @@ export class TrialService {
         variant_category: '',
         exon: '',
         cnv_call: '',
-        wildtype: ''
+        wildtype: '',
+        no_hugo_symbol: false,
+        no_oncokb_variant: false,
+        no_matching_examples: false,
+        no_protein_change: false,
+        no_wildcard_protein_change: false,
+        no_variant_classification: false,
+        no_variant_category: false,
+        no_exon: false,
+        no_cnv_call: false
     };
     clinicalInput = {
         age_numerical: '',
         oncotree_diagnosis: '',
         main_type: '',
-        sub_type: ''
+        sub_type: '',
+        no_age_numerical: false,
+        no_oncotree_diagnosis: false
     };
     mainTypes = ['All Solid', 'All Liquid', 'All Tumors'];
     subTypes = {};
@@ -161,13 +172,13 @@ export class TrialService {
     getClinicalInput() {
         return this.clinicalInput;
     }
-    setClinicalInput(key: string, value: string) {
+    setClinicalInput(key: string, value: any) {
         this.clinicalInput[key] = value;
     }
     getGenomicInput() {
         return this.genomicInput;
     }
-    setGenomicInput(key: string, value: string) {
+    setGenomicInput(key: string, value: any) {
         this.genomicInput[key] = value;
     }
     getStyle(indent: number) {

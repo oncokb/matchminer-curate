@@ -2,20 +2,28 @@
     <div>
         <div class="row" style="margin-bottom:5px">
             <div class="col-sm-3">age_numerical:</div>
-            <div class="col-sm-9">
-                    <input [(ngModel)]="clinicalInput.age_numerical" size="35" />
+            <div class="col-sm-1 notStyle">
+                <label for="no_age_numerical1">Not</label>
+                <input id="no_age_numerical1" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_age_numerical" />
+            </div>
+            <div class="col-sm-8">
+                <input [(ngModel)]="clinicalInput.age_numerical" size="35" />
             </div>
         </div>
         <div class="row">
             <div class="col-sm-3">oncotree_diagnosis:</div>
-            <div class="col-sm-9">
-                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.main_type" (change)="setOncotreeDiagnosis(clinicalInput.main_type)">
-                        <option value="">Choose a maintype---</option>
+            <div class="col-sm-1 notStyle">
+                <label for="no_oncotree_diagnosis1">Not</label>
+                <input id="no_oncotree_diagnosis1" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_oncotree_diagnosis" />
+            </div>
+            <div class="col-sm-8">
+                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.main_type">
+                    <option value="">Choose a maintype---</option>
                     <option *ngFor="let item of mainTypes" [value]="item">{{item}}</option>
                 </select>
-                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.sub_type" (change)="setOncotreeDiagnosis(clinicalInput.sub_type)">
-                        <option value="">Choose a subtype----</option>
-                        <option *ngFor="let item of subTypes[clinicalInput.main_type]" [value]="item">{{item}}</option>
+                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.sub_type">
+                    <option value="">Choose a subtype----</option>
+                    <option *ngFor="let item of subTypes[clinicalInput.main_type]" [value]="item">{{item}}</option>
                 </select>
             </div>
         </div>
@@ -27,18 +35,24 @@
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="operationPool.indexOf('move') === -1 && pathPool.indexOf(path) !== -1; else panel">
         <label class="ageStyle">age_numerical:</label>
+        <label for="no_age_numerical2">Not</label>
+        <input id="no_age_numerical2" type="checkbox" style="margin-left:-155px" [(ngModel)]="clinicalInput.no_age_numerical" />
         <input [(ngModel)]="clinicalInput.age_numerical" size="35" />
         <br/>
         <div class="row">
             <div class="col-sm-3">oncotree_diagnosis:</div>
-            <div class="col-sm-9">
-                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.main_type" (change)="setOncotreeDiagnosis(clinicalInput.main_type)">
-                        <option value="">Choose a maintype---</option>
+            <div class="col-sm-1">
+                <label for="no_oncotree_diagnosis2">Not</label>
+                <input id="no_oncotree_diagnosis2" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_oncotree_diagnosis" />
+            </div>
+            <div class="col-sm-8">
+                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.main_type">
+                    <option value="">Choose a maintype---</option>
                     <option *ngFor="let item of mainTypes" [value]="item">{{item}}</option>
                 </select>
-                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.sub_type" (change)="setOncotreeDiagnosis(clinicalInput.sub_type)">
-                        <option value="">Choose a subtype----</option>
-                        <option *ngFor="let item of subTypes[clinicalInput.main_type]" [value]="item">{{item}}</option>
+                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.sub_type">
+                    <option value="">Choose a subtype----</option>
+                    <option *ngFor="let item of subTypes[clinicalInput.main_type]" [value]="item">{{item}}</option>
                 </select>
             </div>
         </div>

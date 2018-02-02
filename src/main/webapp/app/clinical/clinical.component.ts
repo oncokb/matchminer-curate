@@ -22,7 +22,4 @@ export class ClinicalComponent implements OnInit {
     getStyle() {
         return this.trialService.getStyle(this.indent);
     }
-    setOncotreeDiagnosis(value: string) {
-        this.trialService.setClinicalInput('oncotree_diagnosis', value);
-    }
 }
