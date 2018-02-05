@@ -42,7 +42,7 @@ export class TrialService {
         main_type: '',
         sub_type: ''
     };
-    mainTypes = [];
+    mainTypes = ['All Solid', 'All Liquid', 'All Tumors'];
     subTypes = {};
     oncokb_variants = {};
     constructor(public afs: AngularFirestore, public http: Http) {
