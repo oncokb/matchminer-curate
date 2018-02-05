@@ -164,6 +164,15 @@ export class PanelComponent implements OnInit {
             this.trialService.setClinicalInput('sub_type', '');
         }
     }
+    getOncotree() {
+        let oncotree_diagnosis = '';
+        if (this.clinicalInput.sub_type) {
+            oncotree_diagnosis = this.clinicalInput.sub_type;
+        }else if (this.clinicalInput.main_type) {
+            oncotree_diagnosis = this.clinicalInput.main_type;
+        }
+        return oncotree_diagnosis;
+    }
     addNewNode(obj: Array<any>) {
         if (_.isEmpty(this.dataBlockToMove)) {
             switch (this.nodeType) {
@@ -187,7 +196,7 @@ export class PanelComponent implements OnInit {
                     obj.push({
                         clinical: {
                             age_numerical: this.clinicalInput.age_numerical,
-                            oncotree_diagnosis: this.clinicalInput.oncotree_diagnosis,
+                            oncotree_diagnosis: this.getOncotree(),
                             main_type: this.clinicalInput.main_type,
                             sub_type: this.clinicalInput.sub_type
                         }
@@ -218,7 +227,7 @@ export class PanelComponent implements OnInit {
                                 tempObj1.push({
                                     clinical: {
                                         age_numerical: this.clinicalInput.age_numerical,
-                                        oncotree_diagnosis: this.clinicalInput.oncotree_diagnosis,
+                                        oncotree_diagnosis: this.getOncotree(),
                                         main_type: this.clinicalInput.main_type,
                                         sub_type: this.clinicalInput.sub_type
                                     }
@@ -268,7 +277,7 @@ export class PanelComponent implements OnInit {
         } else if (type === 'clinical') {
             obj['clinical'] = {
                 age_numerical: this.clinicalInput.age_numerical,
-                oncotree_diagnosis: this.clinicalInput.oncotree_diagnosis,
+                oncotree_diagnosis: this.getOncotree(),
                 main_type: this.clinicalInput.main_type,
                 sub_type: this.clinicalInput.sub_type,
             }
