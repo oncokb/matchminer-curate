@@ -3,6 +3,10 @@ import { TrialService } from '../service/trial.service';
 import { Http, Response } from '@angular/http';
 import { environment } from '../environments/environment';
 import { SERVER_API_URL } from '../app.constants';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
 
 @Component({
     selector: 'jhi-genomic',
@@ -30,6 +34,13 @@ export class GenomicComponent implements OnInit {
     oncokb = environment.oncokb ? environment.oncokb : false;
     validationMessage = '';
     validGenomic = this.trialService.getValidGenomic();
+    search = (text$: Observable<string>) =>
+        text$
+        .debounceTime(200)
+        .distinctUntilChanged()
+        .map(term => term.length < 1 ? []
+            : this.oncokb_variants[this.genomicInput.hugo_symbol].filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
+
     constructor(private trialService: TrialService, public http: Http) { 
     }
 

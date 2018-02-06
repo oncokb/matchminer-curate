@@ -19,6 +19,7 @@ export class TrialService {
     operationPool: Array<string> = [];
     loginStatus = [false];
     validGenomic = [false];
+    validClinical = [false];
     currentPath = '';
     movingPath = {
         from: '',
@@ -67,9 +68,9 @@ export class TrialService {
             for (const trial of trials) {
                 if (this.nctIdList.indexOf(trial.nct_id) === -1) {
                     this.nctIdList.push(trial.nct_id);
+                    this.trialList.push(trial);
                 }
             }
-            this.trialList = trials;
         });
         // prepare main types list
         this.http.get(this.getAPIUrl('MainType'))
@@ -198,6 +199,9 @@ export class TrialService {
     }
     getValidGenomic() {
         return this.validGenomic;
+    }
+    getValidClinical() {
+        return this.validClinical;
     }
     getAPIUrl(type: string) {
         if (this.production === true) {
