@@ -136,6 +136,14 @@ export class PanelComponent implements OnInit {
                     this.modifyData(obj[index], path, type);
                 }
                 break;
+            case 'exchange':
+                if (path.length === 2) {
+                    this.exchangeLogic(obj[path[0]]);
+                } else {
+                    const index = path.shift();
+                    this.modifyData(obj[index], path, type);
+                }
+                break;    
             default:
                 break;
         }
@@ -301,6 +309,15 @@ export class PanelComponent implements OnInit {
             }
         }
     }
+    exchangeLogic(obj: any) {
+        if (obj.hasOwnProperty('or')) {
+            obj['and'] = obj['or'];
+            delete obj['or'];
+        } else if (obj.hasOwnProperty('and')) {
+            obj['or'] = obj['and'];
+            delete obj['and'];
+        }
+    }
     sortModifiedArray(a: object, b: object) {
         const keys = ['genomic', 'clinical', 'and', 'or'];
         return keys.indexOf(Object.keys(a)[0]) - keys.indexOf(Object.keys(b)[0]);
@@ -430,5 +447,8 @@ export class PanelComponent implements OnInit {
     }
     displayMove() {
         return this.type.indexOf('move') !== -1 && this.pathPool.length === 0 || this.pathPool.indexOf(this.path) !== -1;
+    }
+    displayExchange() {
+        return this.operationPool.indexOf('move') === -1 && this.type.indexOf('exchange') !== -1;
     }
 }

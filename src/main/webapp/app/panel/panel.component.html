@@ -1,6 +1,7 @@
 <i class="fa fa-plus addIcon" aria-hidden="true" *ngIf="displayAdd()" (click)="preAddNode()"></i>
 <i class="fa fa-trash-o deleteIcon" aria-hidden="true" *ngIf="displayTrash()" (click)="modifyNode('delete')"></i>
 <i class="fa fa-pencil editIcon" aria-hidden="true" *ngIf="displayPencil()" (click)="editNode()"></i>
+<i class="fa fa-exchange exchangeIcon" *ngIf="displayExchange()" (click)="modifyNode('exchange')"></i>
 <i class="fa fa-arrows moveIcon" aria-hidden="true" *ngIf="displayMove()" (click)="moveNode()" title="Click to choose this section as to be moved"></i>
 <i class="fa fa-arrows destinationIcon" aria-hidden="true" *ngIf="displayDestination()" (click)="dropDownNode()"  title="Click to choose as destination"></i>
 <span *ngIf="operationPool.indexOf('move') === -1 && pathPool.indexOf(path) !== -1">
