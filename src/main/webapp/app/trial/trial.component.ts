@@ -6,7 +6,6 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import * as _ from 'underscore';
 import { Trial } from './trial.model';
 import { SERVER_API_URL } from '../app.constants';
@@ -30,6 +29,7 @@ export class TrialComponent {
   importTrials() {
     this.messages = [];
     const newTrials: Array<string>  = this.trialsToImport.split(',');
+    let setChosenTrial = false;
     for (const newTrial of newTrials) {
         const tempTrial = newTrial.trim();
         if (tempTrial.length === 0) {
@@ -37,6 +37,10 @@ export class TrialComponent {
         }
         if (this.nctIdList.indexOf(tempTrial) !== -1) {
             this.messages.push(tempTrial + ' already imported');
+            continue;
+        }
+        if (!tempTrial.match(/NCT[0-9]+/g)) {
+            this.messages.push(tempTrial + ' is invalid trial format');
             continue;
         }
         this.http.get(this.trialService.getAPIUrl('ClinicalTrials') + tempTrial)
@@ -68,7 +72,16 @@ export class TrialComponent {
                };
            this.trialsCollection.doc(trialInfo.nct_id).set(trial);
            this.messages.push('Successfully imported ' + trialInfo.nct_id);
-        });
+           if (setChosenTrial === false) {
+                this.nctIdChosen = trialInfo.nct_id;
+                this.curateTrial(); 
+                setChosenTrial = true;
+           }
+        },
+        error => {
+            this.messages.push(tempTrial + ' not found');
+        }
+        );
     }
     this.trialsToImport = '';
   }

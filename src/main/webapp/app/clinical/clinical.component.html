@@ -1,13 +1,16 @@
 <div *ngIf="type === 'add'; else editPanel">
     <div>
         <div class="row" style="margin-bottom:5px">
-            <div class="col-sm-3">age_numerical:</div>
+            <div class="col-sm-3">
+                    age_numerical:
+                    <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
+            </div>
             <div class="col-sm-1">
                 <label for="no_age_numerical1">Not</label>
                 <input id="no_age_numerical1" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_age_numerical" />
             </div>
             <div class="col-sm-8">
-                <input [(ngModel)]="clinicalInput.age_numerical" size="35" />
+                <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()"/>
             </div>
         </div>
         <div class="row">
@@ -34,10 +37,10 @@
     <jhi-panel [type]="'delete,edit,move'" [unit]="unit" [path]="path"></jhi-panel>
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="operationPool.indexOf('move') === -1 && pathPool.indexOf(path) !== -1; else panel">
-        <label class="ageStyle">age_numerical:</label>
+        <label class="ageStyle">age_numerical: <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span></label>
         <label for="no_age_numerical2">Not</label>
         <input id="no_age_numerical2" type="checkbox" style="margin-left:-155px;margin-right:30px;" [(ngModel)]="clinicalInput.no_age_numerical" />
-        <input [(ngModel)]="clinicalInput.age_numerical" size="35" />
+        <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()"/>
         <br/>
         <div class="row">
             <div class="col-sm-3">oncotree_diagnosis:</div>

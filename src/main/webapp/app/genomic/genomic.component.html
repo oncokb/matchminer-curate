@@ -20,9 +20,7 @@
                 <input id="no_oncokb_variant1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_oncokb_variant" />
             </div>
             <div class="col-sm-8">
-                <select class="form-control selectStyle" [(ngModel)]="genomicInput.oncokb_variant">
-                    <option *ngFor="let item of oncokb_variants[genomicInput.hugo_symbol]" [value]="item">{{item}}</option>
-                </select>
+                <input type="text" size="36" [(ngModel)]="genomicInput.oncokb_variant" [ngbTypeahead]="search"/>
             </div>
         </div>
         <div class="row borderMargin" *ngIf="oncokb">
@@ -138,9 +136,7 @@
                 <input id="no_oncokb_variant2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_oncokb_variant" />
             </div>
             <div class="col-sm-8">
-                <select class="form-control selectStyle" [(ngModel)]="genomicInput.oncokb_variant">
-                    <option *ngFor="let item of oncokb_variants[genomicInput.hugo_symbol]" [value]="item">{{item}}</option>
-                </select>
+                    <input type="text" size="36" [(ngModel)]="genomicInput.oncokb_variant" [ngbTypeahead]="search"/>
             </div>
         </div>
         <div class="row borderMargin" *ngIf="oncokb">
