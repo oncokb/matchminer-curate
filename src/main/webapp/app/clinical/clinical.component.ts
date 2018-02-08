@@ -14,9 +14,11 @@ export class ClinicalComponent implements OnInit {
     pathPool = this.trialService.getPathpool();
     operationPool = this.trialService.getOperationPool();
     clinicalInput = this.trialService.getClinicalInput();
-    mainTypes = this.trialService.getMainTypes();
-    subTypes = this.trialService.getSubTypes();
+    subTypesOptions = this.trialService.getSubTypesOptions();
     validClinical = this.trialService.getValidClinical();
+    subToMainMapping = this.trialService.getSubToMainMapping();
+    mainTypesOptions = this.trialService.getMainTypesOptions();
+
     constructor(private trialService: TrialService) { }
 
     ngOnInit() {
@@ -41,5 +43,17 @@ export class ClinicalComponent implements OnInit {
             this.validClinical.splice(0, this.validClinical.length);
             this.validClinical.push(false);
         }
+    }
+    onSingleSelected(option){
+        if (option.value && this.clinicalInput.main_type !== this.subToMainMapping[option.value]) {
+            this.clinicalInput.main_type = this.subToMainMapping[option.value]; 
+        }
+    }
+    onSingleDeselectedMaintype() {
+        this.clinicalInput.sub_type = '';
+        this.clinicalInput.main_type = '';
+    }
+    onSingleDeselectedSubtype() {
+        this.clinicalInput.sub_type = '';
     }
 }

@@ -16,6 +16,7 @@ import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
+import {SelectModule} from 'angular2-select';
 
 // customized coponent
 import { TrialComponent } from './trial/trial.component';
@@ -49,7 +50,8 @@ import {
         AngularFireModule.initializeApp(environment.firebaseConfig),
         AngularFirestoreModule,
         AngularFireAuthModule,
-        AngularMultiSelectModule
+        AngularMultiSelectModule,
+        SelectModule
     ],
     declarations: [
         JhiMainComponent,

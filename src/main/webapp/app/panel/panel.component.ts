@@ -36,6 +36,10 @@ export class PanelComponent implements OnInit {
     originalArms = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step.arms;
     dataToModify = [];
     validGenomic = this.trialService.getValidGenomic();
+    allSubTypesOptions = this.trialService.getAllSubTypesOptions();
+    subToMainMapping = this.trialService.getSubToMainMapping();
+    mainTypesOptions = this.trialService.getMainTypesOptions();
+
     constructor(private trialService: TrialService) { }
 
     ngOnInit() {
@@ -222,9 +226,7 @@ export class PanelComponent implements OnInit {
                     obj.push({
                         clinical: {
                             age_numerical: this.getClinicalValue('age_numerical'),
-                            oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis'),
-                            main_type: this.clinicalInput.main_type,
-                            sub_type: this.clinicalInput.sub_type
+                            oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis')
                         }
                     });
                     break;
@@ -253,9 +255,7 @@ export class PanelComponent implements OnInit {
                                 tempObj1.push({
                                     clinical: {
                                         age_numerical: this.getClinicalValue('age_numerical'),
-                                        oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis'),
-                                        main_type: this.clinicalInput.main_type,
-                                        sub_type: this.clinicalInput.sub_type
+                                        oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis')
                                     }
                                 });
                                 break;
@@ -303,9 +303,7 @@ export class PanelComponent implements OnInit {
         } else if (type === 'clinical') {
             obj['clinical'] = {
                 age_numerical: this.getClinicalValue('age_numerical'),
-                oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis'),
-                main_type: this.clinicalInput.main_type,
-                sub_type: this.clinicalInput.sub_type,
+                oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis')
             }
         }
     }
@@ -353,9 +351,27 @@ export class PanelComponent implements OnInit {
         if (this.unit.hasOwnProperty('genomic')) {
             this.setEditOriginalValues(['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change', 'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'], 'genomic');
         } else if (this.unit.hasOwnProperty('clinical')) {
-            this.setEditOriginalValues(['age_numerical', 'oncotree_diagnosis'], 'clinical');
-            this.trialService.setClinicalInput('main_type', this.unit['clinical']['main_type']);
-            this.trialService.setClinicalInput('sub_type', this.unit['clinical']['sub_type']);
+            this.setEditOriginalValues(['age_numerical'], 'clinical');
+            this.setOncotree(this.unit['clinical']['oncotree_diagnosis']);
+        }
+    }
+    setOncotree(oncotree_diagnosis: string) {
+        this.trialService.setClinicalInput('sub_type', '');
+        this.trialService.setClinicalInput('main_type', '');
+        let isSubtype = false;
+        for (let item of this.allSubTypesOptions) {
+            if (item.value === oncotree_diagnosis) {
+                this.trialService.setClinicalInput('sub_type', oncotree_diagnosis);
+                this.trialService.setClinicalInput('main_type', this.subToMainMapping[oncotree_diagnosis]);
+                isSubtype = true;
+            }
+        }
+        if (isSubtype === false) {
+            for (let item of this.mainTypesOptions) {
+                if (item.value === oncotree_diagnosis) {
+                    this.trialService.setClinicalInput('main_type', oncotree_diagnosis);
+                }
+            }
         }
     }
     preAddNode() {
