@@ -2,15 +2,15 @@
     <div>
         <div class="row" style="margin-bottom:5px">
             <div class="col-sm-3">
-                    age_numerical:
-                    <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
+                age_numerical:
+                <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
             </div>
             <div class="col-sm-1">
                 <label for="no_age_numerical1">Not</label>
                 <input id="no_age_numerical1" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_age_numerical" />
             </div>
             <div class="col-sm-8">
-                <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()"/>
+                <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
             </div>
         </div>
         <div class="row">
@@ -20,14 +20,16 @@
                 <input id="no_oncotree_diagnosis1" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_oncotree_diagnosis" />
             </div>
             <div class="col-sm-8">
-                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.main_type">
-                    <option value="">Choose a maintype---</option>
-                    <option *ngFor="let item of mainTypes" [value]="item">{{item}}</option>
-                </select>
-                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.sub_type">
-                    <option value="">Choose a subtype----</option>
-                    <option *ngFor="let item of subTypes[clinicalInput.main_type]" [value]="item">{{item}}</option>
-                </select>
+                <div>
+                    <ng-select class="selectStyle" [options]="mainTypesOptions" [(ngModel)]="clinicalInput.main_type" [allowClear]="true" placeholder="Select Maintype"
+                        (deselected)="onSingleDeselectedMaintype($event)">
+                    </ng-select>
+                </div>
+                <div class="subTypeStyle">
+                    <ng-select class="selectStyle" [options]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
+                        [allowClear]="true" placeholder="Select Subtype" (selected)="onSingleSelected($event)" (deselected)="onSingleDeselectedSubtype($event)">
+                    </ng-select>
+                </div>
             </div>
         </div>
     </div>
@@ -37,26 +39,37 @@
     <jhi-panel [type]="'delete,edit,move'" [unit]="unit" [path]="path"></jhi-panel>
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="operationPool.indexOf('move') === -1 && pathPool.indexOf(path) !== -1; else panel">
-        <label class="ageStyle">age_numerical: <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span></label>
-        <label for="no_age_numerical2">Not</label>
-        <input id="no_age_numerical2" type="checkbox" style="margin-left:-155px;margin-right:30px;" [(ngModel)]="clinicalInput.no_age_numerical" />
-        <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()"/>
-        <br/>
         <div class="row">
-            <div class="col-sm-3">oncotree_diagnosis:</div>
-            <div class="col-sm-1">
+            <div class="col-sm-4">
+                <label>age_numerical:
+                    <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
+                </label>
+            </div>
+            <div class="col-sm-1 editMargin">
+                <label for="no_age_numerical2">Not</label>
+                <input id="no_age_numerical2" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_age_numerical" />
+            </div>
+            <div class="col-sm-7">
+                <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">oncotree_diagnosis:</div>
+            <div class="col-sm-1 editMargin">
                 <label for="no_oncotree_diagnosis2">Not</label>
                 <input id="no_oncotree_diagnosis2" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_oncotree_diagnosis" />
             </div>
-            <div class="col-sm-8">
-                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.main_type">
-                    <option value="">Choose a maintype---</option>
-                    <option *ngFor="let item of mainTypes" [value]="item">{{item}}</option>
-                </select>
-                <select class="form-control selectStyle" [(ngModel)]="clinicalInput.sub_type">
-                    <option value="">Choose a subtype----</option>
-                    <option *ngFor="let item of subTypes[clinicalInput.main_type]" [value]="item">{{item}}</option>
-                </select>
+            <div class="col-sm-7">
+                <div>
+                    <ng-select class="selectStyle" [options]="mainTypesOptions" [(ngModel)]="clinicalInput.main_type" [allowClear]="true" placeholder="Select Maintype"
+                        (deselected)="onSingleDeselectedMaintype($event)">
+                    </ng-select>
+                </div>
+                <div class="subTypeStyle">
+                    <ng-select class="selectStyle" [options]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
+                        [allowClear]="true" placeholder="Select Subtype" (selected)="onSingleSelected($event)" (deselected)="onSingleDeselectedSubtype($event)">
+                    </ng-select>
+                </div>
             </div>
         </div>
     </div>

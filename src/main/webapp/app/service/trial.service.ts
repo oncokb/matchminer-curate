@@ -54,8 +54,13 @@ export class TrialService {
         no_age_numerical: false,
         no_oncotree_diagnosis: false
     };
-    mainTypes = ['All Solid', 'All Liquid', 'All Tumors'];
-    subTypes = {};
+    subTypesOptions = {};
+    allSubTypesOptions = [];
+    subToMainMapping = {};
+    mainTypesOptions = [{value: 'All Solid Tumors', label: 'All Solid Tumors'},
+    {value: 'All Liquid Tumors', label: 'All Liquid Tumors'},
+    {value: 'All Tumors', label: 'All Tumors'},
+    {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
     oncokb_variants = {};
     constructor(public afs: AngularFirestore, public http: Http) {
         this.trialsCollection = afs.collection<Trial>('Trials');
@@ -77,14 +82,16 @@ export class TrialService {
         .subscribe((res: Response) => {
             let mainTypeQueries = [];
             for (const item of res.json().data) {
-                this.mainTypes.push(item.name);
                 mainTypeQueries.push({
                     "exactMatch": true,
                     "query": item.name,
                     "type": "mainType"
                 });
+                this.mainTypesOptions.push({
+                    value: item.name,
+                    label: item.name
+                });
             }
-            this.mainTypes.sort();
             // prepare subtypes by maintype
             let queries =  {
                 "queries": mainTypeQueries
@@ -98,13 +105,27 @@ export class TrialService {
                     for (const item of items) {
                         currentMaintype = item.mainType.name;
                         currentSubtype = item.name;
-                        if (this.subTypes[currentMaintype] == undefined) {
-                            this.subTypes[currentMaintype] = [currentSubtype];
+                        this.allSubTypesOptions.push({
+                            value: currentSubtype,
+                            label: currentSubtype
+                        });
+                        this.subToMainMapping[currentSubtype] = currentMaintype;
+                        if (this.subTypesOptions[currentMaintype] == undefined) {
+                            this.subTypesOptions[currentMaintype] = [{
+                                value: currentSubtype,
+                                label: currentSubtype
+                            }];
                         } else {
-                            this.subTypes[currentMaintype].push(currentSubtype);
+                            this.subTypesOptions[currentMaintype].push({
+                                value: currentSubtype,
+                                label: currentSubtype
+                            });
                         }
                     }
-                    this.subTypes[currentMaintype].sort();
+                    this.subTypesOptions[currentMaintype].sort(function(a, b) {
+                        return a.value > b.value;
+                    });
+                    this.subTypesOptions[''] = this.allSubTypesOptions;
                 }
             });
         });
@@ -185,11 +206,17 @@ export class TrialService {
     getStyle(indent: number) {
         return { 'margin-left': (indent * 40) + 'px' };
     }
-    getMainTypes() {
-        return this.mainTypes;
+    getSubTypesOptions() {
+        return this.subTypesOptions;
     }
-    getSubTypes() {
-        return this.subTypes;
+    getSubToMainMapping() {
+        return this.subToMainMapping;
+    }
+    getMainTypesOptions() {
+        return this.mainTypesOptions;
+    }
+    getAllSubTypesOptions() {
+        return this.allSubTypesOptions;
     }
     getOncokbVariants() {
         return this.oncokb_variants;
