@@ -28,7 +28,6 @@
     "applicationType": "monolith",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "enableTranslation": false,
-    "herokuAppName": "matchminer-curate-mongo"
+    "enableTranslation": false
   }
 }
