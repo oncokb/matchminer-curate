@@ -75,7 +75,7 @@ public class MongoController {
                 return new ResponseEntity<Void>(HttpStatus.NOT_ACCEPTABLE);
             }
 
-            tempFile.deleteOnExit();
+            tempFile.delete();
 
         } catch (Exception e){
 
