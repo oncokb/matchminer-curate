@@ -32,8 +32,8 @@ export class PanelComponent implements OnInit {
     clinicalInput = this.trialService.getClinicalInput();
     genomicInput = this.trialService.getGenomicInput();
     trialsCollection = this.trialService.getTrialsCollection();
-    originalMatch = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step.match;
-    originalArms = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step.arms;
+    originalMatch = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step[0].match;
+    originalArms = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step[0].arm;
     dataToModify = [];
     validGenomic = this.trialService.getValidGenomic();
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
@@ -89,10 +89,10 @@ export class PanelComponent implements OnInit {
             this.modifyData(this.dataToModify, this.finalPath, type);
             this.trialsCollection.doc(this.nctId).update({
                 treatment_list: {
-                    step: {
-                        arms: this.originalArms,
+                    step: [{
+                        arm: this.originalArms,
                         match: this.originalMatch
-                    }
+                    }]
                 }
             });
         }
@@ -418,10 +418,10 @@ export class PanelComponent implements OnInit {
         this.dataBlockToMove = {};
         this.trialsCollection.doc(this.nctId).update({
             treatment_list: {
-                step: {
-                    arms: this.originalArms,
+                step: [{
+                    arm: this.originalArms,
                     match: this.originalMatch
-                }
+                }]
             }
         });
     }

@@ -64,10 +64,10 @@ export class TrialComponent {
                    phase: trialInfo.phase.phase,
                    status: trialInfo.current_trial_status,
                    treatment_list: {
-                       step: {
-                           arms:  armsInfo,
-                           match: []
-                       }
+                       step: [{
+                        arm:  armsInfo,
+                        match: []
+                    }]
                    }
                };
            this.trialsCollection.doc(trialInfo.nct_id).set(trial);
