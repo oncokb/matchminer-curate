@@ -22,13 +22,6 @@ import javax.validation.Valid;
 @Controller
 public class MongoController {
 
-    @ApiOperation(value = "", notes = "Load trial or clinical or genomic data into Mongo DB.", response = Void.class, tags={  })
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Load to Mongo DB successfully.", response = Void.class),
-        @ApiResponse(code = 400, message = "The json object is invalid.", response = Void.class),
-        @ApiResponse(code = 404, message = "The json object was not found.", response = Void.class),
-        @ApiResponse(code = 200, message = "Unexpected error.", response = Void.class) })
-
     @RequestMapping(value = "/mongo/load",
         method = RequestMethod.POST)
     public ResponseEntity<Void> load(@ApiParam(value = "a json object with dataType(trial/clinical/genomic)", required = true) @Valid @RequestBody LoadData loadData) {
@@ -70,12 +63,10 @@ public class MongoController {
 
             BufferedReader bfr = new BufferedReader(new InputStreamReader(p.getInputStream()));
             int exitCode = p.waitFor();
-
+            tempFile.delete();
             if(exitCode == 1) {
                 return new ResponseEntity<Void>(HttpStatus.NOT_ACCEPTABLE);
             }
-
-            tempFile.delete();
 
         } catch (Exception e){
 
