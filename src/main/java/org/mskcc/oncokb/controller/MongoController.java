@@ -28,7 +28,8 @@ public class MongoController {
 
     @RequestMapping(value = "/mongo/load",
         method = RequestMethod.POST)
-    public ResponseEntity<Void> load(@ApiParam(value = "a json object with dataType(trial/clinical/genomic)", required = true) @Valid @RequestBody LoadData loadData) {
+    public ResponseEntity<String> load(@ApiParam(value = "a json object with dataType(trial/clinical/genomic)",
+        required = true) @Valid @RequestBody LoadData loadData) {
 
         try{
             String dataType = loadData.getDataType();
@@ -57,18 +58,20 @@ public class MongoController {
             } else if (dataType.equals("clinical")) {
                 fileType = "-c";
             } else {
-                return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+                return new ResponseEntity<>("Data type should be one of 'trial', 'genomic' and 'clinical'.",
+                    HttpStatus.NOT_ACCEPTABLE);
             }
 
             ProcessBuilder pb = new ProcessBuilder("python",
-                System.getenv("CATALINA_HOME")+ "/webapps/matchminer-curate/WEB-INF/classes/matchminerengine/matchengine.py",
+                System.getenv("CATALINA_HOME") +
+                    "/webapps/matchminer-curate/WEB-INF/classes/matchminerengine/matchengine.py",
                 "load", fileType, absolutePath, "--trial-format", "json", "--mongo-uri", "mongodb://127.0.0.1:27017");
             Process p = pb.start();
 
             int exitCode = p.waitFor();
             tempFile.delete();
             if(exitCode == 1) {
-                return new ResponseEntity<Void>(HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>("Issue occurs in MatchEngine.", HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
         } catch (Exception e){
@@ -76,7 +79,7 @@ public class MongoController {
             e.printStackTrace();
 
         }
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return new ResponseEntity<>("Load the trial successfully!", HttpStatus.OK);
     }
 
 }
