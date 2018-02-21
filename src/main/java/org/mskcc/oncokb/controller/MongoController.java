@@ -4,10 +4,8 @@ import org.mskcc.oncokb.model.LoadData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.io.File;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -18,6 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+
+/**
+ * @author jingsu
+ * This controller is used for sending a trial to Mongo DB.
+ * It will call load() method in MatchEngine.
+ */
 
 @Controller
 public class MongoController {
@@ -61,7 +65,6 @@ public class MongoController {
                 "load", fileType, absolutePath, "--trial-format", "json", "--mongo-uri", "mongodb://127.0.0.1:27017");
             Process p = pb.start();
 
-            BufferedReader bfr = new BufferedReader(new InputStreamReader(p.getInputStream()));
             int exitCode = p.waitFor();
             tempFile.delete();
             if(exitCode == 1) {
