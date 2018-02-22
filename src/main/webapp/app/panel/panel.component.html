@@ -4,45 +4,61 @@
 <i class="fa fa-exchange exchangeIcon" *ngIf="displayExchange()" (click)="modifyNode('exchange')"></i>
 <i class="fa fa-arrows moveIcon" aria-hidden="true" *ngIf="displayMove()" (click)="moveNode()" title="Click to choose this section as to be moved"></i>
 <i class="fa fa-arrows destinationIcon" aria-hidden="true" *ngIf="displayDestination()" (click)="dropDownNode()"  title="Click to choose as destination"></i>
-<span *ngIf="operationPool.indexOf('move') === -1 && pathPool.indexOf(path) !== -1">
+<span *ngIf="operationPool['relocate'] !== true && operationPool['currentPath'] === path">
     <button class="btn btn-success editButtonStyle" (click)="saveModification()">Save</button>
     <button class="btn btn-warning editButtonStyle" (click)="cancelModification()">Cancel</button>
 </span>
 
 <div *ngIf="addNode" style="border-style: solid;border-width:1px;margin:10px;padding:10px">
-    <br/>
-    <label>Specify criterion type
-        <button *ngIf="nodeType" class="btn btn-success addButon" (click)="modifyNode('add')">Add</button>
-        <button class="btn btn-warning cancelButton" (click)="clearInput()">Cancel</button>
-    </label>
-    <select class="form-control" [(ngModel)]="nodeType" (change)="clearNodeInput()">
-        <option></option>
-        <option *ngFor="let node of nodeOptions" [value]="node">{{ node }}</option>
-    </select>
-    <br/>
-    <div *ngIf="nodeType === 'Genomic'; else section1">
-        <jhi-genomic [type]="'add'"></jhi-genomic>
-    </div>
-    <ng-template #section1>
-        <div *ngIf="nodeType === 'Clinical'; else section2">
-            <jhi-clinical [type]="'add'"></jhi-clinical>
+    <div *ngIf="arm === false; else armSection">
+        <br/>
+        <label>Specify criterion type
+            <button *ngIf="nodeType" class="btn btn-success addButon" (click)="modifyNode('add')">Add</button>
+            <button class="btn btn-warning cancelButton" (click)="clearInput()">Cancel</button>
+        </label>
+        <select class="form-control" [(ngModel)]="nodeType" (change)="clearNodeInput()">
+            <option></option>
+            <option *ngFor="let node of nodeOptions" [value]="node">{{ node }}</option>
+        </select>
+        <br/>
+        <div *ngIf="nodeType === 'Genomic'; else section1">
+            <jhi-genomic [type]="'add'"></jhi-genomic>
         </div>
-    </ng-template>
-    <ng-template #section2>
-        <div *ngIf="nodeType === 'And' || nodeType === 'Or'">
-            <label>Specify nodes in the {{nodeType}} logic</label>
-            <angular2-multiselect [data]="dropdownList" [(ngModel)]="selectedItems"></angular2-multiselect>
-            <br/>
-            <div *ngFor="let x of selectedItems">
-                <div *ngIf="x.itemName == 'Genomic'">
-                    <h6>Genomic:</h6>
-                    <jhi-genomic [type]="'add'"></jhi-genomic>
-                </div>
-                <div *ngIf="x.itemName == 'Clinical'">
-                    <h6>Clinical:</h6>
-                    <jhi-clinical [type]="'add'"></jhi-clinical>
+        <ng-template #section1>
+            <div *ngIf="nodeType === 'Clinical'; else section2">
+                <jhi-clinical [type]="'add'"></jhi-clinical>
+            </div>
+        </ng-template>
+        <ng-template #section2>
+            <div *ngIf="nodeType === 'And' || nodeType === 'Or'">
+                <label>Specify nodes in the {{nodeType}} logic</label>
+                <angular2-multiselect [data]="dropdownList" [(ngModel)]="selectedItems"></angular2-multiselect>
+                <br/>
+                <div *ngFor="let x of selectedItems">
+                    <div *ngIf="x.itemName == 'Genomic'">
+                        <h6>Genomic:</h6>
+                        <jhi-genomic [type]="'add'"></jhi-genomic>
+                    </div>
+                    <div *ngIf="x.itemName == 'Clinical'">
+                        <h6>Clinical:</h6>
+                        <jhi-clinical [type]="'add'"></jhi-clinical>
+                    </div>
                 </div>
             </div>
+        </ng-template>
+    </div>
+    <ng-template #armSection>
+        <div>
+            <label style="width: 150px; margin-right: -30px">arm name: </label>
+            <input [(ngModel)]="armInput.arm_name" size="100"/>
         </div>
+        <div>
+            <label style="width:150px" for="description">arm description: </label>
+        </div>
+        <div style="margin-top: -20px; margin-left:150px">
+            <textarea id="description" rows="3" cols="100" [(ngModel)]="armInput.arm_description"></textarea>
+        </div>
+        <button class="btn btn-success addButon" (click)="modifyNode('add')">Add</button>
+        <button class="btn btn-warning cancelButton" (click)="clearInput()">Cancel</button>
     </ng-template>
 </div>

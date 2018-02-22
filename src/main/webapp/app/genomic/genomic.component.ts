@@ -18,7 +18,6 @@ export class GenomicComponent implements OnInit {
     @Input() unit = {};
     @Input() type = '';
     indent = 1.2; // the relative indent between the genomic content with the title
-    pathPool = this.trialService.getPathpool();
     operationPool = this.trialService.getOperationPool();
     genomicInput = this.trialService.getGenomicInput();
     variant_categorys = ['Mutation', 'Copy Number Variation', 'Structural Variation', 'Any Variation'];
@@ -32,8 +31,11 @@ export class GenomicComponent implements OnInit {
     wiltypes = [true, false];
     oncokb_variants = this.trialService.getOncokbVariants();
     oncokb = environment.oncokb ? environment.oncokb : false;
-    validationMessage = '';
-    validGenomic = this.trialService.getValidGenomic();
+    validationMessage = {
+        gene: '',
+        example: ''
+    };
+    validation = this.trialService.getValidation();
     search = (text$: Observable<string>) =>
         text$
         .debounceTime(200)
@@ -50,26 +52,37 @@ export class GenomicComponent implements OnInit {
         return this.trialService.getStyle(this.indent);
     }
     // This validation function will be executed the moment the input box lose focus
-    validateGenomicSection() {
+    validateGenomicGene() {
         this.http.get(this.trialService.getAPIUrl('GeneValidation') + this.genomicInput.hugo_symbol)
         .subscribe((res: Response) => {
            const result = res.json();
            if (result.hits.length > 0) {
-                this.validationMessage = 'Valid gene';
-                this.validGenomic.splice(0, this.validGenomic.length);
-                this.validGenomic.push(true);
+                this.validationMessage['gene'] = 'Valid gene';
+                this.validation['genomicGene'] = true;
            } else {
-                this.validationMessage = 'Invalid gene';
-                this.validGenomic.splice(0, this.validGenomic.length);
-                this.validGenomic.push(false);
+                this.validationMessage['gene'] = 'Invalid gene';
+                this.validation['genomicGene'] = false;
            }  
         });
     }
-    getMessageStyle() {
-        if (this.validGenomic[0] === true) {
-            return { 'color': 'green' };
-        } else if (this.validGenomic[0] === false) {
-            return { 'color': 'red' };
-        }
+    validateGenomicExample() {
+        if (this.genomicInput.hugo_symbol && this.genomicInput.oncokb_variant && this.genomicInput.matching_examples) {
+            const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol +'&variant=' + this.genomicInput.oncokb_variant +'&examples=' + this.genomicInput.matching_examples;
+            this.http.get(this.trialService.getAPIUrl('ExampleValidation') + variantsTobeValidated)
+            .subscribe((res: Response) => {
+                const result = res.json();
+                if (result[this.genomicInput.matching_examples] === true) {
+                    this.validationMessage['example'] = 'Valid';
+                    this.validation['example'] = true;
+                } else {
+                    this.validationMessage['example'] = 'Invalid';
+                    this.validation['example'] = false;
+                }
+            });
+        }        
+    }
+    getMessageStyle(type) {
+        const result = (type === 'gene' ? this.validation['genomicGene'] : this.validation['example']);
+        return result === true ? { 'color': 'green' } : { 'color': 'red' };
     }
 }

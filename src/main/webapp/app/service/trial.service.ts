@@ -15,11 +15,13 @@ export class TrialService {
     nctIdList: Array<string> = [];
     trialChosen: Observable<Trial[]>;
     nctIdChosen = '';
-    pathPool: Array<string> = [];
-    operationPool: Array<string> = [];
+    operationPool = {};
     loginStatus = [false];
-    validGenomic = [false];
-    validClinical = [false];
+    validation = {
+        genomicGene: false,
+        genomicMatching: false,
+        clinicalAge: false
+    };
     currentPath = '';
     movingPath = {
         from: '',
@@ -53,6 +55,10 @@ export class TrialService {
         sub_type: '',
         no_age_numerical: false,
         no_oncotree_diagnosis: false
+    };
+    armInput = {
+        arm_name: '',
+        arm_description: ''
     };
     subTypesOptions = {};
     allSubTypesOptions = [];
@@ -173,9 +179,6 @@ export class TrialService {
     getNctIdChosen() {
         return this.nctIdChosen;
     }
-    getPathpool() {
-        return this.pathPool;
-    }
     getOperationPool() {
         return this.operationPool;
     }
@@ -203,6 +206,12 @@ export class TrialService {
     setGenomicInput(key: string, value: any) {
         this.genomicInput[key] = value;
     }
+    getArmInput() {
+        return this.armInput;
+    }
+    setArmInput(key: string, value: any) {
+        this.armInput[key] = value;
+    }
     getStyle(indent: number) {
         return { 'margin-left': (indent * 40) + 'px' };
     }
@@ -224,11 +233,8 @@ export class TrialService {
     getLoginStatus() {
         return this.loginStatus;
     }
-    getValidGenomic() {
-        return this.validGenomic;
-    }
-    getValidClinical() {
-        return this.validClinical;
+    getValidation() {
+        return this.validation;
     }
     getAPIUrl(type: string) {
         if (this.production === true) {
@@ -243,7 +249,8 @@ export class TrialService {
                     return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
                     return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-
+                case 'ExampleValidation':
+                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
             }
         } else {
             switch(type) {
@@ -257,6 +264,8 @@ export class TrialService {
                     return 'http://mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
                     return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
+                case 'ExampleValidation':
+                    return 'http://oncokb.org/api/v1/utils/match/variant?';    
             }
         }
     }

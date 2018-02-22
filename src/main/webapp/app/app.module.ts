@@ -22,6 +22,7 @@ import {SelectModule} from 'angular2-select';
 import { TrialComponent } from './trial/trial.component';
 import { GenomicComponent } from './genomic/genomic.component';
 import { ClinicalComponent } from './clinical/clinical.component';
+import { ArmComponent } from './arm/arm.component';
 import { PanelComponent } from './panel/panel.component';
 import { MatchComponent } from './match/match.component';
 import { LoginComponent } from './login/login.component';
@@ -62,6 +63,7 @@ import {
         TrialComponent,
         GenomicComponent,
         ClinicalComponent,
+        ArmComponent,
         PanelComponent,
         MatchComponent,
         LoginComponent

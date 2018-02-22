@@ -11,11 +11,10 @@ export class ClinicalComponent implements OnInit {
     @Input() type = '';
     validationMessage = '';
     indent = 1.2; // the relative indent between the clinical content with the title
-    pathPool = this.trialService.getPathpool();
     operationPool = this.trialService.getOperationPool();
     clinicalInput = this.trialService.getClinicalInput();
     subTypesOptions = this.trialService.getSubTypesOptions();
-    validClinical = this.trialService.getValidClinical();
+    validation = this.trialService.getValidation();
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
 
@@ -27,21 +26,19 @@ export class ClinicalComponent implements OnInit {
         return this.trialService.getStyle(this.indent);
     }
     getMessageStyle() {
-        if (this.validClinical[0] === true) {
+        if (this.validation['clinicalAge'] === true) {
             return { 'color': 'green' };
-        } else if (this.validClinical[0] === false) {
+        } else if (this.validation['clinicalAge'] === false) {
             return { 'color': 'red' };
         }
     }
     validateAgeInput() {
         if (this.clinicalInput.age_numerical.match(/^(>|>=|<|<=)?[0-9][0-9]$/)) {
             this.validationMessage = 'Valid Age Entry';
-            this.validClinical.splice(0, this.validClinical.length);
-            this.validClinical.push(true);
+            this.validation['clinicalAge'] = true;
         } else {
             this.validationMessage = 'Invalid Age Entry';
-            this.validClinical.splice(0, this.validClinical.length);
-            this.validClinical.push(false);
+            this.validation['clinicalAge'] = false;
         }
     }
     onSingleSelected(option){

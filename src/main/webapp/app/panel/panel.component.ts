@@ -11,6 +11,7 @@ export class PanelComponent implements OnInit {
     // used to manage the icons to be displayed
     @Input() type = '';
     @Input() unit = {};
+    @Input() arm = false;
     nctId = this.trialService.getNctIdChosen();
     finalPath = [];
     message = '';
@@ -19,7 +20,6 @@ export class PanelComponent implements OnInit {
     nodeOptions: Array<string> = ['Genomic', 'Clinical', 'And', 'Or'];
     nodeType = '';
     selectedItems = [];
-    pathPool = this.trialService.getPathpool();
     operationPool = this.trialService.getOperationPool();
     movingPath = this.trialService.getMovingPath();
     dataBlockToMove = {};
@@ -31,11 +31,11 @@ export class PanelComponent implements OnInit {
         { id: 4, itemName: 'Or' }];
     clinicalInput = this.trialService.getClinicalInput();
     genomicInput = this.trialService.getGenomicInput();
+    armInput = this.trialService.getArmInput();
     trialsCollection = this.trialService.getTrialsCollection();
     originalMatch = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step[0].match;
     originalArms = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step[0].arm;
     dataToModify = [];
-    validGenomic = this.trialService.getValidGenomic();
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
@@ -82,20 +82,27 @@ export class PanelComponent implements OnInit {
         let result = true;
         // validate the need to proceed
         if (type === 'delete') {
-            result = confirm('Are you sure you want to delte this section?');
+            result = confirm('This will delete the entire section. Are you sure you want to proceed?');
         }
         if (result) {
-            this.preparePath();
-            this.modifyData(this.dataToModify, this.finalPath, type);
-            this.trialsCollection.doc(this.nctId).update({
-                treatment_list: {
-                    step: [{
-                        arm: this.originalArms,
-                        match: this.originalMatch
-                    }]
-                }
-            });
+            if (this.arm === true) {
+                this.modifyArmGroup(type);
+            } else {
+                this.preparePath();
+                this.modifyData(this.dataToModify, this.finalPath, type);  
+            }
+            this.saveBacktoDB();
         }
+    }
+    saveBacktoDB() {
+        this.trialsCollection.doc(this.nctId).update({
+            treatment_list: {
+                step: [{
+                    arm: this.originalArms,
+                    match: this.originalMatch
+                }]
+            }
+        });
     }
     modifyData(obj: Array<any>, path: Array<string>, type: string) {
         switch (type) {
@@ -168,7 +175,11 @@ export class PanelComponent implements OnInit {
                 this.trialService.setClinicalInput(key, '');
                 this.trialService.setClinicalInput('no_'+key, false);
             }    
-        } 
+        } else if (type === 'arm') {
+            for (let key of keys) {
+                this.trialService.setArmInput(key, '');
+            } 
+        }
     }
     clearNodeInput() {
         if (this.nodeType === 'Genomic') {
@@ -341,18 +352,22 @@ export class PanelComponent implements OnInit {
                     this.trialService.setClinicalInput('no_'+key, false);
                 }
             }
+        } else if (type === 'arm') {
+            for (const key of keys) {
+                this.trialService.setArmInput(key, this.unit[key]);
+            }
         }
     }
-    editNode() {
-        this.validGenomic.splice(0, this.validGenomic.length);
-        this.validGenomic.push(true);
-        this.pathPool.splice(0, this.pathPool.length);
-        this.pathPool.push(this.path);
+    editNode() { 
+        this.operationPool['currentPath'] = this.path;
+        this.operationPool['editing'] = true;
         if (this.unit.hasOwnProperty('genomic')) {
             this.setEditOriginalValues(['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change', 'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'], 'genomic');
         } else if (this.unit.hasOwnProperty('clinical')) {
             this.setEditOriginalValues(['age_numerical'], 'clinical');
             this.setOncotree(this.unit['clinical']['oncotree_diagnosis']);
+        } else if (this.unit.hasOwnProperty('arm_name')) {
+            this.setEditOriginalValues(['arm_name', 'arm_description'], 'arm');
         }
     }
     setOncotree(oncotree_diagnosis: string) {
@@ -375,33 +390,33 @@ export class PanelComponent implements OnInit {
         }
     }
     preAddNode() {
-        this.validGenomic.splice(0, this.validGenomic.length);
-        this.validGenomic.push(false);
         this.addNode = true;
+        if (this.arm === true) {
+            this.clearInputForm(['arm_name', 'arm_description'], 'arm');
+        }
     }
     moveNode() {
-        if (this.operationPool[0] === 'move') {
-            this.pathPool.splice(0, this.pathPool.length);
-            this.operationPool.splice(0, this.operationPool.length);
+        if (this.operationPool['relocate'] === true) {
+            this.operationPool['currentPath'] = '';
+            this.operationPool['relocate'] = false;
         } else {
-            this.pathPool.splice(0, this.pathPool.length);
-            this.pathPool.push(this.path);
-            this.operationPool.splice(0, this.operationPool.length);
-            this.operationPool.push('move');
+            this.operationPool['currentPath'] = this.path;
+            this.operationPool['relocate'] = true;
             this.movingPath.from = this.path;
         }
-
     }
     cancelModification() {
-        this.pathPool.splice(0, this.pathPool.length);
+        this.operationPool['currentPath'] = '';
+        this.operationPool['editing'] = false;
     }
     saveModification() {
-        this.pathPool.splice(0, this.pathPool.length);
+        this.operationPool['currentPath'] = '';
+        this.operationPool['editing'] = false;
         this.modifyNode('update');
     }
     dropDownNode() {
-        this.operationPool.splice(0, this.operationPool.length);
-        this.pathPool.splice(0, this.pathPool.length);
+        this.operationPool['relocate'] = false;
+        this.operationPool['currentPath'] = '';
         this.movingPath.to = this.path;
         // find the data to be moved and mark it as to be removed.
         // We can't remove it at this step because it will upset the path for the destination node
@@ -443,28 +458,49 @@ export class PanelComponent implements OnInit {
             }
         }
     }
+    // when user try to move a section, we hide all icons except the relocate icon to avoid distraction
     displayDestination() {
-        const tempResult = this.type.indexOf('move') !== -1 && this.operationPool.length > 0 && this.pathPool.length > 0 && this.pathPool.indexOf(this.path) === -1;
-        let result = tempResult;
-        if (tempResult) {
-            this.preparePath();
-            result = (['and', 'or'].indexOf(this.finalPath[this.finalPath.length - 1]) !== -1);
-        }
-        return result;
+        return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true;
     }
     displayPencil() {
-        return this.operationPool.indexOf('move') === -1 && this.type.indexOf('edit') !== -1 && this.pathPool.indexOf(this.path) === -1;
+        return this.type.indexOf('edit') !== -1 && this.operationPool['relocate'] !== true && this.operationPool['currentPath'] !== this.path;
     }
     displayAdd() {
-        return this.operationPool.indexOf('move') === -1 && this.type.indexOf('add') !== -1;
+        return this.type.indexOf('add') !== -1 && this.operationPool['relocate'] !== true;
     }
+    // There are three cases we display the trash icon
+    // 1) when the page is first loaded
+    // 2) when the item is not the current editing one
     displayTrash() {
-        return this.operationPool.indexOf('move') === -1 && this.type.indexOf('delete') !== -1;
+        return this.type.indexOf('delete') !== -1 && (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
+        || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path);
     }
+    // There are three cases we display the move icon
+    // 1) when the page is first loaded
+    // 2) when the item is not the current editing one
+    // 3) when the item is the one we chose to move around
     displayMove() {
-        return this.type.indexOf('move') !== -1 && this.pathPool.length === 0 || this.pathPool.indexOf(this.path) !== -1;
+        return this.type.indexOf('relocate') !== -1 && (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
+        || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
+        || this.operationPool['relocate'] === true && this.operationPool['currentPath'] === this.path);
     }
     displayExchange() {
-        return this.operationPool.indexOf('move') === -1 && this.type.indexOf('exchange') !== -1;
+        return this.type.indexOf('exchange') !== -1 && this.operationPool['relocate'] !== true;
+    }
+    modifyArmGroup(type) {
+        if (type === 'add') {
+            this.originalArms.push({
+                arm_name: this.armInput.arm_name,
+                arm_description: this.armInput.arm_description,
+                match: []
+            });
+        } else if (type === 'delete') {
+            const tempIndex = this.path.split(',')[1].trim();
+            this.originalArms.splice(tempIndex, 1);
+        } else if (type === 'update') {
+            const tempIndex = this.path.split(',')[1].trim();
+            this.originalArms[tempIndex].arm_name = this.armInput['arm_name'];
+            this.originalArms[tempIndex].arm_description = this.armInput['arm_description'];
+        }
     }
 }
