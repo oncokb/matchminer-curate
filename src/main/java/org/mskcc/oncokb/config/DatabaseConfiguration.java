@@ -1,20 +1,22 @@
 package org.mskcc.oncokb.config;
 
+import com.mongodb.*;
 import io.github.jhipster.config.JHipsterConstants;
 import com.github.mongobee.Mongobee;
-import com.mongodb.MongoClient;
 import io.github.jhipster.domain.util.JSR310DateConverters.DateToZonedDateTimeConverter;
 import io.github.jhipster.domain.util.JSR310DateConverters.ZonedDateTimeToDateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.CustomConversions;
@@ -29,9 +31,15 @@ import java.util.List;
 @Profile("!" + JHipsterConstants.SPRING_PROFILE_CLOUD)
 @Import(value = MongoAutoConfiguration.class)
 @EnableMongoAuditing(auditorAwareRef = "springSecurityAuditorAware")
-public class DatabaseConfiguration {
+@ConfigurationProperties(prefix = "spring.data.mongodb", ignoreUnknownFields = false)
+public class DatabaseConfiguration extends AbstractMongoConfiguration{
 
     private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
+
+    @Value("${spring.data.mongodb.uri}")
+    private String uri;
+    @Value("${spring.data.mongodb.database}")
+    private String database;
 
     @Bean
     public ValidatingMongoEventListener validatingMongoEventListener() {
@@ -62,4 +70,16 @@ public class DatabaseConfiguration {
         mongobee.setEnabled(true);
         return mongobee;
     }
+
+    @Override
+    public String getDatabaseName() {
+        return database;
+    }
+
+    @Override
+    @Bean
+    public Mongo mongo() throws Exception {
+        return new MongoClient(new MongoClientURI(uri));
+    }
+
 }

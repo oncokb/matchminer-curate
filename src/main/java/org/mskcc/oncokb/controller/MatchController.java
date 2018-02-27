@@ -3,14 +3,18 @@ package org.mskcc.oncokb.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.mongobee.changeset.ChangeSet;
+import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import io.swagger.annotations.ApiParam;
 import org.bson.Document;
+import org.mskcc.oncokb.config.DatabaseConfiguration;
 import org.mskcc.oncokb.model.QueryData;
 import org.mskcc.oncokb.service.util.MatchEngineUtil;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -39,8 +43,11 @@ import static com.mongodb.client.model.Projections.exclude;
 @Controller
 public class MatchController {
 
-    private static final MongoClient mongoClient = new MongoClient( "localhost" , 27017 );;
-    private static final MongoDatabase mongoDb = mongoClient.getDatabase("matchminer");
+    private DatabaseConfiguration dbc = new DatabaseConfiguration();
+    private String database = dbc.getDatabaseName();
+    private ApplicationContext context = new AnnotationConfigApplicationContext();
+    private MongoClient mongoClient = (MongoClient) context.getBean(Mongo.class);
+    private MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
 
     @RequestMapping(value = "/match",
         method = RequestMethod.POST)
@@ -75,8 +82,7 @@ public class MatchController {
 
                 if(isMatch) {
                     // export matched result from collection "trial_match" in MongoDB "matchminer"
-                    matchedResults = getCollection(mongoDb, "trial_match").toString();
-
+                    matchedResults = getCollection(mongoDatabase, "trial_match").toString();
                 } else {
                     return new ResponseEntity<>("Run MatchEngine match() failed.", HttpStatus.INTERNAL_SERVER_ERROR);
                 }
