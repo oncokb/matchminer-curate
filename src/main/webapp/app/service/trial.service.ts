@@ -70,6 +70,7 @@ export class TrialService {
     {value: 'All Tumors', label: 'All Tumors'},
     {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
     oncokb_variants = {};
+    hasWritePermission = {};
     constructor(public afs: AngularFirestore, public http: Http) {
         this.trialsCollection = afs.collection<Trial>('Trials');
         this.trialsCollection.snapshotChanges().map(changes => {
@@ -82,6 +83,7 @@ export class TrialService {
                 if (this.nctIdList.indexOf(trial.nct_id) === -1) {
                     this.nctIdList.push(trial.nct_id);
                     this.trialList.push(trial);
+                    // this.validateWritePermission(trial.nct_id);
                 }
             }
         });
@@ -155,7 +157,18 @@ export class TrialService {
            }
         });
     }
-
+    // an attribute validationNote is inserted to the trial to test the writting permission
+    validateWritePermission(nctId: string) {
+        this.trialsCollection.doc(nctId).update({
+            validationNote: 'success'
+        }).then(result => {
+            this.hasWritePermission[nctId] = true;
+        }).catch(error => {
+            if (error.code === 'permission-denied') {
+                this.hasWritePermission[nctId] = false;
+            }
+        });
+    }
     getNctIdList() {
         return this.nctIdList;
     }

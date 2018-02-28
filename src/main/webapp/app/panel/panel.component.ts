@@ -39,7 +39,10 @@ export class PanelComponent implements OnInit {
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
-
+    // In this project, there is no write permission set based on trial ID so we set isPermitted with true by default
+    // If permission setting by trial is needed in the future, use the statement below.
+    // isPermitted = this.trialService.hasWritePermission[this.nctId];   
+    isPermitted = true; 
     constructor(private trialService: TrialService) { }
 
     ngOnInit() {
@@ -460,18 +463,22 @@ export class PanelComponent implements OnInit {
     }
     // when user try to move a section, we hide all icons except the relocate icon to avoid distraction
     displayDestination() {
+        if (this.isPermitted === false) return false;
         return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true;
     }
     displayPencil() {
+        if (this.isPermitted === false) return false;
         return this.type.indexOf('edit') !== -1 && this.operationPool['relocate'] !== true && this.operationPool['currentPath'] !== this.path;
     }
     displayAdd() {
+        if (this.isPermitted === false) return false;
         return this.type.indexOf('add') !== -1 && this.operationPool['relocate'] !== true;
     }
     // There are three cases we display the trash icon
     // 1) when the page is first loaded
     // 2) when the item is not the current editing one
     displayTrash() {
+        if (this.isPermitted === false) return false;
         return this.type.indexOf('delete') !== -1 && (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
         || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path);
     }
@@ -480,11 +487,13 @@ export class PanelComponent implements OnInit {
     // 2) when the item is not the current editing one
     // 3) when the item is the one we chose to move around
     displayMove() {
+        if (this.isPermitted === false) return false;
         return this.type.indexOf('relocate') !== -1 && (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
         || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
         || this.operationPool['relocate'] === true && this.operationPool['currentPath'] === this.path);
     }
     displayExchange() {
+        if (this.isPermitted === false) return false;
         return this.type.indexOf('exchange') !== -1 && this.operationPool['relocate'] !== true;
     }
     modifyArmGroup(type) {
