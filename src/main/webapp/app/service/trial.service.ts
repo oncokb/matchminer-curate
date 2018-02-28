@@ -16,7 +16,9 @@ export class TrialService {
     trialChosen: Observable<Trial[]>;
     nctIdChosen = '';
     operationPool = {};
-    loginStatus = [false];
+    status = {
+        login: false
+    };
     validation = {
         genomicGene: false,
         genomicMatching: false,
@@ -230,8 +232,8 @@ export class TrialService {
     getOncokbVariants() {
         return this.oncokb_variants;
     }
-    getLoginStatus() {
-        return this.loginStatus;
+    getStatus() {
+        return this.status;
     }
     getValidation() {
         return this.validation;

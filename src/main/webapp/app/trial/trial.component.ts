@@ -23,7 +23,7 @@ export class TrialComponent {
   trialsToImport = '';
   nctIdChosen = '';
   messages: Array<string> = [];
-  isLoggedIn = this.trialService.getLoginStatus();
+  status = this.trialService.getStatus();
   constructor(public http: Http, public afs: AngularFirestore, private trialService: TrialService) {}
 
   importTrials() {

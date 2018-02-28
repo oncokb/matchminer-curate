@@ -1,4 +1,4 @@
-<div class="container" style="min-height:550px" *ngIf="true; else permission">
+<div class="container" style="min-height:550px" *ngIf="status['login']; else permission">
     <div class="input-group">
         <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Enter trial in the format: NCT02057133, NCT03006172"
             size="100">
