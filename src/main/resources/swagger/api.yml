@@ -32,7 +32,7 @@ paths:
           description: The json object was not found.
         default:
           description: Unexpected error.
-  '/match':
+  '/mongo/match':
     post:
       description: Match trial in Mongo DB to patient or sample.
       operationId: "match"

@@ -99,3 +99,6 @@ jhipster:
 # ===================================================================
 
 application:
+    oncokb:
+        api:
+            match-variant: http://dashi-dev.cbio.mskcc.org:8080/endpoints-mm/api/private/utils/match/variant
