@@ -15,11 +15,15 @@ export class TrialService {
     nctIdList: Array<string> = [];
     trialChosen: Observable<Trial[]>;
     nctIdChosen = '';
-    pathPool: Array<string> = [];
-    operationPool: Array<string> = [];
-    loginStatus = [false];
-    validGenomic = [false];
-    validClinical = [false];
+    operationPool = {};
+    status = {
+        login: false
+    };
+    validation = {
+        genomicGene: false,
+        genomicMatching: false,
+        clinicalAge: false
+    };
     currentPath = '';
     movingPath = {
         from: '',
@@ -54,6 +58,10 @@ export class TrialService {
         no_age_numerical: false,
         no_oncotree_diagnosis: false
     };
+    armInput = {
+        arm_name: '',
+        arm_description: ''
+    };
     subTypesOptions = {};
     allSubTypesOptions = [];
     subToMainMapping = {};
@@ -62,6 +70,7 @@ export class TrialService {
     {value: 'All Tumors', label: 'All Tumors'},
     {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
     oncokb_variants = {};
+    hasWritePermission = {};
     constructor(public afs: AngularFirestore, public http: Http) {
         this.trialsCollection = afs.collection<Trial>('Trials');
         this.trialsCollection.snapshotChanges().map(changes => {
@@ -74,6 +83,7 @@ export class TrialService {
                 if (this.nctIdList.indexOf(trial.nct_id) === -1) {
                     this.nctIdList.push(trial.nct_id);
                     this.trialList.push(trial);
+                    // this.validateWritePermission(trial.nct_id);
                 }
             }
         });
@@ -147,7 +157,18 @@ export class TrialService {
            }
         });
     }
-
+    // an attribute validationNote is inserted to the trial to test the writting permission
+    validateWritePermission(nctId: string) {
+        this.trialsCollection.doc(nctId).update({
+            validationNote: 'success'
+        }).then(result => {
+            this.hasWritePermission[nctId] = true;
+        }).catch(error => {
+            if (error.code === 'permission-denied') {
+                this.hasWritePermission[nctId] = false;
+            }
+        });
+    }
     getNctIdList() {
         return this.nctIdList;
     }
@@ -172,9 +193,6 @@ export class TrialService {
     }
     getNctIdChosen() {
         return this.nctIdChosen;
-    }
-    getPathpool() {
-        return this.pathPool;
     }
     getOperationPool() {
         return this.operationPool;
@@ -203,6 +221,12 @@ export class TrialService {
     setGenomicInput(key: string, value: any) {
         this.genomicInput[key] = value;
     }
+    getArmInput() {
+        return this.armInput;
+    }
+    setArmInput(key: string, value: any) {
+        this.armInput[key] = value;
+    }
     getStyle(indent: number) {
         return { 'margin-left': (indent * 40) + 'px' };
     }
@@ -221,14 +245,11 @@ export class TrialService {
     getOncokbVariants() {
         return this.oncokb_variants;
     }
-    getLoginStatus() {
-        return this.loginStatus;
+    getStatus() {
+        return this.status;
     }
-    getValidGenomic() {
-        return this.validGenomic;
-    }
-    getValidClinical() {
-        return this.validClinical;
+    getValidation() {
+        return this.validation;
     }
     getAPIUrl(type: string) {
         if (this.production === true) {
@@ -243,7 +264,8 @@ export class TrialService {
                     return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
                     return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-
+                case 'ExampleValidation':
+                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
             }
         } else {
             switch(type) {
@@ -257,6 +279,8 @@ export class TrialService {
                     return 'http://mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
                     return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
+                case 'ExampleValidation':
+                    return 'http://oncokb.org/api/v1/utils/match/variant?';    
             }
         }
     }

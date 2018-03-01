@@ -10,7 +10,7 @@ import { environment } from '../environments/environment';
 })
 export class LoginComponent {
     public user: Observable<firebase.User>;
-    loginStatus = this.trialService.getLoginStatus();
+    status = this.trialService.getStatus();
 
     constructor(public afAuth: AngularFireAuth, private trialService: TrialService) {
         this.user = this.afAuth.authState;
@@ -20,29 +20,23 @@ export class LoginComponent {
                     alert('Sorry, you do not have the permission to login');
                     this.logout();
                 } else {
-                    this.setLoginStatus(true);
+                    this.status['login'] = true;
                 }
             } else {
-                this.setLoginStatus(false);
+                this.status['login'] = false;
             }
         });
     }
     login() {
         this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then((res) => {
-            this.setLoginStatus(true);
         }).catch((err) => {
             alert('Failed to log in');
         });
     }
     logout() {
         this.afAuth.auth.signOut().then((res) => {
-            this.setLoginStatus(false);
         }).catch((err) => {
             console.log('Failed to log out');
         });
-    }
-    setLoginStatus(value: boolean) {
-        this.loginStatus.splice(0, this.loginStatus.length);
-        this.loginStatus.push(value);
     }
 }

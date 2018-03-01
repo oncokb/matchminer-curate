@@ -4,11 +4,11 @@ export interface Trial {
     short_title: string;
     phase: string;
     status: string;
-    treatment_list: { step: Step; };
+    treatment_list: { step: Array<Step> };
 }
 interface Step {
     match?: Array<Match>;
-    arms?: Array<Arm>;
+    arm?: Array<Arm>;
 }
 interface Arm {
     arm_name: string;

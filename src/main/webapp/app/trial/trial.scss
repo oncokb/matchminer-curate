@@ -11,7 +11,7 @@ label {
     border-left:1px dotted black;
 }
 .armDescription {
-    margin-left: 40px;
+    margin-left: 80px;
     word-wrap:break-word;
 }
 .matchTitle1 {
@@ -20,4 +20,24 @@ label {
 .matchTitle2 {
     margin-left: 40px;
     margin-bottom: -23px;
+}
+.noteAdd {
+    color:green;
+    margin-left:10px
+}
+.noteDelete {
+    color:red;
+    margin-left:10px
+}
+.noteEdit {
+    margin-left:10px
+}
+.noteExchange {
+    color:green
+}
+.noteMove {
+    color:orange;
+}
+.noteDestination {
+    color:green
 }

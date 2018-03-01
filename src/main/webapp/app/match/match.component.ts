@@ -10,7 +10,6 @@ export class MatchComponent implements OnInit {
   @Input() match: Array<any>;
   @Input() base = 0;
   @Input() path = '';
-  pathPool = this.trialService.getPathpool();
   constructor(private trialService: TrialService) { }
 
   ngOnInit() {

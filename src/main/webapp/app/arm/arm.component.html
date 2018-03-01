@@ -1,0 +1,17 @@
+<span class="indent1">-arm name: <jhi-panel [type]="'delete,edit'" [path]="path" [arm]="true" [unit]="unit"></jhi-panel></span>
+<div *ngIf="operationPool['currentPath'] === path; else dispalyArm">
+    <div class="indent2">
+        <input [(ngModel)]="armInput.arm_name" size="100"/>
+    </div>
+    <span class="indent1">-arm description: </span><br/>
+    <div class="armContent">
+        <textarea id="description" rows="3" cols="100" [(ngModel)]="armInput.arm_description"></textarea>
+    </div>
+</div>
+<ng-template #dispalyArm>
+    <br/>
+    <span class="armContent">{{unit.arm_name}}</span><br/>
+    <span class="indent1">-arm description: </span><br/>
+    <div class="armContent">{{unit.arm_description}}</div>
+</ng-template>
+
