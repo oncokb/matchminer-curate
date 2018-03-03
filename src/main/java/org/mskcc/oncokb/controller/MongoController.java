@@ -3,6 +3,7 @@ package org.mskcc.oncokb.controller;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mskcc.oncokb.controller.api.MongoApi;
 import org.mskcc.oncokb.model.*;
@@ -136,22 +137,7 @@ public class MongoController implements MongoApi{
             }
 
             // check if any trials matched for query data
-            for (Document doc: previousMatchedRecordsSet) {
-                for (int i = 0; i < genomicArray.length(); i++){
-                    if (doc.getString("oncokb_genomic_id").equals(
-                        genomicArray.getJSONObject(i).getString("ONCOKB_GENOMIC_ID"))){
-                        for (int j = 0; j < clinicalArray.length(); j++) {
-                            if (doc.getString("oncokb_clinical_id").equals(clinicalArray.getJSONObject(j)
-                                .getString("ONCOKB_CLINICAL_ID"))){
-                                matchedResults.add(doc);
-                                if (matchedResults.size() == previousMatchedRecordsSet.size()) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            matchedResults = findMatchedTrials(previousMatchedRecordsSet, genomicArray, clinicalArray);
 
             // drop collection "trial_query" first to clean records for previous queries
             // create a new collection "trial_query" to save matched trials.
@@ -342,7 +328,26 @@ public class MongoController implements MongoApi{
         return trialMatches;
     }
 
-
-
+    public Set<Document> findMatchedTrials(Set<Document> matchedRecordsSet,
+                                           JSONArray genomicArray, JSONArray clinicalArray) throws JSONException{
+        Set<Document> matchedResults = new HashSet<>();
+        for (Document doc: matchedRecordsSet) {
+            for (int i = 0; i < genomicArray.length(); i++){
+                if (doc.getString("oncokb_genomic_id").equals(
+                    genomicArray.getJSONObject(i).getString("ONCOKB_GENOMIC_ID"))){
+                    for (int j = 0; j < clinicalArray.length(); j++) {
+                        if (doc.getString("oncokb_clinical_id").equals(clinicalArray.getJSONObject(j)
+                            .getString("ONCOKB_CLINICAL_ID"))){
+                            matchedResults.add(doc);
+                            if (matchedResults.size() == matchedRecordsSet.size()) {
+                                return matchedResults;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return  matchedResults;
+    }
 }
 
