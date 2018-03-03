@@ -141,26 +141,26 @@ public class Clinical implements java.io.Serializable {
             } else {
                 content.add("");
             }
-            if (this.ordPhysicianName != null) {
-                content.add(this.ordPhysicianName);
-            } else {
-                content.add("");
-            }
-            if (this.ordPhysicianEmail != null) {
-                content.add(this.ordPhysicianEmail);
-            } else {
-                content.add("");
-            }
+//            if (this.ordPhysicianName != null) {
+//                content.add(this.ordPhysicianName);
+//            } else {
+//                content.add("");
+//            }
+//            if (this.ordPhysicianEmail != null) {
+//                content.add(this.ordPhysicianEmail);
+//            } else {
+//                content.add("");
+//            }
             if (this.oncotreePrimaryDiagnosisName != null) {
                 content.add(this.oncotreePrimaryDiagnosisName);
             } else {
                 content.add("");
             }
-            if (this.reportDate != null) {
-                content.add(this.reportDate);
-            } else {
-                content.add("");
-            }
+//            if (this.reportDate != null) {
+//                content.add(this.reportDate);
+//            } else {
+//                content.add("");
+//            }
             if (this.vitalStatus != null) {
                 content.add(this.vitalStatus);
             } else {

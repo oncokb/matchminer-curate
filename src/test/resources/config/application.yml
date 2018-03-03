@@ -23,9 +23,10 @@ spring:
         type: simple
     data:
         mongodb:
+            uri: mongodb://localhost:27017
             host: localhost
-            port: 0
-            database: matchminerCurate
+            port: 27017
+            database: matchminer
     mail:
         host: localhost
     messages:
@@ -88,3 +89,6 @@ jhipster:
 # ===================================================================
 
 application:
+    oncokb:
+        api:
+            match-variant: http://dashi-dev.cbio.mskcc.org:8080/endpoints-mm/api/private/utils/match/variant

@@ -1,6 +1,7 @@
 package org.mskcc.oncokb.config;
 
 import com.mongodb.*;
+import com.mongodb.client.MongoDatabase;
 import io.github.jhipster.config.JHipsterConstants;
 import com.github.mongobee.Mongobee;
 import io.github.jhipster.domain.util.JSR310DateConverters.DateToZonedDateTimeConverter;
@@ -79,5 +80,11 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration{
     public Mongo mongo() throws Exception {
         return new MongoClient(new MongoClientURI(uri));
     }
+
+    @Bean
+    public MongoDatabase mongoDatabase() throws Exception {
+        return new MongoClient(new MongoClientURI(uri)).getDatabase(database);
+    }
+
 
 }

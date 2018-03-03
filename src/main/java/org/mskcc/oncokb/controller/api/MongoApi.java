@@ -8,10 +8,12 @@ package org.mskcc.oncokb.controller.api;
 import io.swagger.annotations.*;
 import org.mskcc.oncokb.model.Patients;
 import org.mskcc.oncokb.model.TrialJson;
+import org.mskcc.oncokb.model.TrialMatch;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import java.util.Set;
 
 @Api(value = "mongo", description = "The mongo API")
 public interface MongoApi {
@@ -34,8 +36,8 @@ public interface MongoApi {
 
     @RequestMapping(value = "/mongo/match",
         consumes = {"application/json"},
-//        produces = {"application/json"},
+        produces = {"application/json"},
         method = RequestMethod.POST)
-    ResponseEntity<Void> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patients body);
+    ResponseEntity<Set<TrialMatch>> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patients body);
 
 }

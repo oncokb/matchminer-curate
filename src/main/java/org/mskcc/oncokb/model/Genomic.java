@@ -229,11 +229,7 @@ public class Genomic implements java.io.Serializable{
             content.add("");
         }
         if (this.wildtype != null) {
-            if (this.wildtype) {
-                content.add("true");
-            } else {
-                content.add("false");
-            }
+            content.add(this.wildtype.toString());
         } else {
             content.add("");
         }
