@@ -66,12 +66,6 @@ public class MongoController implements MongoApi{
 
             if(!isLoad) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            } else {
-                // runs the matchengine match() once per 24 hours.
-                ProcessBuilder matchPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
-                    "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py", "match", "--daemon",
-                    "--mongo-uri", this.uri);
-                runPythonScript(matchPb);
             }
 
         } catch (Exception e){
