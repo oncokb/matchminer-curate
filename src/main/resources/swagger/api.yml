@@ -32,31 +32,3 @@ paths:
           description: The json object was not found.
         default:
           description: Unexpected error.
-  '/mongo/match':
-    post:
-      description: Match trial in Mongo DB to patient or sample.
-      operationId: "match"
-      parameters:
-      - name: "queryData"
-        in: "body"
-        description: "clinical data and genomic data json objects"
-        required: true
-        schema:
-          type: object
-          required:
-            - clinical
-            - genomic
-          properties:
-            clinical:
-              type: object
-            genomic:
-              type: object
-      responses:
-        '200':
-          description: Match trial successfully.
-        '400':
-          description: The json object is invalid.
-        '404':
-          description: The json object was not found.
-        default:
-          description: Unexpected error.

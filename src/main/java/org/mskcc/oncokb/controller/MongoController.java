@@ -66,6 +66,12 @@ public class MongoController implements MongoApi{
 
             if(!isLoad) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                // runs the matchengine match() once per 24 hours.
+                ProcessBuilder matchPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
+                    "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py", "match", "--daemon",
+                    "--mongo-uri", this.uri);
+                runPythonScript(matchPb);
             }
 
         } catch (Exception e){
@@ -164,7 +170,7 @@ public class MongoController implements MongoApi{
                 // MatchEngine will run 24hours periodically by adding "--daemon" in command line
                 ProcessBuilder matchPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
                     "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py", "match",
-                    "--daemon", "--mongo-uri", this.uri);
+                    "--mongo-uri", this.uri);
                 Boolean isMatch = runPythonScript(matchPb);
 
                 if(isMatch) {
@@ -301,26 +307,28 @@ public class MongoController implements MongoApi{
             trialMatch.setGenomicId(doc.getString("oncokb_genomic_id"));
             trialMatch.setTrueHugoSymbol(doc.getString("true_hugo_symbol"));
             trialMatch.setTrueProteinChange(doc.getString("true_protein_change"));
-            trialMatch.setTrueVariantClassification(doc.getString("variant_category"));
+            trialMatch.setTrueVariantClassification(doc.getString("true_variant_classification"));
+            trialMatch.setVariantCategory(doc.getString("variant_category"));
             trialMatch.setCnvCall(doc.getString("cnv_call"));
-            trialMatch.setWildtype(doc.getBoolean("wild_type"));
+
+            trialMatch.setWildtype(doc.getBoolean("wildtype"));
             trialMatch.setChromosome(doc.getString("chromosome"));
             trialMatch.setPosition(doc.getString("position"));
             trialMatch.setTrueCdnaChange(doc.getString("true_cdna_change"));
             trialMatch.setReferenceAllele(doc.getString("reference_allele"));
-            trialMatch.setTrueTranscriptExon(doc.getInteger("true_transcript_exon"));
-            trialMatch.setCanonicalStand(doc.getString("canonical_stand"));
+            trialMatch.setTrueTranscriptExon(doc.getDouble("true_transcript_exon"));
+            trialMatch.setCanonicalStrand(doc.getString("canonical_strand"));
             trialMatch.setAlleleFraction(doc.getDouble("allele_fraction"));
-            trialMatch.setTier(doc.getInteger("tier"));
+            trialMatch.setTier(doc.getDouble("tier"));
 
-            trialMatch.setProtocolNo(doc.getString("protoco_no"));
+            trialMatch.setProtocolNo(doc.getString("protocol_no"));
             trialMatch.setNctId(doc.getString("nct_id"));
             trialMatch.setGenomicAlteration(doc.getString("genomic_alteration"));
             trialMatch.setMatchType(doc.getString("match_type"));
             trialMatch.setTrialAccrualStatus(doc.getString("trial_accrual_status"));
             trialMatch.setMatchLevel(doc.getString("match_level"));
             trialMatch.setCode(doc.getString("code"));
-            trialMatch.setInternalId(doc.getInteger("internal_id"));
+            trialMatch.setInternalId(doc.getString("internal_id"));
 
             trialMatches.add(trialMatch);
         }

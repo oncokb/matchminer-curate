@@ -26,10 +26,10 @@ public class TrialMatch implements java.io.Serializable{
     private String position;
     private String trueCdnaChange;
     private String referenceAllele;
-    private Integer trueTranscriptExon;
-    private String canonicalStand;
+    private Double trueTranscriptExon;
+    private String canonicalStrand;
     private Double alleleFraction;
-    private Integer tier;
+    private Double tier;
 
     // attributes from Trial
     private String protocolNo;
@@ -39,7 +39,7 @@ public class TrialMatch implements java.io.Serializable{
     private String trialAccrualStatus;
     private String matchLevel;
     private String code;
-    private Integer internalId;
+    private String internalId;
 
     public String getSampleId() {
         return sampleId;
@@ -201,20 +201,20 @@ public class TrialMatch implements java.io.Serializable{
         this.referenceAllele = referenceAllele;
     }
 
-    public Integer getTrueTranscriptExon() {
+    public Double getTrueTranscriptExon() {
         return trueTranscriptExon;
     }
 
-    public void setTrueTranscriptExon(Integer trueTranscriptExon) {
+    public void setTrueTranscriptExon(Double trueTranscriptExon) {
         this.trueTranscriptExon = trueTranscriptExon;
     }
 
-    public String getCanonicalStand() {
-        return canonicalStand;
+    public String getCanonicalStrand() {
+        return canonicalStrand;
     }
 
-    public void setCanonicalStand(String canonicalStand) {
-        this.canonicalStand = canonicalStand;
+    public void setCanonicalStrand(String canonicalStrand) {
+        this.canonicalStrand = canonicalStrand;
     }
 
     public Double getAlleleFraction() {
@@ -225,11 +225,11 @@ public class TrialMatch implements java.io.Serializable{
         this.alleleFraction = alleleFraction;
     }
 
-    public Integer getTier() {
+    public Double getTier() {
         return tier;
     }
 
-    public void setTier(Integer tier) {
+    public void setTier(Double tier) {
         this.tier = tier;
     }
 
@@ -289,11 +289,11 @@ public class TrialMatch implements java.io.Serializable{
         this.code = code;
     }
 
-    public Integer getInternalId() {
+    public String getInternalId() {
         return internalId;
     }
 
-    public void setInternalId(Integer internalId) {
+    public void setInternalId(String internalId) {
         this.internalId = internalId;
     }
 }
