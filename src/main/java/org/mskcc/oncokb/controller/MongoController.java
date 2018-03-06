@@ -10,6 +10,7 @@ import org.mskcc.oncokb.model.*;
 import org.mskcc.oncokb.service.util.FileUtil;
 import org.mskcc.oncokb.service.util.HttpUtil;
 import org.mskcc.oncokb.service.util.MongoUtil;
+import org.mskcc.oncokb.service.util.PythonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -61,7 +62,7 @@ public class MongoController implements MongoApi{
                 System.getenv("CATALINA_HOME") +
                     "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py",
                 "load", fileType, trialPath, "--trial-format", "json", "--mongo-uri", this.uri);
-            Boolean isLoad = runPythonScript(pb);
+            Boolean isLoad = PythonUtil.runPythonScript(pb);
             tempFile.delete();
 
             if(!isLoad) {
@@ -142,12 +143,14 @@ public class MongoController implements MongoApi{
             // drop collection "trial_query" first to clean records for previous queries
             // create a new collection "trial_query" to save matched trials.
             Boolean isDropped = MongoUtil.dropCollection(this.mongoDatabase, "trial_query");
-            if(isDropped) {
-               Boolean isCreated = MongoUtil.createCollection(this.mongoDatabase,
-                   "trial_query", new ArrayList<>(matchedResults));
-               if (!isCreated) {
-                   return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-               }
+            if (matchedResults.size() > 0) {
+                if(isDropped) {
+                    Boolean isCreated = MongoUtil.createCollection(this.mongoDatabase,
+                        "trial_query", new ArrayList<>(matchedResults));
+                    if (!isCreated) {
+                        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+                }
             }
 
             String clinicalPath = FileUtil.buildJsonTempFile(clinicalArray.toString(), clinicalTempFile);
@@ -155,17 +158,17 @@ public class MongoController implements MongoApi{
 
             ProcessBuilder loadPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
                 "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py",
-                "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json",
+                "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json", "--query",
                 "--mongo-uri", this.uri);
-            Boolean isLoad = runPythonScript(loadPb);
+            Boolean isLoad = PythonUtil.runPythonScript(loadPb);
 
             if(isLoad) {
                 // run MatchEngine match()
                 // MatchEngine will run 24hours periodically by adding "--daemon" in command line
                 ProcessBuilder matchPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
-                    "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py", "match",
+                    "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py", "match", "--query",
                     "--mongo-uri", this.uri);
-                Boolean isMatch = runPythonScript(matchPb);
+                Boolean isMatch = PythonUtil.runPythonScript(matchPb);
 
                 if(isMatch) {
                     // export matched result from collection "trial_match" in MongoDB "matchminer"
@@ -190,22 +193,6 @@ public class MongoController implements MongoApi{
         }
 
         return new ResponseEntity<>(trialMatchResult,  HttpStatus.OK);
-    }
-
-    public Boolean runPythonScript(ProcessBuilder pb) throws IOException, InterruptedException{
-        Process p = pb.start();
-        String error = "";
-        BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        int exitCode = p.waitFor();
-        // read any errors from the attempted command
-        if (exitCode != 0) {
-            System.out.println("Here is the standard error of the command (if any):\n");
-            while ((error = stdError.readLine()) != null) {
-                System.out.println(error);
-            }
-            stdError.close();
-        }
-        return exitCode == 0 ? true :false;
     }
 
     public List<Genomic> annotateOncokbVriant(List<Genomic> genomics) {
