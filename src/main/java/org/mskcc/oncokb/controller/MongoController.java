@@ -163,8 +163,7 @@ public class MongoController implements MongoApi{
             Boolean isLoad = PythonUtil.runPythonScript(loadPb);
 
             if(isLoad) {
-                // run MatchEngine match()
-                // MatchEngine will run 24hours periodically by adding "--daemon" in command line
+                // run MatchEngine match() with "--query" flag
                 ProcessBuilder matchPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
                     "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py", "match", "--query",
                     "--mongo-uri", this.uri);

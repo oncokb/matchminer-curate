@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.TimerTask;
 import org.slf4j.Logger;
@@ -33,13 +32,12 @@ public class ScheduledTask extends TimerTask {
     @Override
     @Scheduled(fixedRate = 86400000) // rerun MatchEngine every 24 hours
     public void run() {
-        System.out.println("\n\n------Start MatchEngine Daemon------\n\n");
-        log.info("The time is now {}", dateFormat.format(new Date()));
+        System.out.println("\n\n------Start MatchEngine match() every 24 hours------\n\n");
         Boolean isMatch = runMatch();
         if(isMatch) {
-            System.out.println("Rerun MatchEngine match() successfully!");
+            System.out.println("\nRerun MatchEngine match() successfully!\n");
         } else {
-            System.out.println("Rerun MatchEngine match() failed!");
+            System.out.println("\nRerun MatchEngine match() failed!\n");
         }
     }
 
