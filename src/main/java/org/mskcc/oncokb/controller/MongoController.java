@@ -89,7 +89,7 @@ public class MongoController implements MongoApi{
         Set<TrialMatch> trialMatchResult;
 
         try {
-            List<Genomic> annotatedGenomics = annotateOncokbVriant(genomics);
+            List<Genomic> annotatedGenomics = annotateOncokbVariant(genomics);
             if(annotatedGenomics == null) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -194,7 +194,7 @@ public class MongoController implements MongoApi{
         return new ResponseEntity<>(trialMatchResult,  HttpStatus.OK);
     }
 
-    public List<Genomic> annotateOncokbVriant(List<Genomic> genomics) {
+    public List<Genomic> annotateOncokbVariant(List<Genomic> genomics) {
 
         List<Genomic> results = new ArrayList<>(genomics);
 
