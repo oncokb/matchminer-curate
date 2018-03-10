@@ -89,7 +89,7 @@ public class MongoController implements MongoApi{
         Set<TrialMatch> trialMatchResult;
 
         try {
-            List<Genomic> annotatedGenomics = annotateOncokbVariant(genomics);
+            List<Genomic> annotatedGenomics = annotateOncokbVariant(genomics, this.oncokbMatchVariantApi);
             if(annotatedGenomics == null) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -194,7 +194,7 @@ public class MongoController implements MongoApi{
         return new ResponseEntity<>(trialMatchResult,  HttpStatus.OK);
     }
 
-    public List<Genomic> annotateOncokbVariant(List<Genomic> genomics) {
+    public List<Genomic> annotateOncokbVariant(List<Genomic> genomics, String annotateApi) {
 
         List<Genomic> results = new ArrayList<>(genomics);
 
@@ -244,7 +244,7 @@ public class MongoController implements MongoApi{
 
             ObjectMapper mapper = new ObjectMapper();
             String postBody = mapper.writeValueAsString(request);
-            String response = HttpUtil.postRequest(oncokbMatchVariantApi, postBody, true);
+            String response = HttpUtil.postRequest(annotateApi, postBody, true);
 
             if (response != null && response != "TIMEOUT") {
                 JSONArray outputArr = new JSONArray(response);
