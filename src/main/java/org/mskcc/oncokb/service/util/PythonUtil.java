@@ -1,5 +1,8 @@
 package org.mskcc.oncokb.service.util;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,5 +23,19 @@ public class PythonUtil {
             stdError.close();
         }
         return exitCode == 0 ? true :false;
+    }
+
+    public static String getMatchEnginePath (String configMatchEnginePath) {
+        String absolutePath = "";
+        String catalinaHome = System.getenv("CATALINA_HOME");
+        if(configMatchEnginePath != null && configMatchEnginePath.length() > 0) {
+            absolutePath = configMatchEnginePath;
+        } else if (catalinaHome != null && catalinaHome.length() > 0) {
+            absolutePath = catalinaHome + "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine";
+        } else {
+            return null;
+        }
+        return absolutePath;
+
     }
 }

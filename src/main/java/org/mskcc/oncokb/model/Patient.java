@@ -8,7 +8,7 @@ import java.util.List;
  * @author Jing Su
  */
 
-public class Patients {
+public class Patient {
     @JsonProperty("clinicals")
     List<Clinical> clinicals;
 

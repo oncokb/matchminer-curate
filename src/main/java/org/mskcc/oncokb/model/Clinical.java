@@ -33,6 +33,13 @@ public class Clinical implements java.io.Serializable {
         this.gender = gender;
     }
 
+    public Clinical(String sampleId, String birthDate, String gender, String oncotreePrimaryDiagnosisName) {
+        this.birthDate = birthDate;
+        this.sampleId = sampleId;
+        this.gender = gender;
+        this.oncotreePrimaryDiagnosisName = oncotreePrimaryDiagnosisName;
+    }
+
     // constructor for matchminer
     public Clinical(String sampleId, String ordPhysicianName, String ordPhysicianEmail,
                     String oncotreePrimaryDiagnosisName, String reportDate, String vitalStatus,

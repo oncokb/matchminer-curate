@@ -2,19 +2,17 @@ import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
 import * as _ from 'underscore';
 import { Trial } from './trial.model';
-import { SERVER_API_URL } from '../app.constants';
 import * as $ from 'jquery';
 import "../../../../../node_modules/jquery/dist/jquery.js";
 import "../../../../../node_modules/datatables.net/js/jquery.dataTables.js";
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
-import { ConnectionService } from '../service/connection.service';
+import {ConnectionService} from "../service/connection.service";
 
 @Component({
     selector: 'jhi-trial',
@@ -182,21 +180,22 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
     }
 
-    loadMongo() {
-        this.mongoMessage = "Loading the trial ......";
-        this.mongoMessageColor = '#ffc107';
-        let trial = {
-            'trial': this.trialChosen
-        }
-        this.connectionService.loadMongo(trial).subscribe((res) => {
-            if (res.status === 200) {
-                this.mongoMessage = 'Send trial ' + this.nctIdChosen + ' successfully!';
-                this.mongoMessageColor = 'green';
-            }
-        }, (error) => {
-            this.mongoMessage = 'Request for sending trial ' + this.nctIdChosen + ' failed!';
-            this.mongoMessageColor = 'red';
-            return Observable.throw(error);
-        });
-    }
+    loadMongo(){
+      this.mongoMessage = "Loading the trial ......";
+      this.mongoMessageColor = '#ffc107';
+      let trial = {
+          'trial': this.trialChosen
+      }
+      this.connectionService.loadMongo(trial).subscribe((res) => {
+          if (res.status === 200) {
+              this.mongoMessage = 'Send trial ' + this.nctIdChosen + ' successfully!';
+              this.mongoMessageColor = 'green';
+          }
+      }, (error) => {
+          this.mongoMessage = 'Request for sending trial' + this.nctIdChosen + ' failed!';
+          this.mongoMessageColor = 'red';
+          return Observable.throw(error);
+      });
+  }
+
 }

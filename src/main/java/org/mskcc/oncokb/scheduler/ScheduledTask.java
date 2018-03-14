@@ -25,6 +25,9 @@ public class ScheduledTask extends TimerTask {
     @Value("${spring.data.mongodb.uri}")
     private String uri;
 
+    @Value("${application.matchengine.absolute-path}")
+    private String matchengineAbsolutePath;
+
     @Autowired
     private MongoDatabase mongoDatabase;
 
@@ -43,14 +46,17 @@ public class ScheduledTask extends TimerTask {
 
     public Boolean runMatch(){
         Boolean isMatch = false;
+        String runnableScriptPath = PythonUtil.getMatchEnginePath(this.matchengineAbsolutePath);
+        if (runnableScriptPath == null || runnableScriptPath.length() <= 0 ) {
+            return isMatch;
+        }
         try {
             List<Document> trialMatches = MongoUtil.getCollection(this.mongoDatabase, "trial_match");
             Boolean isDelete = MongoUtil.dropCollection(this.mongoDatabase, "trial_match");
 
             if (isDelete) {
-                ProcessBuilder matchPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
-                    "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py", "match",
-                    "--mongo-uri", this.uri);
+                ProcessBuilder matchPb = new ProcessBuilder("python",
+                    runnableScriptPath + "/matchengine.py", "match", "--mongo-uri", this.uri);
                 isMatch = PythonUtil.runPythonScript(matchPb);
                 if (!isMatch) {
                     MongoUtil.createCollection(this.mongoDatabase, "trial_match", trialMatches);

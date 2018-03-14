@@ -6,14 +6,14 @@
 package org.mskcc.oncokb.controller.api;
 
 import io.swagger.annotations.*;
-import org.mskcc.oncokb.model.Patients;
+import org.mskcc.oncokb.model.Patient;
 import org.mskcc.oncokb.model.TrialJson;
 import org.mskcc.oncokb.model.TrialMatch;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import java.util.Set;
+import java.util.List;
 
 @Api(value = "mongo", description = "The mongo API")
 public interface MongoApi {
@@ -23,7 +23,7 @@ public interface MongoApi {
         @ApiResponse(code = 200, message = "Load the trial successfully!", response = Void.class),
         @ApiResponse(code = 500, message = "Load the trial failed!")})
 
-    @RequestMapping(value = "/mongo/loadTrial",
+    @RequestMapping(value = "/trials/create",
         consumes = {"application/json"},
         method = RequestMethod.POST)
     ResponseEntity<Void> loadTrial(@ApiParam(value = "a trial json object ", required = true) @RequestBody TrialJson body);
@@ -34,10 +34,10 @@ public interface MongoApi {
         @ApiResponse(code = 200, message = "Match trials successfully!", response = Void.class),
         @ApiResponse(code = 500, message = "Match trials failed!")})
 
-    @RequestMapping(value = "/mongo/match",
+    @RequestMapping(value = "/trials/match",
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    ResponseEntity<Set<TrialMatch>> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patients body);
+    ResponseEntity<List<TrialMatch>> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patient body);
 
 }

@@ -1,5 +1,7 @@
 package org.mskcc.oncokb.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.json.JSONArray;
@@ -39,29 +41,31 @@ public class MongoController implements MongoApi{
     @Value("${spring.data.mongodb.uri}")
     private String uri;
 
+    @Value("${application.matchengine.absolute-path}")
+    private String matchengineAbsolutePath;
+
     @Autowired
     private MongoDatabase mongoDatabase;
 
-    @RequestMapping(value = "/mongo/loadTrial",
+    @RequestMapping(value = "/trials/create",
         consumes = {"application/json"},
         method = RequestMethod.POST)
     public ResponseEntity<Void> loadTrial(@RequestBody(required = true) TrialJson body) {
+        // check if MatchEngine is accessible.
+        String runnableScriptPath = PythonUtil.getMatchEnginePath(this.matchengineAbsolutePath);
+        if (runnableScriptPath == null || runnableScriptPath.length() <= 0 ) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         try{
-            String fileType = "-t";
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(body.getTrial());
 
-            String prefix = "trial";
-            String suffix = ".json";
-
             // this temporary file remains after the jvm exits
-            File tempFile = File.createTempFile(prefix, suffix);
+            File tempFile = File.createTempFile("trial", ".json");
             String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
 
-            ProcessBuilder pb = new ProcessBuilder("python",
-                System.getenv("CATALINA_HOME") +
-                    "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py",
-                "load", fileType, trialPath, "--trial-format", "json", "--mongo-uri", this.uri);
+            ProcessBuilder pb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
+                "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", this.uri);
             Boolean isLoad = PythonUtil.runPythonScript(pb);
             tempFile.delete();
 
@@ -71,22 +75,29 @@ public class MongoController implements MongoApi{
 
         } catch (Exception e){
             e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    @RequestMapping(value = "/mongo/match",
+    @RequestMapping(value = "/trials/match",
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    public ResponseEntity<Set<TrialMatch>> matchTrial(@RequestBody(required = true) Patients body) {
+    public ResponseEntity<List<TrialMatch>> matchTrial(@RequestBody(required = true) Patient body) {
+        // check if MatchEngine is accessible.
+        String runnableScriptPath = PythonUtil.getMatchEnginePath(this.matchengineAbsolutePath);
+        if (runnableScriptPath == null || runnableScriptPath.length() <= 0 ) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         List<Clinical> clinicals = body.getClinicals();
         List<Genomic> genomics = body.getGenomics();
-        List<Document> previousMatchedRecordsList = MongoUtil.getCollection(this.mongoDatabase,"trial_match");
-        Set<Document> previousMatchedRecordsSet = new HashSet<>(previousMatchedRecordsList);
-        Set<Document> matchedResults = new HashSet<>();
-        Set<TrialMatch> trialMatchResult;
+        Set<Document> previousMatchedRecordsSet = new HashSet<>(MongoUtil.getCollection(this.mongoDatabase,
+            "trial_match"));
+        List<Document> matchedResults = new LinkedList<>();
+        List<TrialMatch> trialMatchResult = new LinkedList<>();
 
         try {
             List<Genomic> annotatedGenomics = annotateOncokbVariant(genomics, this.oncokbMatchVariantApi);
@@ -133,15 +144,18 @@ public class MongoController implements MongoApi{
                 jsonObject.put("CANONICAL_STRAND", genomic.getCanonicalStand());
                 jsonObject.put("ALLELE_FRACTION", genomic.getAlleleFraction());
                 jsonObject.put("TIER", genomic.getTier());
-                jsonObject.put("ONCOKB_VARIANT",genomic.getOncokbVariant().toString());
+                if (genomic.getOncokbVariant() != null && genomic.getOncokbVariant().size() > 0 ) {
+                    jsonObject.put("ONCOKB_VARIANT",genomic.getOncokbVariant().toString());
+                }
                 genomicArray.put(jsonObject);
             }
 
-            // check if any trials matched for query data
-            matchedResults = findMatchedTrials(previousMatchedRecordsSet, genomicArray, clinicalArray);
+            // check if any trials matched for query data. We check trials from history(collection "trial_match") to
+            // see if any matched records can be found and save them to "matchedResults".
+            matchedResults.addAll(findMatchedTrials(previousMatchedRecordsSet, genomicArray, clinicalArray));
 
             // drop collection "trial_query" first to clean records for previous queries
-            // create a new collection "trial_query" to save matched trials.
+            // create a new collection "trial_query" to save matched trials from history(collection "trial_match").
             Boolean isDropped = MongoUtil.dropCollection(this.mongoDatabase, "trial_query");
             if (matchedResults.size() > 0) {
                 if(isDropped) {
@@ -156,17 +170,19 @@ public class MongoController implements MongoApi{
             String clinicalPath = FileUtil.buildJsonTempFile(clinicalArray.toString(), clinicalTempFile);
             String genomicPath = FileUtil.buildJsonTempFile(genomicArray.toString(), genomicTempFile);
 
-            ProcessBuilder loadPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
-                "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py",
+
+            ProcessBuilder loadPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
                 "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json", "--query",
                 "--mongo-uri", this.uri);
             Boolean isLoad = PythonUtil.runPythonScript(loadPb);
 
             if(isLoad) {
-                // run MatchEngine match() with "--query" flag
-                ProcessBuilder matchPb = new ProcessBuilder("python", System.getenv("CATALINA_HOME") +
-                    "/webapps/matchminer-curate/WEB-INF/classes/matchminer-engine/matchengine.py", "match", "--query",
-                    "--mongo-uri", this.uri);
+                // run MatchEngine match() with "--query" flag. "--query" means only match trials to
+                // current patient data that is newly added to "new_genomic" and "new_clinical" collections.
+                // In this way, MatchEngine won't match from "clinical" and "genomic" collections
+                // in case generate duplicate matched records.
+                ProcessBuilder matchPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
+                    "match", "--query", "--mongo-uri", this.uri);
                 Boolean isMatch = PythonUtil.runPythonScript(matchPb);
 
                 if(isMatch) {
@@ -245,24 +261,24 @@ public class MongoController implements MongoApi{
             ObjectMapper mapper = new ObjectMapper();
             String postBody = mapper.writeValueAsString(request);
             String response = HttpUtil.postRequest(annotateApi, postBody, true);
+            if (response != "TIMEOUT") {
+                Gson gson = new GsonBuilder().create();
+                MatchVariantResult[] matchVariantResultArr = gson.fromJson(response, MatchVariantResult[].class);
 
-            if (response != null && response != "TIMEOUT") {
-                JSONArray outputArr = new JSONArray(response);
-                //Iterate output
-                for (int i = 0; i < outputArr.length(); i++) {
-                    JSONObject outputObj = outputArr.getJSONObject(i);
-                    JSONArray resultArr = new JSONArray(outputObj.get("result").toString());
-
-                    //Iterate "results" in output and add each "alteration" to alterationList
-                    ArrayList<String> alterationList = new ArrayList<String>();
-                    for (int j = 0; j < resultArr.length(); j++) {
-                        JSONObject resultObj = resultArr.getJSONObject(j);
-                        alterationList.add(resultObj.getString("alteration"));
+                if (matchVariantResultArr != null) {
+                    for (int i = 0; i < matchVariantResultArr.length; i++) {
+                        Set<MatchVariant> mvResult= matchVariantResultArr[i].getResult();
+                        if (mvResult.size() > 0 ) {
+                            ArrayList<String> alterationList = new ArrayList<String>();
+                            for (MatchVariant mv: mvResult) {
+                                alterationList.add(mv.getAlteration());
+                            }
+                            results.get(i).setOncokbVariant(alterationList);
+                        }
                     }
-                    results.get(i).setOncokbVariant(alterationList);
+                } else {
+                    return null;
                 }
-            } else {
-                return null;
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -270,8 +286,8 @@ public class MongoController implements MongoApi{
         return results;
     }
 
-    public Set<TrialMatch> capsulateTrialMatchDoc(Set<Document> documents) {
-        Set<TrialMatch> trialMatches = new HashSet<>();
+    public List<TrialMatch> capsulateTrialMatchDoc(List<Document> documents) {
+        List<TrialMatch> trialMatches = new LinkedList<>();
         for (Document doc: documents) {
             TrialMatch trialMatch = new TrialMatch();
             trialMatch.setClinicalId(doc.getString("oncokb_clinical_id"));
@@ -316,9 +332,9 @@ public class MongoController implements MongoApi{
         return trialMatches;
     }
 
-    public Set<Document> findMatchedTrials(Set<Document> matchedRecordsSet,
+    public List<Document> findMatchedTrials(Set<Document> matchedRecordsSet,
                                            JSONArray genomicArray, JSONArray clinicalArray) throws JSONException{
-        Set<Document> matchedResults = new HashSet<>();
+        List<Document> matchedResults = new LinkedList<>();
         for (Document doc: matchedRecordsSet) {
             for (int i = 0; i < genomicArray.length(); i++){
                 if (doc.getString("oncokb_genomic_id").equals(

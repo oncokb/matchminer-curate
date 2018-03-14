@@ -140,7 +140,7 @@ public class MongoControllerTest {
     @Test
     public void testFindMatchedTrials(){
         try {
-            Set<Document> matchedResults = mongoController.findMatchedTrials(trialMatchDocs,genomicArray,clinicalArray);
+            List<Document> matchedResults = mongoController.findMatchedTrials(trialMatchDocs,genomicArray,clinicalArray);
             assertThat(matchedResults.size()).isEqualTo(1);
             for (Document doc: matchedResults) {
                 assertThat(doc.getString("nct_id")).isEqualTo("NCT02561962");
