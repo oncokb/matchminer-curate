@@ -172,8 +172,7 @@ public class MongoController implements MongoApi{
 
 
             ProcessBuilder loadPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
-                "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json", "--query",
-                "--mongo-uri", this.uri);
+                "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json", "--mongo-uri", this.uri);
             Boolean isLoad = PythonUtil.runPythonScript(loadPb);
 
             if(isLoad) {
@@ -182,7 +181,7 @@ public class MongoController implements MongoApi{
                 // In this way, MatchEngine won't match from "clinical" and "genomic" collections
                 // in case generate duplicate matched records.
                 ProcessBuilder matchPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
-                    "match", "--query", "--mongo-uri", this.uri);
+                    "match", "--mongo-uri", this.uri);
                 Boolean isMatch = PythonUtil.runPythonScript(matchPb);
 
                 if(isMatch) {
