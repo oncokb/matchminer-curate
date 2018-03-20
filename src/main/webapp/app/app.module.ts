@@ -14,7 +14,7 @@ import { customHttpProvider } from './blocks/interceptor/http.provider';
 import { PaginationConfig } from './blocks/config/uib-pagination.config';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { AngularFirestoreModule } from 'angularfire2/firestore';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import {SelectModule} from 'angular2-select';
 
@@ -49,8 +49,8 @@ import {
         MatchminerCurateAccountModule,
         MatchminerCurateEntityModule,
         AngularFireModule.initializeApp(environment.firebaseConfig),
-        AngularFirestoreModule,
         AngularFireAuthModule,
+        AngularFireDatabaseModule,
         AngularMultiSelectModule,
         SelectModule
     ],

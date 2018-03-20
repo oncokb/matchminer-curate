@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { AngularFireDatabase, AngularFireObject, AngularFireList } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { Trial } from '../trial/trial.model';
+import { Genomic } from '../genomic/genomic.model';
+import { Clinical } from '../clinical/clinical.model';
+import { MovingPath } from '../panel/movingPath.model';
+import { Arm } from '../arm/arm.model';
 import { Http, Response } from '@angular/http';
 import * as _ from 'underscore';
 import { currentId } from 'async_hooks';
@@ -9,59 +14,48 @@ import { SERVER_API_URL } from '../app.constants';
 import { environment } from '../environments/environment';
 @Injectable()
 export class TrialService {
-    production = environment.production ? environment.production : false;
-    trialsCollection: AngularFirestoreCollection<Trial>;
-    trialList = [];
-    nctIdList: Array<string> = [];
-    trialChosen: Observable<Trial[]>;
-    nctIdChosen = '';
-    operationPool = {};
-    status = {
-        login: false
-    };
-    validation = {
-        genomicGene: false,
-        genomicMatching: false,
-        clinicalAge: false
-    };
-    currentPath = '';
-    movingPath = {
+    private nctIdChosenSource = new BehaviorSubject<string>('');
+    nctIdChosenObs = this.nctIdChosenSource.asObservable();
+
+    private trialChosenSource = new BehaviorSubject<object>({});
+    trialChosenObs = this.trialChosenSource.asObservable();
+
+    private trialListSource = new BehaviorSubject<Array<string>>([]);
+    trialListObs = this.trialListSource.asObservable();
+
+    private authorizedSource = new BehaviorSubject<boolean>(false);
+    authorizedObs = this.authorizedSource.asObservable();
+
+    private operationPoolSource = new BehaviorSubject<object>({});
+    operationPoolObs = this.operationPoolSource.asObservable();
+
+    private currentPathSource = new BehaviorSubject<string>('');
+    currentPathObs = this.currentPathSource.asObservable();
+
+    movingPath: MovingPath = {
         from: '',
         to: ''
+    }
+    private movingPathSource = new BehaviorSubject<MovingPath>(this.movingPath);
+    movingPathObs = this.movingPathSource.asObservable();
+
+    genomicInput: Genomic = {
+        hugo_symbol: ''
     };
-    genomicInput = {
-        hugo_symbol: '',
-        oncokb_variant: '',
-        matching_examples: '',
-        protein_change: '',
-        wildcard_protein_change: '',
-        variant_classification: '',
-        variant_category: '',
-        exon: '',
-        cnv_call: '',
-        wildtype: '',
-        no_hugo_symbol: false,
-        no_oncokb_variant: false,
-        no_matching_examples: false,
-        no_protein_change: false,
-        no_wildcard_protein_change: false,
-        no_variant_classification: false,
-        no_variant_category: false,
-        no_exon: false,
-        no_cnv_call: false
-    };
-    clinicalInput = {
-        age_numerical: '',
-        oncotree_diagnosis: '',
-        main_type: '',
-        sub_type: '',
-        no_age_numerical: false,
-        no_oncotree_diagnosis: false
-    };
-    armInput = {
+    private genomicInputSource = new BehaviorSubject<Genomic>(this.genomicInput);
+    genomicInputObs = this.genomicInputSource.asObservable();
+
+    clinicalInput: Clinical= {};
+    private clinicalInputSource = new BehaviorSubject<Clinical>(this.clinicalInput);
+    clinicalInputObs = this.clinicalInputSource.asObservable();
+
+    armInput: Arm = {
         arm_name: '',
         arm_description: ''
     };
+    private armInputSource = new BehaviorSubject<Arm>(this.armInput);
+    armInputObs = this.armInputSource.asObservable();
+
     subTypesOptions = {};
     allSubTypesOptions = [];
     subToMainMapping = {};
@@ -70,23 +64,12 @@ export class TrialService {
     {value: 'All Tumors', label: 'All Tumors'},
     {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
     oncokb_variants = {};
-    hasWritePermission = {};
-    constructor(public afs: AngularFirestore, public http: Http) {
-        this.trialsCollection = afs.collection<Trial>('Trials');
-        this.trialsCollection.snapshotChanges().map(changes => {
-            return changes.map(a => {
-                const data = a.payload.doc.data() as Trial;
-                return data;
-            });
-        }).subscribe(trials => {
-            for (const trial of trials) {
-                if (this.nctIdList.indexOf(trial.nct_id) === -1) {
-                    this.nctIdList.push(trial.nct_id);
-                    this.trialList.push(trial);
-                    // this.validateWritePermission(trial.nct_id);
-                }
-            }
-        });
+    trialList = [];
+    trialsRef: AngularFireObject<any>;
+    production = environment.production ? environment.production : false;
+    constructor(public http: Http, public db: AngularFireDatabase) {
+        this.trialsRef = db.object('Trials');
+        
         // prepare main types list
         this.http.get(this.getAPIUrl('MainType'))
         .subscribe((res: Response) => {
@@ -157,75 +140,43 @@ export class TrialService {
            }
         });
     }
-    // an attribute validationNote is inserted to the trial to test the writting permission
-    validateWritePermission(nctId: string) {
-        this.trialsCollection.doc(nctId).update({
-            validationNote: 'success'
-        }).then(result => {
-            this.hasWritePermission[nctId] = true;
-        }).catch(error => {
-            if (error.code === 'permission-denied') {
-                this.hasWritePermission[nctId] = false;
+    fetchTrials() {
+        this.trialsRef.snapshotChanges().subscribe(action => {
+            this.authorizedSource.next(true);
+            this.trialList = [];
+            for (const nctId of _.keys(action.payload.val())) {
+                this.trialList.push(action.payload.val()[nctId]);
             }
+            this.trialListSource.next(this.trialList);
+        }, error => {
+            this.authorizedSource.next(false);
         });
     }
-    getNctIdList() {
-        return this.nctIdList;
-    }
-    getTrialList() {
-        return this.trialList;
-    }
-    getTrialsCollection() {
-        return this.trialsCollection;
-    }
-    getChosenTrialDoc(nctId: string) {
-        return this.afs.collection<Trial>('Trials', ref => ref.where('nct_id', '==', nctId)).valueChanges();
-    }
-    getChosenTrialJSON(nctId: string) {
-        for (const currentTrial of this.trialList) {
-            if (currentTrial.nct_id === nctId) {
-                return currentTrial;
+    setTrialChosen(nctId: string) {
+        this.nctIdChosenSource.next(nctId);
+        for (const trial of this.trialList) {
+            if (nctId === trial.nct_id) {
+                if (_.isUndefined(trial['treatment_list'])) {
+                    trial['treatment_list'] = {
+                        step: [{
+                            arm:  [],
+                            match: []
+                        }]
+                    }
+                } else {
+                    _.each(trial['treatment_list'].step[0].arm, function(armItem) {
+                        if (_.isUndefined(armItem.match)) {
+                            armItem.match = [];
+                        }
+                    });
+                    if (_.isUndefined(trial['treatment_list'].step[0].match)) {
+                        trial['treatment_list'].step[0].match = [];
+                    }
+                }
+                this.trialChosenSource.next(trial);
+                break;
             }
         }
-    }
-    setNctIdChosen(nctId: string) {
-        this.nctIdChosen = nctId;
-    }
-    getNctIdChosen() {
-        return this.nctIdChosen;
-    }
-    getOperationPool() {
-        return this.operationPool;
-    }
-    getCurrentPath() {
-        return this.currentPath;
-    }
-    setCurrentPath(currentPath: string) {
-        this.currentPath = currentPath;
-    }
-    getMovingPath() {
-        return this.movingPath;
-    }
-    setMovingPath(key: string, value: string) {
-        this.movingPath[key] = value;
-    }
-    getClinicalInput() {
-        return this.clinicalInput;
-    }
-    setClinicalInput(key: string, value: any) {
-        this.clinicalInput[key] = value;
-    }
-    getGenomicInput() {
-        return this.genomicInput;
-    }
-    setGenomicInput(key: string, value: any) {
-        this.genomicInput[key] = value;
-    }
-    getArmInput() {
-        return this.armInput;
-    }
-    setArmInput(key: string, value: any) {
-        this.armInput[key] = value;
     }
     getStyle(indent: number) {
         return { 'margin-left': (indent * 40) + 'px' };
@@ -245,11 +196,8 @@ export class TrialService {
     getOncokbVariants() {
         return this.oncokb_variants;
     }
-    getStatus() {
-        return this.status;
-    }
-    getValidation() {
-        return this.validation;
+    getTrialRef(nctId: string) {
+        return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
     }
     getAPIUrl(type: string) {
         if (this.production === true) {

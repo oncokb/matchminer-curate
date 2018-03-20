@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
+import { Clinical } from './clinical.model';
 @Component({
     selector: 'jhi-clinical',
     templateUrl: './clinical.component.html',
@@ -11,34 +12,40 @@ export class ClinicalComponent implements OnInit {
     @Input() type = '';
     validationMessage = '';
     indent = 1.2; // the relative indent between the clinical content with the title
-    operationPool = this.trialService.getOperationPool();
-    clinicalInput = this.trialService.getClinicalInput();
+    operationPool: {};
+    clinicalInput: Clinical;
     subTypesOptions = this.trialService.getSubTypesOptions();
-    validation = this.trialService.getValidation();
+    validation = false;
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
 
     constructor(private trialService: TrialService) { }
 
     ngOnInit() {
+        this.trialService.clinicalInputObs.subscribe(message => {
+            this.clinicalInput = message;
+        });
+        this.trialService.operationPoolObs.subscribe(message => {
+            this.operationPool = message;
+        });
     }
     getStyle() {
         return this.trialService.getStyle(this.indent);
     }
     getMessageStyle() {
-        if (this.validation['clinicalAge'] === true) {
+        if (this.validation === true) {
             return { 'color': 'green' };
-        } else if (this.validation['clinicalAge'] === false) {
+        } else if (this.validation === false) {
             return { 'color': 'red' };
         }
     }
     validateAgeInput() {
         if (this.clinicalInput.age_numerical.match(/^(>|>=|<|<=)?[0-9][0-9]$/)) {
             this.validationMessage = 'Valid Age Entry';
-            this.validation['clinicalAge'] = true;
+            this.validation = true;
         } else {
             this.validationMessage = 'Invalid Age Entry';
-            this.validation['clinicalAge'] = false;
+            this.validation = false;
         }
     }
     onSingleSelected(option){

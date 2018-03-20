@@ -2,17 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, NavigationEnd } from '@angular/router';
 
 import { Title } from '@angular/platform-browser';
-
+import { TrialService } from '../../service/trial.service';
 @Component({
     selector: 'jhi-main',
     templateUrl: './main.component.html'
 })
 export class JhiMainComponent implements OnInit {
-
+    authorized = false;
     constructor(
         private titleService: Title,
-        private router: Router
-    ) {}
+        private router: Router,
+        private trialService: TrialService
+    ) {
+        this.trialService.authorizedObs.subscribe(message => this.authorized = message);
+    }
 
     private getPageTitle(routeSnapshot: ActivatedRouteSnapshot) {
         let title: string = (routeSnapshot.data && routeSnapshot.data['pageTitle']) ? routeSnapshot.data['pageTitle'] : 'matchminerCurateApp';

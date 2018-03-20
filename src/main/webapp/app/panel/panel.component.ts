@@ -1,6 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
+import { AngularFireDatabase, AngularFireObject, AngularFireList } from 'angularfire2/database';
 import * as _ from 'underscore';
+import { Genomic } from '../genomic/genomic.model';
+import { Clinical } from '../clinical/clinical.model';
+import { MovingPath } from './movingPath.model';
+import { Arm } from '../arm/arm.model';
 @Component({
     selector: 'jhi-panel',
     templateUrl: './panel.component.html',
@@ -12,7 +17,6 @@ export class PanelComponent implements OnInit {
     @Input() type = '';
     @Input() unit = {};
     @Input() arm = false;
-    nctId = this.trialService.getNctIdChosen();
     finalPath = [];
     message = '';
     addNode = false;
@@ -20,32 +24,55 @@ export class PanelComponent implements OnInit {
     nodeOptions: Array<string> = ['Genomic', 'Clinical', 'And', 'Or'];
     nodeType = '';
     selectedItems = [];
-    operationPool = this.trialService.getOperationPool();
-    movingPath = this.trialService.getMovingPath();
+    operationPool: {};
+    movingPath: MovingPath;
     dataBlockToMove = {};
-    currentPath = this.trialService.getCurrentPath();
+    currentPath = '';
     dropdownList = [
         { id: 1, itemName: 'Genomic' },
         { id: 2, itemName: 'Clinical' },
         { id: 3, itemName: 'And' },
         { id: 4, itemName: 'Or' }];
-    clinicalInput = this.trialService.getClinicalInput();
-    genomicInput = this.trialService.getGenomicInput();
-    armInput = this.trialService.getArmInput();
-    trialsCollection = this.trialService.getTrialsCollection();
-    originalMatch = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step[0].match;
-    originalArms = this.trialService.getChosenTrialJSON(this.nctId).treatment_list.step[0].arm;
+    armInput: Arm;
+    originalMatch = [];
+    originalArms = [];
     dataToModify = [];
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
     subToMainMapping = this.trialService.getSubToMainMapping();
-    mainTypesOptions = this.trialService.getMainTypesOptions();
-    // In this project, there is no write permission set based on trial ID so we set isPermitted with true by default
-    // If permission setting by trial is needed in the future, use the statement below.
-    // isPermitted = this.trialService.hasWritePermission[this.nctId];   
+    mainTypesOptions = this.trialService.getMainTypesOptions(); 
     isPermitted = true; 
-    constructor(private trialService: TrialService) { }
+    nctIdChosen:string;
+    trialChosen: {};
+    genomicInput: Genomic;
+    clinicalInput: Clinical;
+    constructor(private trialService: TrialService) { 
+    }
 
     ngOnInit() {
+        this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
+        this.trialService.trialChosenObs.subscribe(message => {
+            this.trialChosen = message;
+            this.originalMatch = this.trialChosen['treatment_list'].step[0].match;
+            this.originalArms = this.trialChosen['treatment_list'].step[0].arm;
+        });
+        this.trialService.genomicInputObs.subscribe(message => {
+            this.genomicInput = message;
+        });
+        this.trialService.clinicalInputObs.subscribe(message => {
+            this.clinicalInput = message;
+        });
+        this.trialService.operationPoolObs.subscribe(message => {
+            this.operationPool = message;
+        });
+        this.trialService.currentPathObs.subscribe(message => {
+            this.currentPath = message;
+        });
+        this.trialService.movingPathObs.subscribe(message => {
+            this.movingPath = message;
+        });
+        this.trialService.armInputObs.subscribe(message => {
+            this.armInput = message;
+        });
     }
     preparePath(pathParameter?: string) {
         const pathStr = pathParameter ? pathParameter : this.path;
@@ -98,13 +125,13 @@ export class PanelComponent implements OnInit {
         }
     }
     saveBacktoDB() {
-        this.trialsCollection.doc(this.nctId).update({
-            treatment_list: {
-                step: [{
-                    arm: this.originalArms,
-                    match: this.originalMatch
-                }]
-            }
+        this.trialService.getTrialRef(this.nctIdChosen).set({
+            arm: this.originalArms,
+            match: this.originalMatch
+        }).then(result => {
+            this.clearInput();
+        }).catch(error => {
+            console.log('Failed to save to DB ', error);
         });
     }
     modifyData(obj: Array<any>, path: Array<string>, type: string) {
@@ -166,32 +193,33 @@ export class PanelComponent implements OnInit {
         this.selectedItems = [];
         this.addNode = false;
         this.nodeType = '';
+        this.clearNodeInput();
     }
     clearInputForm(keys: Array<string>, type: string) {
         if (type === 'Genomic') {
             for (let key of keys) {
-                this.trialService.setGenomicInput(key, '');
-                this.trialService.setGenomicInput('no_'+key, false);
+                this.genomicInput[key] = '';
+                this.genomicInput['no_'+key] = false;
             }    
         } else if (type === 'Clinical') {
             for (let key of keys) {
-                this.trialService.setClinicalInput(key, '');
-                this.trialService.setClinicalInput('no_'+key, false);
+                this.clinicalInput[key] = '';
+                this.clinicalInput['no_'+key] = false;
             }    
         } else if (type === 'arm') {
             for (let key of keys) {
-                this.trialService.setArmInput(key, '');
+                this.armInput[key] = '';
             } 
         }
     }
     clearNodeInput() {
         if (this.nodeType === 'Genomic') {
             this.clearInputForm(['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change', 'variant_classification', 'variant_category', 'exon', 'cnv_call'], this.nodeType);
-            this.trialService.setGenomicInput('wildtype', '');
+            this.genomicInput.wildtype = '';
         } else if (this.nodeType === 'Clinical') {
             this.clearInputForm(['age_numerical', 'oncotree_diagnosis'], this.nodeType);
-            this.trialService.setClinicalInput('main_type', '');
-            this.trialService.setClinicalInput('sub_type', '');
+            this.clinicalInput['main_type'] = '';
+            this.clinicalInput['sub_type'] = '';
         }
     }
     getGenomicValue(key: string) {
@@ -338,26 +366,26 @@ export class PanelComponent implements OnInit {
         if (type === 'genomic') {
             for (let key of keys) {
                 if (this.unit['genomic'][key][0] === '!') {
-                    this.trialService.setGenomicInput(key, this.unit['genomic'][key].slice(1));
-                    this.trialService.setGenomicInput('no_'+key, true);    
+                    this.genomicInput[key] = this.unit['genomic'][key].slice(1);
+                    this.genomicInput['no_'+key] = true;
                 } else {
-                    this.trialService.setGenomicInput(key, this.unit['genomic'][key]);
-                    this.trialService.setGenomicInput('no_'+key, false);
+                    this.genomicInput[key] = this.unit['genomic'][key];
+                    this.genomicInput['no_'+key] = false;
                 }
             }
         } else if (type === 'clinical') {
             for (let key of keys) {
                 if (this.unit['clinical'][key][0] === '!') {
-                    this.trialService.setClinicalInput(key, this.unit['clinical'][key].slice(1));
-                    this.trialService.setClinicalInput('no_'+key, true);    
+                    this.clinicalInput[key] = this.unit['clinical'][key].slice(1);
+                    this.clinicalInput['no_'+key] = true;
                 } else {
-                    this.trialService.setClinicalInput(key, this.unit['clinical'][key]);
-                    this.trialService.setClinicalInput('no_'+key, false);
+                    this.clinicalInput[key] = this.unit['clinical'][key];
+                    this.clinicalInput['no_'+key] = false;
                 }
             }
         } else if (type === 'arm') {
             for (const key of keys) {
-                this.trialService.setArmInput(key, this.unit[key]);
+                this.armInput[key] = this.unit[key];
             }
         }
     }
@@ -374,20 +402,20 @@ export class PanelComponent implements OnInit {
         }
     }
     setOncotree(oncotree_diagnosis: string) {
-        this.trialService.setClinicalInput('sub_type', '');
-        this.trialService.setClinicalInput('main_type', '');
+        this.clinicalInput['sub_type'] = '';
+        this.clinicalInput['main_type'] = '';
         let isSubtype = false;
         for (let item of this.allSubTypesOptions) {
             if (item.value === oncotree_diagnosis) {
-                this.trialService.setClinicalInput('sub_type', oncotree_diagnosis);
-                this.trialService.setClinicalInput('main_type', this.subToMainMapping[oncotree_diagnosis]);
+                this.clinicalInput['sub_type'] = oncotree_diagnosis;
+                this.clinicalInput['main_type'] = this.subToMainMapping[oncotree_diagnosis];
                 isSubtype = true;
             }
         }
         if (isSubtype === false) {
             for (let item of this.mainTypesOptions) {
                 if (item.value === oncotree_diagnosis) {
-                    this.trialService.setClinicalInput('main_type', oncotree_diagnosis);
+                    this.clinicalInput['main_type'] = oncotree_diagnosis;
                 }
             }
         }
@@ -434,14 +462,7 @@ export class PanelComponent implements OnInit {
             this.removeOriginalNode(arm.match);
         }
         this.dataBlockToMove = {};
-        this.trialsCollection.doc(this.nctId).update({
-            treatment_list: {
-                step: [{
-                    arm: this.originalArms,
-                    match: this.originalMatch
-                }]
-            }
-        });
+        this.saveBacktoDB();
     }
     removeOriginalNode(match: Array<any>) {
         let itemsToRemove = [];
@@ -464,7 +485,7 @@ export class PanelComponent implements OnInit {
     // when user try to move a section, we hide all icons except the relocate icon to avoid distraction
     displayDestination() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true;
+        return this.type.indexOf('destination') !== -1 && this.operationPool['currentPath'] !== this.path && this.operationPool['relocate'] === true;
     }
     displayPencil() {
         if (this.isPermitted === false) return false;
@@ -504,7 +525,7 @@ export class PanelComponent implements OnInit {
                 match: []
             });
         } else if (type === 'delete') {
-            const tempIndex = this.path.split(',')[1].trim();
+            const tempIndex = Number(this.path.split(',')[1].trim());
             this.originalArms.splice(tempIndex, 1);
         } else if (type === 'update') {
             const tempIndex = this.path.split(',')[1].trim();
