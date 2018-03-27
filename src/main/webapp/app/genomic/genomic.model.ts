@@ -1,5 +1,5 @@
 export interface Genomic {
-    hugo_symbol: string,
+    hugo_symbol?: string,
     oncokb_variant?: string,
     matching_examples?: string,
     protein_change?: string,

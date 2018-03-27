@@ -14,6 +14,9 @@ import { SERVER_API_URL } from '../app.constants';
 import { environment } from '../environments/environment';
 @Injectable()
 export class TrialService {
+    production = environment.production ? environment.production : false;
+    oncokb = environment.oncokb ? environment.oncokb : false;
+
     private nctIdChosenSource = new BehaviorSubject<string>('');
     nctIdChosenObs = this.nctIdChosenSource.asObservable();
 
@@ -39,19 +42,51 @@ export class TrialService {
     private movingPathSource = new BehaviorSubject<MovingPath>(this.movingPath);
     movingPathObs = this.movingPathSource.asObservable();
 
-    genomicInput: Genomic = {
-        hugo_symbol: ''
-    };
+    genomicInput: Genomic = (this.oncokb === true ? {
+        hugo_symbol: '',
+        oncokb_variant: '',
+        matching_examples: '',
+        no_hugo_symbol: false,
+        no_oncokb_variant: false
+    } : {
+        hugo_symbol: '',
+        oncokb_variant: '',
+        matching_examples: '',
+        protein_change: '',
+        wildcard_protein_change: '',
+        variant_classification: '',
+        variant_category: '',
+        exon: '',
+        cnv_call: '',
+        wildtype: '',
+        no_hugo_symbol: false,
+        no_oncokb_variant: false,
+        no_matching_examples: false,
+        no_protein_change: false,
+        no_wildcard_protein_change: false,
+        no_variant_classification: false,
+        no_variant_category: false,
+        no_exon: false,
+        no_cnv_call: false
+    });
     private genomicInputSource = new BehaviorSubject<Genomic>(this.genomicInput);
     genomicInputObs = this.genomicInputSource.asObservable();
 
-    clinicalInput: Clinical= {};
+    clinicalInput: Clinical= {
+        age_numerical: '',
+        oncotree_diagnosis: '',
+        main_type: '',
+        sub_type: '',
+        no_age_numerical: false,
+        no_oncotree_diagnosis: false
+    };
     private clinicalInputSource = new BehaviorSubject<Clinical>(this.clinicalInput);
     clinicalInputObs = this.clinicalInputSource.asObservable();
 
     armInput: Arm = {
         arm_name: '',
-        arm_description: ''
+        arm_description: '',
+        match: []
     };
     private armInputSource = new BehaviorSubject<Arm>(this.armInput);
     armInputObs = this.armInputSource.asObservable();
@@ -66,7 +101,6 @@ export class TrialService {
     oncokb_variants = {};
     trialList = [];
     trialsRef: AngularFireObject<any>;
-    production = environment.production ? environment.production : false;
     constructor(public http: Http, public db: AngularFireDatabase) {
         this.trialsRef = db.object('Trials');
         
@@ -177,6 +211,15 @@ export class TrialService {
                 break;
             }
         }
+    }
+    setGenomicInput(genomicInput: Genomic) {
+        this.genomicInputSource.next(genomicInput);
+    }
+    setClinicalInput(clinicalInput: Clinical) {
+        this.clinicalInputSource.next(clinicalInput);
+    }
+    setArmInput(armInput: Arm) {
+        this.armInputSource.next(armInput);
     }
     getStyle(indent: number) {
         return { 'margin-left': (indent * 40) + 'px' };

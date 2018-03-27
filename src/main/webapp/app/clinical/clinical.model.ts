@@ -3,6 +3,6 @@ export interface Clinical {
     oncotree_diagnosis?: string,
     main_type?: string,
     sub_type?: string,
-    no_age_numerical?: false,
-    no_oncotree_diagnosis?: false
+    no_age_numerical?: boolean,
+    no_oncotree_diagnosis?: boolean
 }

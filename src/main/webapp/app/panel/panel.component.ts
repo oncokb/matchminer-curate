@@ -154,9 +154,10 @@ export class PanelComponent implements OnInit {
             case 'update':
                 if (path.length === 1) {
                     if (obj[path[0]].hasOwnProperty('genomic')) {
-                        this.updateNode(obj[path[0]], 'genomic');
+                        obj[path[0]]['genomic'] = _.clone(this.genomicInput);
                     } else if (obj[path[0]].hasOwnProperty('clinical')) {
-                        this.updateNode(obj[path[0]], 'clinical');
+                        this.processClinicalData();
+                        obj[path[0]]['clinical'] = _.clone(this.clinicalInput);
                     }
                 } else {
                     const index = path.shift();
@@ -222,20 +223,6 @@ export class PanelComponent implements OnInit {
             this.clinicalInput['sub_type'] = '';
         }
     }
-    getGenomicValue(key: string) {
-        if (this.genomicInput['no_' + key] === true) {
-            return '!' + this.genomicInput[key];
-        } else {
-            return this.genomicInput[key];
-        }
-    }
-    getClinicalValue(key: string) {
-        if (this.clinicalInput['no_' + key] === true) {
-            return '!' + (key === 'oncotree_diagnosis' ? this.getOncotree() : this.clinicalInput[key]);
-        } else {
-            return (key === 'oncotree_diagnosis' ? this.getOncotree() : this.clinicalInput[key]);
-        }
-    }
     getOncotree() {
         let oncotree_diagnosis = '';
         if (this.clinicalInput.sub_type) {
@@ -245,31 +232,24 @@ export class PanelComponent implements OnInit {
         }
         return oncotree_diagnosis;
     }
+    processClinicalData() {
+        if (_.isUndefined(this.clinicalInput['sub_type'])) {
+            this.clinicalInput['sub_type'] = '';
+        }
+        this.clinicalInput['oncotree_diagnosis'] = this.getOncotree();
+    }
     addNewNode(obj: Array<any>) {
         if (_.isEmpty(this.dataBlockToMove)) {
             switch (this.nodeType) {
                 case 'Genomic':
                     obj.push({
-                        genomic: {
-                            hugo_symbol: this.getGenomicValue('hugo_symbol'),
-                            oncokb_variant: this.getGenomicValue('oncokb_variant'),
-                            matching_examples: this.getGenomicValue('matching_examples'),
-                            protein_change: this.getGenomicValue('protein_change'),
-                            wildcard_protein_change: this.getGenomicValue('wildcard_protein_change'),
-                            variant_classification: this.getGenomicValue('variant_classification'),
-                            variant_category: this.getGenomicValue('variant_category'),
-                            exon: this.getGenomicValue('exon'),
-                            cnv_call: this.getGenomicValue('cnv_call'),
-                            wildtype: this.getGenomicValue('wildtype')
-                        }
+                        genomic: _.clone(this.genomicInput)
                     });
                     break;
                 case 'Clinical':
+                    this.processClinicalData();
                     obj.push({
-                        clinical: {
-                            age_numerical: this.getClinicalValue('age_numerical'),
-                            oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis')
-                        }
+                        clinical: _.clone(this.clinicalInput)
                     });
                     break;
                 case 'And':
@@ -279,26 +259,13 @@ export class PanelComponent implements OnInit {
                         switch (item.itemName) {
                             case 'Genomic':
                                 tempObj1.push({
-                                    genomic: {
-                                        hugo_symbol: this.getGenomicValue('hugo_symbol'),
-                                        oncokb_variant: this.getGenomicValue('oncokb_variant'),
-                                        matching_examples: this.getGenomicValue('matching_examples'),
-                                        protein_change: this.getGenomicValue('protein_change'),
-                                        wildcard_protein_change: this.getGenomicValue('wildcard_protein_change'),
-                                        variant_classification: this.getGenomicValue('variant_classification'),
-                                        variant_category: this.getGenomicValue('variant_category'),
-                                        exon: this.getGenomicValue('exon'),
-                                        cnv_call: this.getGenomicValue('cnv_call'),
-                                        wildtype: this.getGenomicValue('wildtype')
-                                    }
+                                    genomic: _.clone(this.genomicInput)
                                 });
                                 break;
                             case 'Clinical':
+                                this.processClinicalData();
                                 tempObj1.push({
-                                    clinical: {
-                                        age_numerical: this.getClinicalValue('age_numerical'),
-                                        oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis')
-                                    }
+                                    clinical: _.clone(this.clinicalInput)
                                 });
                                 break;
                             case 'And':
@@ -328,27 +295,6 @@ export class PanelComponent implements OnInit {
         }
         obj.sort(this.sortModifiedArray);
     }
-    updateNode(obj: any, type: string) {
-        if (type === 'genomic') {
-            obj['genomic'] = {
-                hugo_symbol: this.getGenomicValue('hugo_symbol'),
-                oncokb_variant: this.getGenomicValue('oncokb_variant'),
-                matching_examples: this.getGenomicValue('matching_examples'),
-                protein_change: this.getGenomicValue('protein_change'),
-                wildcard_protein_change: this.getGenomicValue('wildcard_protein_change'),
-                variant_classification: this.getGenomicValue('variant_classification'),
-                variant_category: this.getGenomicValue('variant_category'),
-                exon: this.getGenomicValue('exon'),
-                cnv_call: this.getGenomicValue('cnv_call'),
-                wildtype: this.genomicInput.wildtype
-            };
-        } else if (type === 'clinical') {
-            obj['clinical'] = {
-                age_numerical: this.getClinicalValue('age_numerical'),
-                oncotree_diagnosis: this.getClinicalValue('oncotree_diagnosis')
-            }
-        }
-    }
     exchangeLogic(obj: any) {
         if (obj.hasOwnProperty('or')) {
             obj['and'] = obj['or'];
@@ -362,43 +308,21 @@ export class PanelComponent implements OnInit {
         const keys = ['genomic', 'clinical', 'and', 'or'];
         return keys.indexOf(Object.keys(a)[0]) - keys.indexOf(Object.keys(b)[0]);
     }
-    setEditOriginalValues(keys: Array<any>, type: string) {
-        if (type === 'genomic') {
-            for (let key of keys) {
-                if (this.unit['genomic'][key][0] === '!') {
-                    this.genomicInput[key] = this.unit['genomic'][key].slice(1);
-                    this.genomicInput['no_'+key] = true;
-                } else {
-                    this.genomicInput[key] = this.unit['genomic'][key];
-                    this.genomicInput['no_'+key] = false;
-                }
-            }
-        } else if (type === 'clinical') {
-            for (let key of keys) {
-                if (this.unit['clinical'][key][0] === '!') {
-                    this.clinicalInput[key] = this.unit['clinical'][key].slice(1);
-                    this.clinicalInput['no_'+key] = true;
-                } else {
-                    this.clinicalInput[key] = this.unit['clinical'][key];
-                    this.clinicalInput['no_'+key] = false;
-                }
-            }
-        } else if (type === 'arm') {
-            for (const key of keys) {
-                this.armInput[key] = this.unit[key];
-            }
-        }
-    }
     editNode() { 
         this.operationPool['currentPath'] = this.path;
         this.operationPool['editing'] = true;
         if (this.unit.hasOwnProperty('genomic')) {
-            this.setEditOriginalValues(['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change', 'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'], 'genomic');
+            this.trialService.setGenomicInput(this.unit['genomic']);
         } else if (this.unit.hasOwnProperty('clinical')) {
-            this.setEditOriginalValues(['age_numerical'], 'clinical');
+            this.trialService.setClinicalInput(this.unit['clinical']);
             this.setOncotree(this.unit['clinical']['oncotree_diagnosis']);
         } else if (this.unit.hasOwnProperty('arm_name')) {
-            this.setEditOriginalValues(['arm_name', 'arm_description'], 'arm');
+            let armToAdd: Arm = {
+                arm_name: this.unit['arm_name'],
+                arm_description: this.unit['arm_description'],
+                match: this.unit['match']
+            };
+            this.trialService.setArmInput(armToAdd);
         }
     }
     setOncotree(oncotree_diagnosis: string) {
@@ -482,10 +406,29 @@ export class PanelComponent implements OnInit {
             }
         }
     }
-    // when user try to move a section, we hide all icons except the relocate icon to avoid distraction
+    isNestedInside(currentPath: string, destinationPath: string) {
+        let currentPathArr = currentPath.split(',');
+        let destinationPathArr = destinationPath.split(',');
+        let isInside = true;
+        if (currentPathArr.length < destinationPathArr.length) {
+            _.some(currentPathArr, function(item, index) {
+                if (item !== destinationPathArr[index]) {
+                    isInside = false;
+                    return true;
+                }
+            });
+        } else {
+            isInside = false;
+        }
+        return isInside;
+    }
+    // when user try to move a section, we hide all icons except the relocate icon to avoid distraction. Among which, there are two cases the destination icons are hidden
+    // 1) The section is the current chosen one to move around.
+    // 2) The section is inside the current chosen section.
     displayDestination() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('destination') !== -1 && this.operationPool['currentPath'] !== this.path && this.operationPool['relocate'] === true;
+        return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true 
+        && this.operationPool['currentPath'] !== this.path && !this.isNestedInside(this.operationPool['currentPath'], this.path);
     }
     displayPencil() {
         if (this.isPermitted === false) return false;
@@ -519,11 +462,12 @@ export class PanelComponent implements OnInit {
     }
     modifyArmGroup(type) {
         if (type === 'add') {
-            this.originalArms.push({
+            let armToAdd: Arm = {
                 arm_name: this.armInput.arm_name,
                 arm_description: this.armInput.arm_description,
                 match: []
-            });
+            };
+            this.originalArms.push(armToAdd);
         } else if (type === 'delete') {
             const tempIndex = Number(this.path.split(',')[1].trim());
             this.originalArms.splice(tempIndex, 1);
