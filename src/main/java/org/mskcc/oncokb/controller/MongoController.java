@@ -63,6 +63,7 @@ public class MongoController implements MongoApi{
             // this temporary file remains after the jvm exits
             File tempFile = File.createTempFile("trial", ".json");
             String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
+            System.out.println("trial temp file: " + trialPath);
 
             ProcessBuilder pb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
                 "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", this.uri);
@@ -70,6 +71,7 @@ public class MongoController implements MongoApi{
             tempFile.delete();
 
             if(!isLoad) {
+                System.out.println("Load trial json temp file failed!");
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
@@ -85,23 +87,26 @@ public class MongoController implements MongoApi{
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    public ResponseEntity<List<TrialMatch>> matchTrial(@RequestBody(required = true) Patient body) {
+    public ResponseEntity<TrialMatch> matchTrial(@RequestBody(required = true) Patient body) {
         // check if MatchEngine is accessible.
         String runnableScriptPath = PythonUtil.getMatchEnginePath(this.matchengineAbsolutePath);
         if (runnableScriptPath == null || runnableScriptPath.length() <= 0 ) {
+            System.out.println("Cannot' find matchengine path!");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        List<Clinical> clinicals = body.getClinicals();
+        Clinical clinical = body.getClinical();
         List<Genomic> genomics = body.getGenomics();
         Set<Document> previousMatchedRecordsSet = new HashSet<>(MongoUtil.getCollection(this.mongoDatabase,
             "trial_match"));
+        System.out.println("\n\npreviousMatchedRecordsSet:\n" + previousMatchedRecordsSet);
         List<Document> matchedResults = new LinkedList<>();
-        List<TrialMatch> trialMatchResult = new LinkedList<>();
+        TrialMatch trialMatchResult = new TrialMatch();
 
         try {
             List<Genomic> annotatedGenomics = annotateOncokbVariant(genomics, this.oncokbMatchVariantApi);
             if(annotatedGenomics == null) {
+                System.out.println("Annotate oncokb_variant on genomic data failed!");
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
@@ -110,21 +115,20 @@ public class MongoController implements MongoApi{
             JSONArray clinicalArray = new JSONArray();
             JSONArray genomicArray = new JSONArray();
 
-            for(Clinical clinical: clinicals){
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("ONCOKB_CLINICAL_ID", clinical.getClinicalId());
-                jsonObject.put("SAMPLE_ID", clinical.getSampleId());
-                jsonObject.put("ORD_PHYSICIAN_NAME", clinical.getOrdPhysicianName());
-                jsonObject.put("ORD_PHYSICIAN_EMAIL", clinical.getOrdPhysicianEmail());
-                jsonObject.put("ONCOTREE_PRIMARY_DIAGNOSIS_NAME", clinical.getOncotreePrimaryDiagnosisName());
-                jsonObject.put("REPORT_DATE", clinical.getReportDate());
-                jsonObject.put("VITAL_STATUS", clinical.getVitalStatus());
-                jsonObject.put("FIRST_LAST", clinical.getFirstLast());
-                jsonObject.put("BIRTH_DATE", clinical.getBirthDate());
-                jsonObject.put("DFCI_MRN", clinical.getMrn());
-                jsonObject.put("GENDER", clinical.getGender());
-                clinicalArray.put(jsonObject);
-            }
+            JSONObject clinicalObject = new JSONObject();
+            clinicalObject.put("ONCOKB_CLINICAL_ID", clinical.getClinicalId());
+            clinicalObject.put("SAMPLE_ID", clinical.getSampleId());
+            clinicalObject.put("ORD_PHYSICIAN_NAME", clinical.getOrdPhysicianName());
+            clinicalObject.put("ORD_PHYSICIAN_EMAIL", clinical.getOrdPhysicianEmail());
+            clinicalObject.put("ONCOTREE_PRIMARY_DIAGNOSIS_NAME", clinical.getOncotreePrimaryDiagnosisName());
+            clinicalObject.put("REPORT_DATE", clinical.getReportDate());
+            clinicalObject.put("VITAL_STATUS", clinical.getVitalStatus());
+            clinicalObject.put("FIRST_LAST", clinical.getFirstLast());
+            clinicalObject.put("BIRTH_DATE", clinical.getBirthDate());
+            clinicalObject.put("DFCI_MRN", clinical.getMrn());
+            clinicalObject.put("GENDER", clinical.getGender());
+            clinicalArray.put(clinicalObject);
+
 
             for(Genomic genomic: annotatedGenomics){
                 JSONObject jsonObject = new JSONObject();
@@ -152,24 +156,24 @@ public class MongoController implements MongoApi{
 
             // check if any trials matched for query data. We check trials from history(collection "trial_match") to
             // see if any matched records can be found and save them to "matchedResults".
-            matchedResults.addAll(findMatchedTrials(previousMatchedRecordsSet, genomicArray, clinicalArray));
-
+            if (previousMatchedRecordsSet.size() > 0) {
+                matchedResults.addAll(findMatchedTrials(previousMatchedRecordsSet, genomicArray, clinicalArray));
+                System.out.println("\n\nMatched Result: \n" + matchedResults + "\n\n");
+            }
             // drop collection "trial_query" first to clean records for previous queries
             // create a new collection "trial_query" to save matched trials from history(collection "trial_match").
             Boolean isDropped = MongoUtil.dropCollection(this.mongoDatabase, "trial_query");
-            if (matchedResults.size() > 0) {
-                if(isDropped) {
-                    Boolean isCreated = MongoUtil.createCollection(this.mongoDatabase,
-                        "trial_query", new ArrayList<>(matchedResults));
-                    if (!isCreated) {
-                        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                    }
+            if(matchedResults.size() > 0 && isDropped) {
+                Boolean isCreated = MongoUtil.createCollection(this.mongoDatabase,
+                    "trial_query", new ArrayList<>(matchedResults));
+                if (!isCreated) {
+                    System.out.println("Create trial_query collection failed!");
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }
 
             String clinicalPath = FileUtil.buildJsonTempFile(clinicalArray.toString(), clinicalTempFile);
             String genomicPath = FileUtil.buildJsonTempFile(genomicArray.toString(), genomicTempFile);
-
 
             ProcessBuilder loadPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
                 "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json", "--mongo-uri", this.uri);
@@ -188,15 +192,18 @@ public class MongoController implements MongoApi{
                     // export matched result from collection "trial_match" in MongoDB "matchminer"
                     List<Document> matchedTrialDocs = MongoUtil.getCollection(this.mongoDatabase,
                         "new_trial_match");
+                    System.out.println("\n\nmatched trials docs:\n" + matchedTrialDocs);
                     matchedResults.addAll(matchedTrialDocs);
                 } else {
+                    System.out.println("Run match() of matchengine failed!");
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             } else {
+                System.out.println("Load genomic and clinical data into MongoDB failed!");
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            trialMatchResult = capsulateTrialMatchDoc(matchedResults);
+            trialMatchResult = capsulateTrialMatchDoc(body.getId(), matchedResults);
 
             clinicalTempFile.delete();
             genomicTempFile.delete();
@@ -285,54 +292,19 @@ public class MongoController implements MongoApi{
         return results;
     }
 
-    public List<TrialMatch> capsulateTrialMatchDoc(List<Document> documents) {
-        List<TrialMatch> trialMatches = new LinkedList<>();
+    public TrialMatch capsulateTrialMatchDoc(String id, List<Document> documents) {
+        TrialMatch trialMatch = new TrialMatch();
+        Set<String> nctIds = new HashSet<>();
         for (Document doc: documents) {
-            TrialMatch trialMatch = new TrialMatch();
-            trialMatch.setClinicalId(doc.getString("oncokb_clinical_id"));
-            trialMatch.setSampleId(doc.getString("sample_id"));
-            trialMatch.setOrdPhysicianName(doc.getString("ord_physician_name"));
-            trialMatch.setOrdPhysicianEmail(doc.getString("ord_physician_email"));
-            trialMatch.setOncotreePrimaryDiagnosisName(doc.getString("oncotree_primary_diagnosis_name"));
-            trialMatch.setVitalStatus(doc.getString("vital_status"));
-            trialMatch.setFirstLast(doc.getString("first_last"));
-            trialMatch.setReportDate(doc.getString("report_date"));
-            trialMatch.setMrn(doc.getInteger("mrn"));
-
-            trialMatch.setGenomicId(doc.getString("oncokb_genomic_id"));
-            trialMatch.setTrueHugoSymbol(doc.getString("true_hugo_symbol"));
-            trialMatch.setTrueProteinChange(doc.getString("true_protein_change"));
-            trialMatch.setTrueVariantClassification(doc.getString("true_variant_classification"));
-            trialMatch.setVariantCategory(doc.getString("variant_category"));
-            trialMatch.setCnvCall(doc.getString("cnv_call"));
-
-            trialMatch.setWildtype(doc.getBoolean("wildtype"));
-            trialMatch.setChromosome(doc.getString("chromosome"));
-            trialMatch.setPosition(doc.getString("position"));
-            trialMatch.setTrueCdnaChange(doc.getString("true_cdna_change"));
-            trialMatch.setReferenceAllele(doc.getString("reference_allele"));
-            trialMatch.setTrueTranscriptExon(doc.getDouble("true_transcript_exon"));
-            trialMatch.setCanonicalStrand(doc.getString("canonical_strand"));
-            trialMatch.setAlleleFraction(doc.getDouble("allele_fraction"));
-            trialMatch.setTier(doc.getDouble("tier"));
-
-            trialMatch.setProtocolNo(doc.getString("protocol_no"));
-            trialMatch.setNctId(doc.getString("nct_id"));
-            trialMatch.setGenomicAlteration(doc.getString("genomic_alteration"));
-            trialMatch.setMatchType(doc.getString("match_type"));
-            trialMatch.setTrialAccrualStatus(doc.getString("trial_accrual_status"));
-            trialMatch.setMatchLevel(doc.getString("match_level"));
-            trialMatch.setCode(doc.getString("code"));
-            trialMatch.setInternalId(doc.getString("internal_id"));
-
-            trialMatches.add(trialMatch);
+            nctIds.add(doc.getString("nct_id"));
         }
-
-        return trialMatches;
+        trialMatch.setId(id);
+        trialMatch.setNctIds(nctIds);
+        return trialMatch;
     }
 
     public List<Document> findMatchedTrials(Set<Document> matchedRecordsSet,
-                                           JSONArray genomicArray, JSONArray clinicalArray) throws JSONException{
+                                            JSONArray genomicArray, JSONArray clinicalArray) throws JSONException{
         List<Document> matchedResults = new LinkedList<>();
         for (Document doc: matchedRecordsSet) {
             for (int i = 0; i < genomicArray.length(); i++){

@@ -9,18 +9,29 @@ import java.util.List;
  */
 
 public class Patient {
-    @JsonProperty("clinicals")
-    List<Clinical> clinicals;
+    @JsonProperty("id")
+    String id;
+
+    @JsonProperty("clinical")
+    Clinical clinical;
 
     @JsonProperty("genomics")
     List<Genomic> genomics;
 
-    public List<Clinical> getClinicals() {
-        return clinicals;
+    public String getId() {
+        return id;
     }
 
-    public void setClinicals(List<Clinical> clinicals) {
-        this.clinicals = clinicals;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Clinical getClinical() {
+        return clinical;
+    }
+
+    public void setClinical(Clinical clinical) {
+        this.clinical = clinical;
     }
 
     public List<Genomic> getGenomics() {

@@ -38,6 +38,6 @@ public interface MongoApi {
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    ResponseEntity<List<TrialMatch>> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patient body);
+    ResponseEntity<TrialMatch> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patient body);
 
 }
