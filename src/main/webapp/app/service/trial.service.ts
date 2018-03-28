@@ -74,11 +74,11 @@ export class TrialService {
 
     clinicalInput: Clinical= {
         age_numerical: '',
-        oncotree_diagnosis: '',
+        oncotree_primary_diagnosis: '',
         main_type: '',
         sub_type: '',
         no_age_numerical: false,
-        no_oncotree_diagnosis: false
+        no_oncotree_primary_diagnosis: false
     };
     private clinicalInputSource = new BehaviorSubject<Clinical>(this.clinicalInput);
     clinicalInputObs = this.clinicalInputSource.asObservable();

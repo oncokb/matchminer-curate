@@ -218,25 +218,25 @@ export class PanelComponent implements OnInit {
             this.clearInputForm(['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change', 'variant_classification', 'variant_category', 'exon', 'cnv_call'], this.nodeType);
             this.genomicInput.wildtype = '';
         } else if (this.nodeType === 'Clinical') {
-            this.clearInputForm(['age_numerical', 'oncotree_diagnosis'], this.nodeType);
+            this.clearInputForm(['age_numerical', 'oncotree_primary_diagnosis'], this.nodeType);
             this.clinicalInput['main_type'] = '';
             this.clinicalInput['sub_type'] = '';
         }
     }
     getOncotree() {
-        let oncotree_diagnosis = '';
+        let oncotree_primary_diagnosis = '';
         if (this.clinicalInput.sub_type) {
-            oncotree_diagnosis = this.clinicalInput.sub_type;
+            oncotree_primary_diagnosis = this.clinicalInput.sub_type;
         }else if (this.clinicalInput.main_type) {
-            oncotree_diagnosis = this.clinicalInput.main_type;
+            oncotree_primary_diagnosis = this.clinicalInput.main_type;
         }
-        return oncotree_diagnosis;
+        return oncotree_primary_diagnosis;
     }
     processClinicalData() {
         if (_.isUndefined(this.clinicalInput['sub_type'])) {
             this.clinicalInput['sub_type'] = '';
         }
-        this.clinicalInput['oncotree_diagnosis'] = this.getOncotree();
+        this.clinicalInput['oncotree_primary_diagnosis'] = this.getOncotree();
     }
     addNewNode(obj: Array<any>) {
         if (_.isEmpty(this.dataBlockToMove)) {
@@ -315,7 +315,7 @@ export class PanelComponent implements OnInit {
             this.trialService.setGenomicInput(this.unit['genomic']);
         } else if (this.unit.hasOwnProperty('clinical')) {
             this.trialService.setClinicalInput(this.unit['clinical']);
-            this.setOncotree(this.unit['clinical']['oncotree_diagnosis']);
+            this.setOncotree(this.unit['clinical']['oncotree_primary_diagnosis']);
         } else if (this.unit.hasOwnProperty('arm_name')) {
             let armToAdd: Arm = {
                 arm_name: this.unit['arm_name'],
@@ -325,21 +325,21 @@ export class PanelComponent implements OnInit {
             this.trialService.setArmInput(armToAdd);
         }
     }
-    setOncotree(oncotree_diagnosis: string) {
+    setOncotree(oncotree_primary_diagnosis: string) {
         this.clinicalInput['sub_type'] = '';
         this.clinicalInput['main_type'] = '';
         let isSubtype = false;
         for (let item of this.allSubTypesOptions) {
-            if (item.value === oncotree_diagnosis) {
-                this.clinicalInput['sub_type'] = oncotree_diagnosis;
-                this.clinicalInput['main_type'] = this.subToMainMapping[oncotree_diagnosis];
+            if (item.value === oncotree_primary_diagnosis) {
+                this.clinicalInput['sub_type'] = oncotree_primary_diagnosis;
+                this.clinicalInput['main_type'] = this.subToMainMapping[oncotree_primary_diagnosis];
                 isSubtype = true;
             }
         }
         if (isSubtype === false) {
             for (let item of this.mainTypesOptions) {
-                if (item.value === oncotree_diagnosis) {
-                    this.clinicalInput['main_type'] = oncotree_diagnosis;
+                if (item.value === oncotree_primary_diagnosis) {
+                    this.clinicalInput['main_type'] = oncotree_primary_diagnosis;
                 }
             }
         }

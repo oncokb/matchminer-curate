@@ -14,10 +14,10 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-3">oncotree_diagnosis:</div>
+            <div class="col-sm-3">oncotree_primary_diagnosis:</div>
             <div class="col-sm-1">
-                <label for="no_oncotree_diagnosis1">Not</label>
-                <input id="no_oncotree_diagnosis1" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_oncotree_diagnosis" />
+                <label for="no_oncotree_primary_diagnosis1">Not</label>
+                <input id="no_oncotree_primary_diagnosis1" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_oncotree_primary_diagnosis" />
             </div>
             <div class="col-sm-8">
                 <div>
@@ -54,10 +54,10 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4">oncotree_diagnosis:</div>
+            <div class="col-sm-4">oncotree_primary_diagnosis:</div>
             <div class="col-sm-1 editMargin">
-                <label for="no_oncotree_diagnosis2">Not</label>
-                <input id="no_oncotree_diagnosis2" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_oncotree_diagnosis" />
+                <label for="no_oncotree_primary_diagnosis2">Not</label>
+                <input id="no_oncotree_primary_diagnosis2" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_oncotree_primary_diagnosis" />
             </div>
             <div class="col-sm-7">
                 <div>
@@ -78,8 +78,8 @@
             <label>age_numerical:</label>
             <span>{{unit.clinical.age_numerical}}</span>
             <br/>
-            <label>oncotree_diagnosis:</label>
-            <span>{{unit.clinical.oncotree_diagnosis}}</span>
+            <label>oncotree_primary_diagnosis:</label>
+            <span>{{unit.clinical.oncotree_primary_diagnosis}}</span>
         </div>
     </ng-template>
 </ng-template>
