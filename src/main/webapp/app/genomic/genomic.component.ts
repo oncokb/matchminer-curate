@@ -2,13 +2,13 @@ import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Http, Response } from '@angular/http';
 import { environment } from '../environments/environment';
-import { SERVER_API_URL } from '../app.constants';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import { Genomic } from './genomic.model';
 import * as _ from 'underscore';
+import {ConnectionService} from "../service/connection.service";
 @Component({
     selector: 'jhi-genomic',
     templateUrl: './genomic.component.html',
@@ -45,7 +45,7 @@ export class GenomicComponent implements OnInit {
         .map(term => (term.length < 1 || _.isUndefined(this.annotated_variants[this.genomicInput.hugo_symbol])) ? []
             : this.annotated_variants[this.genomicInput.hugo_symbol].filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
 
-    constructor(private trialService: TrialService, public http: Http) { 
+    constructor(private connectionService: ConnectionService, private trialService: TrialService, public http: Http) {
     }
 
     ngOnInit() {
@@ -61,34 +61,31 @@ export class GenomicComponent implements OnInit {
     }
     // This validation function will be executed the moment the input box lose focus
     validateGenomicGene() {
-        this.http.get(this.trialService.getAPIUrl('GeneValidation') + this.genomicInput.hugo_symbol)
-        .subscribe((res: Response) => {
-           const result = res.json();
-           if (result.hits.length > 0) {
+        this.connectionService.validateGenomicGene(this.genomicInput.hugo_symbol).subscribe((result) => {
+           if (result['hits'].length > 0) {
                 this.validationMessage['gene'] = 'Valid gene';
                 this.geneValidation = true;
            } else {
                 this.validationMessage['gene'] = 'Invalid gene';
                 this.geneValidation = false;
-           }  
+           }
         });
     }
     validateGenomicExample() {
         if (this.genomicInput.hugo_symbol && this.genomicInput.annotated_variant && this.genomicInput.matching_examples) {
             const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol +'&variant=' + this.genomicInput.annotated_variant +'&examples=' + this.genomicInput.matching_examples;
-            this.http.get(this.trialService.getAPIUrl('ExampleValidation') + variantsTobeValidated)
-            .subscribe((res: Response) => {
-                const result = res.json();
-                if (result[this.genomicInput.matching_examples] === true) {
-                    this.validationMessage['example'] = 'Valid';
-                    this.exampleValidation = true;
-                } else {
-                    this.validationMessage['example'] = 'Invalid';
-                    this.exampleValidation = false;
-                }
-            });
-        }        
+            this.connectionService.validateGenomicExample(variantsTobeValidated).subscribe((result) => {
+                    if (result[this.genomicInput.matching_examples] === true) {
+                        this.validationMessage['example'] = 'Valid';
+                        this.exampleValidation = true;
+                    } else {
+                        this.validationMessage['example'] = 'Invalid';
+                        this.exampleValidation = false;
+                    }
+                });
+        }
     }
+
     getMessageStyle(type) {
         const result = (type === 'gene' ? this.geneValidation : this.exampleValidation);
         return result === true ? { 'color': 'green' } : { 'color': 'red' };

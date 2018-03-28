@@ -38,6 +38,7 @@ import {
     PageRibbonComponent,
     ErrorComponent
 } from './layouts';
+import {ConnectionService} from "./service/connection.service";
 
 @NgModule({
     imports: [
@@ -75,7 +76,8 @@ import {
         customHttpProvider(),
         PaginationConfig,
         UserRouteAccessService,
-        TrialService
+        TrialService,
+        ConnectionService
     ],
     bootstrap: [ JhiMainComponent ]
 })
