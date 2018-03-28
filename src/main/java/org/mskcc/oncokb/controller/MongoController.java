@@ -1,7 +1,5 @@
 package org.mskcc.oncokb.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.json.JSONArray;
@@ -10,7 +8,6 @@ import org.json.JSONObject;
 import org.mskcc.oncokb.controller.api.MongoApi;
 import org.mskcc.oncokb.model.*;
 import org.mskcc.oncokb.service.util.FileUtil;
-import org.mskcc.oncokb.service.util.HttpUtil;
 import org.mskcc.oncokb.service.util.MongoUtil;
 import org.mskcc.oncokb.service.util.PythonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +70,15 @@ public class MongoController implements MongoApi{
             if(!isLoad) {
                 System.out.println("Load trial json temp file failed!");
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                JSONObject trialObj = new JSONObject(json);
+                String nctId = trialObj.get("nct_id").toString();
+                System.out.println("\n\nnct_id: " + nctId + "\n\n");
+
+                Boolean isDeleted = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
+                if (!isDeleted) {
+                    System.out.println("Delete the trial related matched record failed!");
+                }
             }
 
         } catch (Exception e){
@@ -104,11 +110,6 @@ public class MongoController implements MongoApi{
         TrialMatch trialMatchResult = new TrialMatch();
 
         try {
-            List<Genomic> annotatedGenomics = annotateOncokbVariant(genomics, this.oncokbMatchVariantApi);
-            if(annotatedGenomics == null) {
-                System.out.println("Annotate oncokb_variant on genomic data failed!");
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
 
             File clinicalTempFile = File.createTempFile("clinical", ".json");
             File genomicTempFile = File.createTempFile("genomic", ".json");
@@ -130,7 +131,7 @@ public class MongoController implements MongoApi{
             clinicalArray.put(clinicalObject);
 
 
-            for(Genomic genomic: annotatedGenomics){
+            for(Genomic genomic: genomics){
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("ONCOKB_GENOMIC_ID", genomic.getGenomicId());
                 jsonObject.put("SAMPLE_ID", genomic.getSampleId());
@@ -160,10 +161,9 @@ public class MongoController implements MongoApi{
                 matchedResults.addAll(findMatchedTrials(previousMatchedRecordsSet, genomicArray, clinicalArray));
                 System.out.println("\n\nMatched Result: \n" + matchedResults + "\n\n");
             }
-            // drop collection "trial_query" first to clean records for previous queries
+
             // create a new collection "trial_query" to save matched trials from history(collection "trial_match").
-            Boolean isDropped = MongoUtil.dropCollection(this.mongoDatabase, "trial_query");
-            if(matchedResults.size() > 0 && isDropped) {
+            if(matchedResults.size() > 0) {
                 Boolean isCreated = MongoUtil.createCollection(this.mongoDatabase,
                     "trial_query", new ArrayList<>(matchedResults));
                 if (!isCreated) {
@@ -205,6 +205,18 @@ public class MongoController implements MongoApi{
 
             trialMatchResult = capsulateTrialMatchDoc(body.getId(), matchedResults);
 
+            // drop collections "trial_query" and "new_trial_match" in case they will influence next matching result
+            Boolean isTrialQueryDropped = MongoUtil.dropCollection(this.mongoDatabase, "trial_query");
+            Boolean isNewTrialMatchDropped = MongoUtil.dropCollection(this.mongoDatabase, "new_trial_match");
+            if(!isTrialQueryDropped) {
+                System.out.println("Drop collection trial_query failed!");
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            if(!isNewTrialMatchDropped) {
+                System.out.println("Drop collection new_trial_match failed!");
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
             clinicalTempFile.delete();
             genomicTempFile.delete();
 
@@ -214,82 +226,6 @@ public class MongoController implements MongoApi{
         }
 
         return new ResponseEntity<>(trialMatchResult,  HttpStatus.OK);
-    }
-
-    public List<Genomic> annotateOncokbVariant(List<Genomic> genomics, String annotateApi) {
-
-        List<Genomic> results = new ArrayList<>(genomics);
-
-        try {
-            Set<MatchVariant> matchVariants = new HashSet<>();
-            List<Query> queries = new ArrayList<>();
-            Map<String, Set<String>> oncoVaMap = new HashMap<>();
-
-            // get genomic attributes for querying "oncokb_variant"
-            for (Genomic genomic: genomics) {
-                String sampleId = genomic.getSampleId();
-                String hugoSymbol = genomic.getTrueHugoSymbol();
-                String proteinChange = genomic.getTrueProteinChange();
-
-                // each item of "oncoKbVariants" should be unique
-                if (oncoVaMap.containsKey(hugoSymbol)) {
-                    oncoVaMap.get(hugoSymbol).add(proteinChange);
-                } else {
-                    Set<String> proteinChangeSet = new HashSet<>() ;
-                    proteinChangeSet.add(proteinChange);
-                    oncoVaMap.put(hugoSymbol, proteinChangeSet);
-                }
-
-                Query query = new Query();
-                query.setId(sampleId);
-                query.setHugoSymbol(hugoSymbol);
-                query.setAlteration(proteinChange);
-                queries.add(query);
-            }
-
-            // flatten oncoVaMap
-            Set<String> keys = oncoVaMap.keySet();
-            for(String key: keys){
-                Set<String> valuesSet = oncoVaMap.get(key);
-                String[] valuesArr = valuesSet.toArray(new String[valuesSet.size()]);
-                for (int i = 0; i < valuesArr.length; i++) {
-                    MatchVariant matchVariant = new MatchVariant();
-                    matchVariant.setHugoSymbol(key);
-                    matchVariant.setAlteration(valuesArr[i]);
-                    matchVariants.add(matchVariant);
-                }
-            }
-
-            MatchVariantRequest request = new MatchVariantRequest();
-            request.setOncokbVariants(matchVariants);
-            request.setQueries(queries);
-
-            ObjectMapper mapper = new ObjectMapper();
-            String postBody = mapper.writeValueAsString(request);
-            String response = HttpUtil.postRequest(annotateApi, postBody, true);
-            if (response != "TIMEOUT") {
-                Gson gson = new GsonBuilder().create();
-                MatchVariantResult[] matchVariantResultArr = gson.fromJson(response, MatchVariantResult[].class);
-
-                if (matchVariantResultArr != null) {
-                    for (int i = 0; i < matchVariantResultArr.length; i++) {
-                        Set<MatchVariant> mvResult= matchVariantResultArr[i].getResult();
-                        if (mvResult.size() > 0 ) {
-                            ArrayList<String> alterationList = new ArrayList<String>();
-                            for (MatchVariant mv: mvResult) {
-                                alterationList.add(mv.getAlteration());
-                            }
-                            results.get(i).setOncokbVariant(alterationList);
-                        }
-                    }
-                } else {
-                    return null;
-                }
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        return results;
     }
 
     public TrialMatch capsulateTrialMatchDoc(String id, List<Document> documents) {

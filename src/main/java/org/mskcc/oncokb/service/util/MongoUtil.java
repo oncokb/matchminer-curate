@@ -46,4 +46,18 @@ public class MongoUtil {
             return true;
         }
     }
+
+    @ChangeSet(order = "004", id = "deleteMany", author = "jingsu")
+    public static Boolean deleteMany(MongoDatabase mongoDatabase, String collectionName, String id) {
+        Boolean collectionExists = mongoDatabase.listCollectionNames()
+            .into(new ArrayList<String>()).contains(collectionName);
+        if (collectionExists) {
+            MongoCollection collection = mongoDatabase.getCollection(collectionName);
+            collection.deleteMany(new Document("nct_id", id));
+            MongoCursor<Document> cursor = collection.find(new Document("nct_id", id)).iterator();
+            return !cursor.hasNext();
+        } else {
+            return true;
+        }
+    }
 }

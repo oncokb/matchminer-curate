@@ -12,7 +12,7 @@ import "../../../../../node_modules/jquery/dist/jquery.js";
 import "../../../../../node_modules/datatables.net/js/jquery.dataTables.js";
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
-import {ConnectionService} from "../service/connection.service";
+import { ConnectionService } from '../service/connection.service'
 
 @Component({
     selector: 'jhi-trial',
@@ -180,22 +180,21 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
     }
 
-    loadMongo(){
-      this.mongoMessage = "Loading the trial ......";
-      this.mongoMessageColor = '#ffc107';
-      let trial = {
-          'trial': this.trialChosen
-      }
-      this.connectionService.loadMongo(trial).subscribe((res) => {
-          if (res.status === 200) {
-              this.mongoMessage = 'Send trial ' + this.nctIdChosen + ' successfully!';
-              this.mongoMessageColor = 'green';
-          }
-      }, (error) => {
-          this.mongoMessage = 'Request for sending trial' + this.nctIdChosen + ' failed!';
-          this.mongoMessageColor = 'red';
-          return Observable.throw(error);
-      });
-  }
-
+    loadMongo() {
+        this.mongoMessage = "Loading the trial ......";
+        this.mongoMessageColor = '#ffc107';
+        let trial = {
+            'trial': this.trialChosen
+        }
+        this.connectionService.loadMongo(trial).subscribe((res) => {
+            if (res.status === 200) {
+                this.mongoMessage = 'Send trial ' + this.nctIdChosen + ' successfully!';
+                this.mongoMessageColor = 'green';
+            }
+        }, (error) => {
+            this.mongoMessage = 'Request for sending trial' + this.nctIdChosen + ' failed!';
+            this.mongoMessageColor = 'red';
+            return Observable.throw(error);
+        });
+    }
 }
