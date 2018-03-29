@@ -38,7 +38,7 @@ import {
     PageRibbonComponent,
     ErrorComponent
 } from './layouts';
-import {ConnectionService} from "./service/connection.service";
+import {ConnectionService} from './service/connection.service';
 
 @NgModule({
     imports: [

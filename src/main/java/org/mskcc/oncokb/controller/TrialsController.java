@@ -5,7 +5,7 @@ import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mskcc.oncokb.controller.api.MongoApi;
+import org.mskcc.oncokb.controller.api.TrialsApi;
 import org.mskcc.oncokb.model.*;
 import org.mskcc.oncokb.service.util.FileUtil;
 import org.mskcc.oncokb.service.util.MongoUtil;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 
 @Controller
-public class MongoController implements MongoApi{
+public class TrialsController implements TrialsApi {
 
     @Value("${application.oncokb.api.match-variant}")
     private String oncokbMatchVariantApi;
@@ -73,7 +73,7 @@ public class MongoController implements MongoApi{
             } else {
                 JSONObject trialObj = new JSONObject(json);
                 String nctId = trialObj.get("nct_id").toString();
-                System.out.println("\n\nnct_id: " + nctId + "\n\n");
+                System.out.println("\n\n Update trial nct_id: " + nctId + "\n\n");
 
                 Boolean isDeleted = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
                 if (!isDeleted) {
@@ -96,7 +96,7 @@ public class MongoController implements MongoApi{
     public ResponseEntity<TrialMatch> matchTrial(@RequestBody(required = true) Patient body) {
         // check if MatchEngine is accessible.
         String runnableScriptPath = PythonUtil.getMatchEnginePath(this.matchengineAbsolutePath);
-        if (runnableScriptPath == null || runnableScriptPath.length() <= 0 ) {
+        if (runnableScriptPath == null || runnableScriptPath.length() == 0 ) {
             System.out.println("Cannot' find matchengine path!");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -105,7 +105,7 @@ public class MongoController implements MongoApi{
         List<Genomic> genomics = body.getGenomics();
         Set<Document> previousMatchedRecordsSet = new HashSet<>(MongoUtil.getCollection(this.mongoDatabase,
             "trial_match"));
-        System.out.println("\n\npreviousMatchedRecordsSet:\n" + previousMatchedRecordsSet);
+        System.out.println("\n\nprevious matched records set:\n" + previousMatchedRecordsSet);
         List<Document> matchedResults = new LinkedList<>();
         TrialMatch trialMatchResult = new TrialMatch();
 

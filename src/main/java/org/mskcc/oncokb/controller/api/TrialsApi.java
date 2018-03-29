@@ -13,10 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import java.util.List;
 
-@Api(value = "mongo", description = "The mongo API")
-public interface MongoApi {
+@Api(value = "trials", description = "the trials API")
+public interface TrialsApi {
 
     @ApiOperation(value = "", notes = "Load trial data into Mongo DB.", response = Void.class, tags="Mongo")
     @ApiResponses(value = {

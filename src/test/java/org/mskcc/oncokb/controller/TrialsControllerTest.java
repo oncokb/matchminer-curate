@@ -24,13 +24,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @Configuration
 @SpringBootTest(classes = MatchminerCurateApp.class)
-public class MongoControllerTest {
+public class TrialsControllerTest {
     private List<Clinical> clinicals;
     private List<Genomic> genomics;
     private JSONArray clinicalArray;
     private JSONArray genomicArray;
     private Set<Document> trialMatchDocs;
-    private MongoController mongoController;
+    private TrialsController trialsController;
 
     @Value("${application.oncokb.api.match-variant}")
     private String oncokbMatchVariantApi;
@@ -42,7 +42,7 @@ public class MongoControllerTest {
         clinicalArray = new JSONArray();
         genomicArray = new JSONArray();
         trialMatchDocs = new HashSet<>();
-        mongoController = new MongoController();
+        trialsController = new TrialsController();
 
         try {
             clinicals.add(new Clinical("BRCA-METABRIC-S1-MB-0506","Parker Swinford [fake] M.D.",
@@ -129,18 +129,9 @@ public class MongoControllerTest {
     }
 
     @Test
-    public void testAnnotateOncokbVariant(){
-        List<Genomic> annotatedGenomics = mongoController.annotateOncokbVariant(genomics, oncokbMatchVariantApi);
-        assertThat(annotatedGenomics.size()).isEqualTo(genomics.size());
-        assertThat(annotatedGenomics.get(0).getOncokbVariant().toString()).isEqualTo("[p.H1047R]");
-        assertThat(annotatedGenomics.get(1).getOncokbVariant().toString()).isEqualTo("[p.C135W]");
-        assertThat(annotatedGenomics.get(2).getOncokbVariant().toString()).isEqualTo("[T599_V600insEAT]");
-    }
-
-    @Test
     public void testFindMatchedTrials(){
         try {
-            List<Document> matchedResults = mongoController.findMatchedTrials(trialMatchDocs,genomicArray,clinicalArray);
+            List<Document> matchedResults = trialsController.findMatchedTrials(trialMatchDocs,genomicArray,clinicalArray);
             assertThat(matchedResults.size()).isEqualTo(1);
             for (Document doc: matchedResults) {
                 assertThat(doc.getString("nct_id")).isEqualTo("NCT02561962");

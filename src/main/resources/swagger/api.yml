@@ -7,7 +7,7 @@ info:
 schemes:
 - "http"
 paths:
-  '/mongo/loadTrial':
+  '/trials/create':
     post:
       description: Load trial data into Mongo DB.
       operationId: "loadTrial"
