@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimerTask;
 import org.slf4j.Logger;
@@ -20,7 +18,6 @@ public class ScheduledTask extends TimerTask {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTask.class);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     @Value("${spring.data.mongodb.uri}")
     private String uri;

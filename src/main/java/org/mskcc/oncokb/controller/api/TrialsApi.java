@@ -6,6 +6,7 @@
 package org.mskcc.oncokb.controller.api;
 
 import io.swagger.annotations.*;
+import org.mskcc.oncokb.model.MatchTrialResult;
 import org.mskcc.oncokb.model.Patient;
 import org.mskcc.oncokb.model.TrialJson;
 import org.mskcc.oncokb.model.TrialMatch;
@@ -37,6 +38,6 @@ public interface TrialsApi {
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    ResponseEntity<TrialMatch> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patient body);
+    ResponseEntity<MatchTrialResult> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patient body);
 
 }

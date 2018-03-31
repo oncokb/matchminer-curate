@@ -60,4 +60,26 @@ public class MongoUtil {
             return true;
         }
     }
+
+    @ChangeSet(order = "005", id = "findByOneField", author = "jingsu")
+    public static List<Document> findByOneField(MongoDatabase mongoDatabase, String collectionName, String fieldName, String id) {
+        List<Document> docList = new ArrayList<>();
+        MongoCollection collection = mongoDatabase.getCollection(collectionName);
+        MongoCursor<Document> cursor = collection.find(new Document(fieldName, id)).projection(exclude("_id")).iterator();
+        while (cursor.hasNext()) {
+            Document doc = cursor.next();
+            docList.add(doc);
+        }
+        return docList;
+    }
+
+    public static String getPureMongoUri(String uri) {
+        String pureUri = "";
+        if(uri.contains("?authMode=scram-sha1")) {
+            pureUri = uri.replace("?authMode=scram-sha1", "");
+        } else {
+            pureUri = uri;
+        }
+        return pureUri;
+    }
 }

@@ -93,7 +93,7 @@ public class TrialsController implements TrialsApi {
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    public ResponseEntity<TrialMatch> matchTrial(@RequestBody(required = true) Patient body) {
+    public ResponseEntity<MatchTrialResult> matchTrial(@RequestBody(required = true) Patient body) {
         // check if MatchEngine is accessible.
         String runnableScriptPath = PythonUtil.getMatchEnginePath(this.matchengineAbsolutePath);
         if (runnableScriptPath == null || runnableScriptPath.length() == 0 ) {
@@ -107,7 +107,7 @@ public class TrialsController implements TrialsApi {
             "trial_match"));
         System.out.println("\n\nprevious matched records set:\n" + previousMatchedRecordsSet);
         List<Document> matchedResults = new LinkedList<>();
-        TrialMatch trialMatchResult = new TrialMatch();
+        MatchTrialResult matchTrialResult = new MatchTrialResult();
 
         try {
 
@@ -203,7 +203,7 @@ public class TrialsController implements TrialsApi {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            trialMatchResult = capsulateTrialMatchDoc(body.getId(), matchedResults);
+            matchTrialResult = capsulateTrialMatchDoc(body.getId(), matchedResults);
 
             // drop collections "trial_query" and "new_trial_match" in case they will influence next matching result
             Boolean isTrialQueryDropped = MongoUtil.dropCollection(this.mongoDatabase, "trial_query");
@@ -225,18 +225,34 @@ public class TrialsController implements TrialsApi {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(trialMatchResult,  HttpStatus.OK);
+        return new ResponseEntity<>(matchTrialResult,  HttpStatus.OK);
     }
 
-    public TrialMatch capsulateTrialMatchDoc(String id, List<Document> documents) {
-        TrialMatch trialMatch = new TrialMatch();
+    public MatchTrialResult capsulateTrialMatchDoc(String id, List<Document> documents) {
+        MatchTrialResult matchTrialResult = new MatchTrialResult();
         Set<String> nctIds = new HashSet<>();
-        for (Document doc: documents) {
+        List<Trial> matchedTrialsList = new ArrayList<>();
+        for (Document doc : documents) {
             nctIds.add(doc.getString("nct_id"));
         }
-        trialMatch.setId(id);
-        trialMatch.setNctIds(nctIds);
-        return trialMatch;
+        for (String nctId : nctIds) {
+            List<Document> trialDocs = MongoUtil.findByOneField(this.mongoDatabase, "trial",
+                "nct_id", nctId);
+            // Each trial is unique based on "nct_id", so trialDocs should only have one element.
+            Document doc = trialDocs.get(0);
+            Trial trial = new Trial();
+            trial.setLongTitle(doc.get("long_title").toString());
+            trial.setNctId(doc.get("nct_id").toString());
+            trial.setPhase(doc.get("phase").toString());
+            trial.setShortTitle(doc.get("short_title").toString());
+            trial.setStatus(doc.get("status").toString());
+            trial.setTreatmentList(doc.get("treatment_list").toString().replace("Document", ""));
+            matchedTrialsList.add(trial);
+        }
+        matchTrialResult.setId(id);
+        matchTrialResult.setTrials(matchedTrialsList);
+
+        return matchTrialResult;
     }
 
     public List<Document> findMatchedTrials(Set<Document> matchedRecordsSet,
