@@ -29,8 +29,7 @@ export class ConnectionService {
         } else {
             switch (type) {
                 case 'MainType':
-                    return '' +
-                        '';
+                    return 'http://oncotree.mskcc.org/oncotree/api/mainTypes';
                 case 'SubType':
                     return 'http://oncotree.mskcc.org/oncotree/api/tumorTypes/search';
                 case 'OncoKBVariant':
