@@ -54,6 +54,7 @@ public class TrialsController implements TrialsApi {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         try{
+            String mongoUri = MongoUtil.getPureMongoUri(this.uri);
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(body.getTrial());
 
@@ -63,7 +64,7 @@ public class TrialsController implements TrialsApi {
             System.out.println("trial temp file: " + trialPath);
 
             ProcessBuilder pb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
-                "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", this.uri);
+                "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", mongoUri);
             Boolean isLoad = PythonUtil.runPythonScript(pb);
             tempFile.delete();
 
@@ -110,7 +111,7 @@ public class TrialsController implements TrialsApi {
         MatchTrialResult matchTrialResult = new MatchTrialResult();
 
         try {
-
+            String mongoUri = MongoUtil.getPureMongoUri(this.uri);
             File clinicalTempFile = File.createTempFile("clinical", ".json");
             File genomicTempFile = File.createTempFile("genomic", ".json");
             JSONArray clinicalArray = new JSONArray();
@@ -176,7 +177,7 @@ public class TrialsController implements TrialsApi {
             String genomicPath = FileUtil.buildJsonTempFile(genomicArray.toString(), genomicTempFile);
 
             ProcessBuilder loadPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
-                "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json", "--mongo-uri", this.uri);
+                "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json", "--mongo-uri", mongoUri);
             Boolean isLoad = PythonUtil.runPythonScript(loadPb);
 
             if(isLoad) {
@@ -185,7 +186,7 @@ public class TrialsController implements TrialsApi {
                 // In this way, MatchEngine won't match from "clinical" and "genomic" collections
                 // in case generate duplicate matched records.
                 ProcessBuilder matchPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
-                    "match", "--mongo-uri", this.uri);
+                    "match", "--mongo-uri", mongoUri);
                 Boolean isMatch = PythonUtil.runPythonScript(matchPb);
 
                 if(isMatch) {
@@ -246,7 +247,9 @@ public class TrialsController implements TrialsApi {
             trial.setPhase(doc.get("phase").toString());
             trial.setShortTitle(doc.get("short_title").toString());
             trial.setStatus(doc.get("status").toString());
-            trial.setTreatmentList(doc.get("treatment_list").toString().replace("Document", ""));
+            String treatmentList = doc.get("treatment_list").toString().replace("Document", "")
+                .replace("=", ":");
+            trial.setTreatmentList(treatmentList);
             matchedTrialsList.add(trial);
         }
         matchTrialResult.setId(id);

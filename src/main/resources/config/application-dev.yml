@@ -123,3 +123,7 @@ jhipster:
 # ===================================================================
 
 application:
+    matchengine:
+        absolute-path: ${CATALINA_HOME}/webapps/matchminer-engine
+        git-url: https://github.com/victoria34/matchminer-engine.git
+        branch: oncokb_variant

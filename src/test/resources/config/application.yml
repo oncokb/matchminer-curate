@@ -93,4 +93,7 @@ application:
         api:
             match-variant: http://oncokb.org/api/private/utils/match/variant
     matchengine:
-            absolute-path:
+        absolute-path: ${CATALINA_HOME}/webapps/matchminer-engine
+        git-url: https://github.com/victoria34/matchminer-engine.git
+        branch: oncokb_variant
+

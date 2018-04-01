@@ -53,7 +53,7 @@ public class ScheduledTask extends TimerTask {
 
             if (isDelete) {
                 ProcessBuilder matchPb = new ProcessBuilder("python",
-                    runnableScriptPath + "/matchengine.py", "match", "--mongo-uri", this.uri);
+                    runnableScriptPath + "/matchengine.py", "match", "--mongo-uri", MongoUtil.getPureMongoUri(this.uri));
                 isMatch = PythonUtil.runPythonScript(matchPb);
                 if (!isMatch) {
                     MongoUtil.createCollection(this.mongoDatabase, "trial_match", trialMatches);

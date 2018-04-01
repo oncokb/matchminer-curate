@@ -1,0 +1,31 @@
+# ===================================================================
+# Spring Boot configuration for the "heroku" profile.
+#
+# This configuration overrides the application.yml file.
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+eureka:
+    instance:
+        hostname: matchminer-test.herokuapp.com
+        non-secure-port: 80
+        prefer-ip-address: false
+    client:
+        service-url:
+            defaultZone: ${JHIPSTER_REGISTRY_URL}/eureka/
+
+spring:
+    data:
+        mongodb:
+            uri: ${MONGODB_URI}?authMode=scram-sha1
+
+application:
+    matchengine:
+        absolute-path: ${HOME}/matchminer-engine
+        git-url: https://github.com/victoria34/matchminer-engine.git
+        branch: oncokb_variant

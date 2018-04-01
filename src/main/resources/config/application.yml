@@ -103,6 +103,3 @@ application:
     oncokb:
         api:
             match-variant: http://oncokb.org/api/private/utils/match/variant
-    matchengine:
-        #format: ........../matchminer-engine
-        absolute-path:

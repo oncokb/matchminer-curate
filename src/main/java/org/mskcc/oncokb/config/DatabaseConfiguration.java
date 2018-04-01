@@ -6,6 +6,7 @@ import io.github.jhipster.config.JHipsterConstants;
 import com.github.mongobee.Mongobee;
 import io.github.jhipster.domain.util.JSR310DateConverters.DateToZonedDateTimeConverter;
 import io.github.jhipster.domain.util.JSR310DateConverters.ZonedDateTimeToDateConverter;
+import org.mskcc.oncokb.service.util.MongoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,10 +36,17 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration{
 
     private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
 
-    @Value("${spring.data.mongodb.uri}")
     private String uri;
-    @Value("${spring.data.mongodb.database}")
     private String database;
+
+    public DatabaseConfiguration() {
+    }
+
+    public DatabaseConfiguration(@Value("${spring.data.mongodb.uri}") String uri,
+                                 @Value("${spring.data.mongodb.database}") String database) {
+        this.uri = MongoUtil.getPureMongoUri(uri);
+        this.database = database;
+    }
 
     @Bean
     public ValidatingMongoEventListener validatingMongoEventListener() {
@@ -72,18 +80,18 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration{
 
     @Override
     public String getDatabaseName() {
-        return database;
+        return this.database;
     }
 
     @Override
     @Bean
     public Mongo mongo() throws Exception {
-        return new MongoClient(new MongoClientURI(uri));
+        return new MongoClient(new MongoClientURI(this.uri));
     }
 
     @Bean
     public MongoDatabase mongoDatabase() throws Exception {
-        return new MongoClient(new MongoClientURI(uri)).getDatabase(database);
+        return new MongoClient(new MongoClientURI(this.uri)).getDatabase(this.database);
     }
 
 
