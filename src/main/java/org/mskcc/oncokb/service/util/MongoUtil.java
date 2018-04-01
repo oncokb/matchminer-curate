@@ -80,6 +80,8 @@ public class MongoUtil {
         } else {
             pureUri = uri;
         }
+        System.out.println("\n\nmongo uri: " + uri);
+        System.out.println("\n\npure mongo uri: " + pureUri + "\n\n");
         return pureUri;
     }
 }

@@ -35,15 +35,16 @@ import java.util.List;
 public class DatabaseConfiguration extends AbstractMongoConfiguration{
 
     private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
-
+    @Value("${spring.data.mongodb.uri}")
     private String uri;
+    @Value("${spring.data.mongodb.database}")
     private String database;
 
     public DatabaseConfiguration() {
     }
 
-    public DatabaseConfiguration(@Value("${spring.data.mongodb.uri}") String uri,
-                                 @Value("${spring.data.mongodb.database}") String database) {
+    public DatabaseConfiguration( String uri,
+                                  String database) {
         this.uri = MongoUtil.getPureMongoUri(uri);
         this.database = database;
     }
@@ -86,6 +87,7 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration{
     @Override
     @Bean
     public Mongo mongo() throws Exception {
+        System.out.println("\n\nthis.uri:" + this.uri + "\n\n");
         return new MongoClient(new MongoClientURI(this.uri));
     }
 
