@@ -40,15 +40,6 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration{
     @Value("${spring.data.mongodb.database}")
     private String database;
 
-    public DatabaseConfiguration() {
-    }
-
-    public DatabaseConfiguration( String uri,
-                                  String database) {
-        this.uri = MongoUtil.getPureMongoUri(uri);
-        this.database = database;
-    }
-
     @Bean
     public ValidatingMongoEventListener validatingMongoEventListener() {
         return new ValidatingMongoEventListener(validator());
@@ -93,7 +84,16 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration{
 
     @Bean
     public MongoDatabase mongoDatabase() throws Exception {
-        return new MongoClient(new MongoClientURI(this.uri)).getDatabase(this.database);
+        MongoClientURI uri  = new MongoClientURI(this.uri);
+        MongoClient client = new MongoClient(uri);
+        MongoDatabase db;
+        if (this.uri.contains("mlab")) {
+           db = client.getDatabase(uri.getDatabase());
+        } else {
+           db = client.getDatabase(getDatabaseName());
+        }
+
+        return db;
     }
 
 

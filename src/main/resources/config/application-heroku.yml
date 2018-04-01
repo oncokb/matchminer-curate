@@ -28,4 +28,4 @@ application:
     matchengine:
         absolute-path: ${HOME}/matchminer-engine
         git-url: https://github.com/victoria34/matchminer-engine.git
-        branch: oncokb_variant
+        branch: oncokb-variant
