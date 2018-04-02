@@ -45,6 +45,10 @@ export class PanelComponent implements OnInit {
     trialChosen: {};
     genomicInput: Genomic;
     clinicalInput: Clinical;
+    clinicalFields = ['age_numerical', 'oncotree_primary_diagnosis'];
+    genomicFields = ['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change',
+    'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'];
+            
     constructor(private trialService: TrialService) { 
     }
 
@@ -154,10 +158,9 @@ export class PanelComponent implements OnInit {
             case 'update':
                 if (path.length === 1) {
                     if (obj[path[0]].hasOwnProperty('genomic')) {
-                        obj[path[0]]['genomic'] = _.clone(this.genomicInput);
+                        obj[path[0]]['genomic'] = this.prepareGenomicData();
                     } else if (obj[path[0]].hasOwnProperty('clinical')) {
-                        this.processClinicalData();
-                        obj[path[0]]['clinical'] = _.clone(this.clinicalInput);
+                        obj[path[0]]['clinical'] = this.prepareClinicalData();
                     }
                 } else {
                     const index = path.shift();
@@ -194,7 +197,8 @@ export class PanelComponent implements OnInit {
         this.selectedItems = [];
         this.addNode = false;
         this.nodeType = '';
-        this.clearNodeInput();
+        this.trialService.setGenomicInput(this.trialService.createGenomic());
+        this.trialService.setClinicalInput(this.trialService.createClinical());
     }
     clearInputForm(keys: Array<string>, type: string) {
         if (type === 'Genomic') {
@@ -213,16 +217,6 @@ export class PanelComponent implements OnInit {
             } 
         }
     }
-    clearNodeInput() {
-        if (this.nodeType === 'Genomic') {
-            this.clearInputForm(['hugo_symbol', 'oncokb_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change', 'variant_classification', 'variant_category', 'exon', 'cnv_call'], this.nodeType);
-            this.genomicInput.wildtype = '';
-        } else if (this.nodeType === 'Clinical') {
-            this.clearInputForm(['age_numerical', 'oncotree_primary_diagnosis'], this.nodeType);
-            this.clinicalInput['main_type'] = '';
-            this.clinicalInput['sub_type'] = '';
-        }
-    }
     getOncotree() {
         let oncotree_primary_diagnosis = '';
         if (this.clinicalInput.sub_type) {
@@ -232,24 +226,49 @@ export class PanelComponent implements OnInit {
         }
         return oncotree_primary_diagnosis;
     }
-    processClinicalData() {
-        if (_.isUndefined(this.clinicalInput['sub_type'])) {
-            this.clinicalInput['sub_type'] = '';
-        }
+    prepareClinicalData() {
         this.clinicalInput['oncotree_primary_diagnosis'] = this.getOncotree();
+        let clinicalToSave = _.clone(this.clinicalInput);
+        delete clinicalToSave['main_type'];
+        delete clinicalToSave['sub_type'];
+        this.prepareSectionByField('clinical', clinicalToSave);
+        return clinicalToSave;
+    }
+    prepareGenomicData() {
+        let genomicToSave = _.clone(this.genomicInput);
+        this.prepareSectionByField('genomic', genomicToSave);
+        return genomicToSave;
+    }
+    prepareSectionByField(type: string, nodeData: object) {
+        let keysToCheck = [];
+        if (type === 'clinical') {
+            keysToCheck = this.clinicalFields;
+        } else if (type === 'genomic') {
+            keysToCheck = this.genomicFields;
+        }
+        for (const key of keysToCheck) {
+            // remove empty fields
+            if (!_.isUndefined(nodeData[key]) && nodeData[key].length === 0) {
+                delete nodeData[key];
+            }
+            // apply not logic
+            if (nodeData['no_' + key]) {
+                nodeData[key] = '!' + nodeData[key];
+            }   
+            delete nodeData['no_' + key];     
+        } 
     }
     addNewNode(obj: Array<any>) {
         if (_.isEmpty(this.dataBlockToMove)) {
             switch (this.nodeType) {
                 case 'Genomic':
                     obj.push({
-                        genomic: _.clone(this.genomicInput)
+                        genomic: this.prepareGenomicData()
                     });
                     break;
                 case 'Clinical':
-                    this.processClinicalData();
                     obj.push({
-                        clinical: _.clone(this.clinicalInput)
+                        clinical: this.prepareClinicalData()
                     });
                     break;
                 case 'And':
@@ -259,13 +278,12 @@ export class PanelComponent implements OnInit {
                         switch (item.itemName) {
                             case 'Genomic':
                                 tempObj1.push({
-                                    genomic: _.clone(this.genomicInput)
+                                    genomic: this.prepareGenomicData()
                                 });
                                 break;
                             case 'Clinical':
-                                this.processClinicalData();
                                 tempObj1.push({
-                                    clinical: _.clone(this.clinicalInput)
+                                    clinical: this.prepareClinicalData()
                                 });
                                 break;
                             case 'And':
@@ -313,9 +331,11 @@ export class PanelComponent implements OnInit {
         this.operationPool['editing'] = true;
         if (this.unit.hasOwnProperty('genomic')) {
             this.trialService.setGenomicInput(this.unit['genomic']);
+            this.setNotLogic('genomic');
         } else if (this.unit.hasOwnProperty('clinical')) {
             this.trialService.setClinicalInput(this.unit['clinical']);
-            this.setOncotree(this.unit['clinical']['oncotree_primary_diagnosis']);
+            this.setNotLogic('clinical');
+            this.setOncotree();
         } else if (this.unit.hasOwnProperty('arm_name')) {
             let armToAdd: Arm = {
                 arm_name: this.unit['arm_name'],
@@ -325,7 +345,8 @@ export class PanelComponent implements OnInit {
             this.trialService.setArmInput(armToAdd);
         }
     }
-    setOncotree(oncotree_primary_diagnosis: string) {
+    setOncotree() {
+        let oncotree_primary_diagnosis = this.clinicalInput['oncotree_primary_diagnosis'];
         this.clinicalInput['sub_type'] = '';
         this.clinicalInput['main_type'] = '';
         let isSubtype = false;
@@ -343,6 +364,24 @@ export class PanelComponent implements OnInit {
                 }
             }
         }
+    }
+    setNotLogic(type: string) {
+        if (type === 'clinical') {
+            for(const key of this.clinicalFields) {
+                if (!_.isUndefined(this.clinicalInput[key]) && this.clinicalInput[key].startsWith('!')) {
+                    this.clinicalInput['no_' + key] = true;
+                    this.clinicalInput[key] = this.clinicalInput[key].substr(1);
+                }
+            }
+        } else if (type === 'genomic') {
+            for(const key of this.genomicFields) {
+                if (!_.isUndefined(this.genomicInput[key]) && this.genomicInput[key].startsWith('!')) {
+                    this.genomicInput['no_' + key] = true;
+                    this.genomicInput[key] = this.genomicInput[key].substr(1);
+                }
+            }
+        }
+        
     }
     preAddNode() {
         this.addNode = true;
