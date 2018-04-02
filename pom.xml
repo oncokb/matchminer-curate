@@ -377,7 +377,6 @@
                                     <filtering>true</filtering>
                                     <includes>
                                         <include>config/*.yml</include>
-                                        <include>matchminer-engine/**/*.py</include>
                                     </includes>
                                 </resource>
                                 <resource>
@@ -385,7 +384,6 @@
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>config/*.yml</exclude>
-                                        <exclude>matchminer-engine/**/*.py</exclude>
                                     </excludes>
                                 </resource>
                             </resources>
