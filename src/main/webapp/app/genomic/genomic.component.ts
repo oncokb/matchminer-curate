@@ -7,7 +7,8 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
-
+import { Genomic } from './genomic.model';
+import * as _ from 'underscore';
 @Component({
     selector: 'jhi-genomic',
     templateUrl: './genomic.component.html',
@@ -18,8 +19,8 @@ export class GenomicComponent implements OnInit {
     @Input() unit = {};
     @Input() type = '';
     indent = 1.2; // the relative indent between the genomic content with the title
-    operationPool = this.trialService.getOperationPool();
-    genomicInput = this.trialService.getGenomicInput();
+    operationPool: {};
+    genomicInput: Genomic;
     variant_categorys = ['Mutation', 'Copy Number Variation', 'Structural Variation', 'Any Variation'];
     variant_classifications = ['In_Frame_Del', 'In_Frame_Ins', 'Missense_Mutation', 'Nonsense_Mutation', 'Nonstop_Mutation',
     'Del_Ins', 'Frameshift', 'Frame_Shift_Del','Frame_Shift_Ins', 'Frameshift_mutation',
@@ -35,18 +36,25 @@ export class GenomicComponent implements OnInit {
         gene: '',
         example: ''
     };
-    validation = this.trialService.getValidation();
+    geneValidation = false;
+    exampleValidation = false;
     search = (text$: Observable<string>) =>
         text$
         .debounceTime(200)
         .distinctUntilChanged()
-        .map(term => term.length < 1 ? []
+        .map(term => (term.length < 1 || _.isUndefined(this.oncokb_variants[this.genomicInput.hugo_symbol])) ? []
             : this.oncokb_variants[this.genomicInput.hugo_symbol].filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
 
     constructor(private trialService: TrialService, public http: Http) { 
     }
 
     ngOnInit() {
+        this.trialService.genomicInputObs.subscribe(message => {
+            this.genomicInput = message;
+        });
+        this.trialService.operationPoolObs.subscribe(message => {
+            this.operationPool = message;
+        });
     }
     getStyle() {
         return this.trialService.getStyle(this.indent);
@@ -58,10 +66,10 @@ export class GenomicComponent implements OnInit {
            const result = res.json();
            if (result.hits.length > 0) {
                 this.validationMessage['gene'] = 'Valid gene';
-                this.validation['genomicGene'] = true;
+                this.geneValidation = true;
            } else {
                 this.validationMessage['gene'] = 'Invalid gene';
-                this.validation['genomicGene'] = false;
+                this.geneValidation = false;
            }  
         });
     }
@@ -73,16 +81,16 @@ export class GenomicComponent implements OnInit {
                 const result = res.json();
                 if (result[this.genomicInput.matching_examples] === true) {
                     this.validationMessage['example'] = 'Valid';
-                    this.validation['example'] = true;
+                    this.exampleValidation = true;
                 } else {
                     this.validationMessage['example'] = 'Invalid';
-                    this.validation['example'] = false;
+                    this.exampleValidation = false;
                 }
             });
         }        
     }
     getMessageStyle(type) {
-        const result = (type === 'gene' ? this.validation['genomicGene'] : this.validation['example']);
+        const result = (type === 'gene' ? this.geneValidation : this.exampleValidation);
         return result === true ? { 'color': 'green' } : { 'color': 'red' };
     }
 }

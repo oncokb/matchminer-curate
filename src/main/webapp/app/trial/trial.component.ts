@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
+import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/switchMap';
@@ -16,15 +16,21 @@ import { SERVER_API_URL } from '../app.constants';
   styleUrls: ['trial.scss']
 })
 export class TrialComponent {
-  trialsCollection = this.trialService.getTrialsCollection();
-  trialChosen: Observable<Trial[]>;
-  nctIdList = this.trialService.getNctIdList();
-  trialList = this.trialService.getTrialList();
   trialsToImport = '';
   nctIdChosen = '';
   messages: Array<string> = [];
-  status = this.trialService.getStatus();
-  constructor(public http: Http, public afs: AngularFirestore, private trialService: TrialService) {}
+  trialList = [];
+  trialChosen = {};
+  nctIdList = [];
+  constructor(public http: Http, private trialService: TrialService, public db: AngularFireDatabase) {
+    this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);
+    this.trialService.trialListObs.subscribe(message => {
+        this.trialList = message;
+        this.nctIdList = _.map(this.trialList, function(trial){
+            return trial.nct_id;
+        });
+    });
+  }
 
   importTrials() {
     this.messages = [];
@@ -70,13 +76,17 @@ export class TrialComponent {
                     }]
                    }
                };
-           this.trialsCollection.doc(trialInfo.nct_id).set(trial);
-           this.messages.push('Successfully imported ' + trialInfo.nct_id);
-           if (setChosenTrial === false) {
-                this.nctIdChosen = trialInfo.nct_id;
-                this.curateTrial(); 
-                setChosenTrial = true;
-           }
+           this.db.object('Trials/' + trialInfo.nct_id).set(trial).then(result => {
+            this.messages.push('Successfully imported ' + trialInfo.nct_id);
+            if (setChosenTrial === false) {
+                 this.nctIdChosen = trialInfo.nct_id;
+                 this.trialService.setTrialChosen(this.nctIdChosen);
+                 setChosenTrial = true;
+            }
+           }).catch(error => {
+            this.messages.push('Fail to save to database ' + tempTrial);
+           });
+           
         },
         error => {
             this.messages.push(tempTrial + ' not found');
@@ -87,7 +97,6 @@ export class TrialComponent {
   }
 
   curateTrial() {
-    this.trialService.setNctIdChosen(this.nctIdChosen);
-    this.trialChosen = this.trialService.getChosenTrialDoc(this.nctIdChosen);
+      this.trialService.setTrialChosen(this.nctIdChosen);
   }
 }
