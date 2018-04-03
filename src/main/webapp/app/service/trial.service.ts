@@ -65,7 +65,7 @@ export class TrialService {
     {value: 'All Liquid Tumors', label: 'All Liquid Tumors'},
     {value: 'All Tumors', label: 'All Tumors'},
     {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
-    oncokb_variants = {};
+    annotated_variants = {};
     trialList = [];
     trialsRef: AngularFireObject<any>;
     constructor(public http: Http, public db: AngularFireDatabase) {
@@ -129,15 +129,15 @@ export class TrialService {
            const allAnnotatedVariants = res.json();
            for(const item of  allAnnotatedVariants) {
                 if (item['gene']['hugoSymbol']) {
-                    if (this.oncokb_variants[item['gene']['hugoSymbol']]) {
-                        this.oncokb_variants[item['gene']['hugoSymbol']].push(item['alteration']);
+                    if (this.annotated_variants[item['gene']['hugoSymbol']]) {
+                        this.annotated_variants[item['gene']['hugoSymbol']].push(item['alteration']);
                     } else {
-                        this.oncokb_variants[item['gene']['hugoSymbol']] = [item['alteration']];
+                        this.annotated_variants[item['gene']['hugoSymbol']] = [item['alteration']];
                     }
                 }
            }
-           for(const key of _.keys(this.oncokb_variants)) {
-                this.oncokb_variants[key].sort();
+           for(const key of _.keys(this.annotated_variants)) {
+                this.annotated_variants[key].sort();
            }
         });
     }
@@ -146,15 +146,15 @@ export class TrialService {
         if (this.oncokb === true) {
             genomicInput = {
                 hugo_symbol: '',
-                oncokb_variant: '',
+                annotated_variant: '',
                 matching_examples: '',
                 no_hugo_symbol: false,
-                no_oncokb_variant: false
+                no_annotated_variant: false
             };
         } else {
             genomicInput = {
                 hugo_symbol: '',
-                oncokb_variant: '',
+                annotated_variant: '',
                 matching_examples: '',
                 protein_change: '',
                 wildcard_protein_change: '',
@@ -164,7 +164,7 @@ export class TrialService {
                 cnv_call: '',
                 wildtype: '',
                 no_hugo_symbol: false,
-                no_oncokb_variant: false,
+                no_annotated_variant: false,
                 no_matching_examples: false,
                 no_protein_change: false,
                 no_wildcard_protein_change: false,
@@ -250,7 +250,7 @@ export class TrialService {
         return this.allSubTypesOptions;
     }
     getOncokbVariants() {
-        return this.oncokb_variants;
+        return this.annotated_variants;
     }
     getTrialRef(nctId: string) {
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
