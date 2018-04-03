@@ -197,6 +197,9 @@ export class PanelComponent implements OnInit {
         this.selectedItems = [];
         this.addNode = false;
         this.nodeType = '';
+        this.clearNodeInput();
+    }
+    clearNodeInput() {
         this.trialService.setGenomicInput(this.trialService.createGenomic());
         this.trialService.setClinicalInput(this.trialService.createClinical());
     }

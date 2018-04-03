@@ -20,7 +20,8 @@ export class TrialService {
     private nctIdChosenSource = new BehaviorSubject<string>('');
     nctIdChosenObs = this.nctIdChosenSource.asObservable();
 
-    private trialChosenSource = new BehaviorSubject<object>({});
+    trial = this.createTrial();
+    private trialChosenSource = new BehaviorSubject<Trial>(this.trial);
     trialChosenObs = this.trialChosenSource.asObservable();
 
     private trialListSource = new BehaviorSubject<Array<string>>([]);
@@ -186,6 +187,18 @@ export class TrialService {
             no_oncotree_primary_diagnosis: false
         };
         return clinicalInput;
+    }
+    createTrial() {
+        let trial: Trial= {
+            curation_status: '',
+            nct_id: '',
+            long_title: '',
+            short_title: '',
+            phase: '',
+            status: '',
+            treatment_list: { step: [] }
+        }
+        return trial;
     }
     fetchTrials() {
         this.trialsRef.snapshotChanges().subscribe(action => {
