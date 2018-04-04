@@ -20,7 +20,8 @@ export class TrialService {
     private nctIdChosenSource = new BehaviorSubject<string>('');
     nctIdChosenObs = this.nctIdChosenSource.asObservable();
 
-    private trialChosenSource = new BehaviorSubject<object>({});
+    trial = this.createTrial();
+    private trialChosenSource = new BehaviorSubject<Trial>(this.trial);
     trialChosenObs = this.trialChosenSource.asObservable();
 
     private trialListSource = new BehaviorSubject<Array<string>>([]);
@@ -42,44 +43,11 @@ export class TrialService {
     private movingPathSource = new BehaviorSubject<MovingPath>(this.movingPath);
     movingPathObs = this.movingPathSource.asObservable();
 
-    genomicInput: Genomic = (this.oncokb === true ? {
-        hugo_symbol: '',
-        oncokb_variant: '',
-        matching_examples: '',
-        no_hugo_symbol: false,
-        no_oncokb_variant: false
-    } : {
-        hugo_symbol: '',
-        oncokb_variant: '',
-        matching_examples: '',
-        protein_change: '',
-        wildcard_protein_change: '',
-        variant_classification: '',
-        variant_category: '',
-        exon: '',
-        cnv_call: '',
-        wildtype: '',
-        no_hugo_symbol: false,
-        no_oncokb_variant: false,
-        no_matching_examples: false,
-        no_protein_change: false,
-        no_wildcard_protein_change: false,
-        no_variant_classification: false,
-        no_variant_category: false,
-        no_exon: false,
-        no_cnv_call: false
-    });
+    genomicInput = this.createGenomic();
     private genomicInputSource = new BehaviorSubject<Genomic>(this.genomicInput);
     genomicInputObs = this.genomicInputSource.asObservable();
 
-    clinicalInput: Clinical= {
-        age_numerical: '',
-        oncotree_primary_diagnosis: '',
-        main_type: '',
-        sub_type: '',
-        no_age_numerical: false,
-        no_oncotree_primary_diagnosis: false
-    };
+    clinicalInput = this.createClinical();
     private clinicalInputSource = new BehaviorSubject<Clinical>(this.clinicalInput);
     clinicalInputObs = this.clinicalInputSource.asObservable();
 
@@ -98,7 +66,7 @@ export class TrialService {
     {value: 'All Liquid Tumors', label: 'All Liquid Tumors'},
     {value: 'All Tumors', label: 'All Tumors'},
     {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
-    oncokb_variants = {};
+    annotated_variants = {};
     trialList = [];
     trialsRef: AngularFireObject<any>;
     constructor(public http: Http, public db: AngularFireDatabase) {
@@ -162,17 +130,75 @@ export class TrialService {
            const allAnnotatedVariants = res.json();
            for(const item of  allAnnotatedVariants) {
                 if (item['gene']['hugoSymbol']) {
-                    if (this.oncokb_variants[item['gene']['hugoSymbol']]) {
-                        this.oncokb_variants[item['gene']['hugoSymbol']].push(item['alteration']);
+                    if (this.annotated_variants[item['gene']['hugoSymbol']]) {
+                        this.annotated_variants[item['gene']['hugoSymbol']].push(item['alteration']);
                     } else {
-                        this.oncokb_variants[item['gene']['hugoSymbol']] = [item['alteration']];
+                        this.annotated_variants[item['gene']['hugoSymbol']] = [item['alteration']];
                     }
                 }
            }
-           for(const key of _.keys(this.oncokb_variants)) {
-                this.oncokb_variants[key].sort();
+           for(const key of _.keys(this.annotated_variants)) {
+                this.annotated_variants[key].sort();
            }
         });
+    }
+    createGenomic() {
+        let genomicInput: Genomic;
+        if (this.oncokb === true) {
+            genomicInput = {
+                hugo_symbol: '',
+                annotated_variant: '',
+                matching_examples: '',
+                no_hugo_symbol: false,
+                no_annotated_variant: false
+            };
+        } else {
+            genomicInput = {
+                hugo_symbol: '',
+                annotated_variant: '',
+                matching_examples: '',
+                protein_change: '',
+                wildcard_protein_change: '',
+                variant_classification: '',
+                variant_category: '',
+                exon: '',
+                cnv_call: '',
+                wildtype: '',
+                no_hugo_symbol: false,
+                no_annotated_variant: false,
+                no_matching_examples: false,
+                no_protein_change: false,
+                no_wildcard_protein_change: false,
+                no_variant_classification: false,
+                no_variant_category: false,
+                no_exon: false,
+                no_cnv_call: false
+            }
+        }
+        return genomicInput;
+    }
+    createClinical() {
+        let clinicalInput: Clinical= {
+            age_numerical: '',
+            oncotree_primary_diagnosis: '',
+            main_type: '',
+            sub_type: '',
+            no_age_numerical: false,
+            no_oncotree_primary_diagnosis: false
+        };
+        return clinicalInput;
+    }
+    createTrial() {
+        let trial: Trial= {
+            curation_status: '',
+            nct_id: '',
+            long_title: '',
+            short_title: '',
+            phase: '',
+            status: '',
+            treatment_list: { step: [] }
+        }
+        return trial;
     }
     fetchTrials() {
         this.trialsRef.snapshotChanges().subscribe(action => {
@@ -237,7 +263,7 @@ export class TrialService {
         return this.allSubTypesOptions;
     }
     getOncokbVariants() {
-        return this.oncokb_variants;
+        return this.annotated_variants;
     }
     getTrialRef(nctId: string) {
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');

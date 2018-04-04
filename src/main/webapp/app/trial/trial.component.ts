@@ -64,6 +64,7 @@ export class TrialComponent {
                }
            });
            const trial: Trial = {
+                   curation_status: 'In progress',
                    nct_id: trialInfo.nct_id,
                    long_title: trialInfo.official_title,
                    short_title: trialInfo.brief_title,
@@ -95,7 +96,15 @@ export class TrialComponent {
     }
     this.trialsToImport = '';
   }
-
+  updateCuationStatus() {
+    this.db.object('Trials/' + this.nctIdChosen).update({
+        curation_status: this.trialChosen['curation_status']
+    }).then(result => {
+        console.log('success saving curation status');
+    }).catch(error => {
+        console.log('error', error);
+    });
+  }
   curateTrial() {
       this.trialService.setTrialChosen(this.nctIdChosen);
   }

@@ -30,7 +30,7 @@ export class GenomicComponent implements OnInit {
     'protein_altering', 'splice site_mutation', 'stop_retained', 'synonymous', "3'UTR", "3_prime_UTR",
     "5'Flank", "5'UTR", "5'UTR_mutation", "5_prime_UTR"];
     wiltypes = [true, false];
-    oncokb_variants = this.trialService.getOncokbVariants();
+    annotated_variants = this.trialService.getOncokbVariants();
     oncokb = environment.oncokb ? environment.oncokb : false;
     validationMessage = {
         gene: '',
@@ -42,8 +42,8 @@ export class GenomicComponent implements OnInit {
         text$
         .debounceTime(200)
         .distinctUntilChanged()
-        .map(term => (term.length < 1 || _.isUndefined(this.oncokb_variants[this.genomicInput.hugo_symbol])) ? []
-            : this.oncokb_variants[this.genomicInput.hugo_symbol].filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
+        .map(term => (term.length < 1 || _.isUndefined(this.annotated_variants[this.genomicInput.hugo_symbol])) ? []
+            : this.annotated_variants[this.genomicInput.hugo_symbol].filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
 
     constructor(private trialService: TrialService, public http: Http) { 
     }
@@ -74,8 +74,8 @@ export class GenomicComponent implements OnInit {
         });
     }
     validateGenomicExample() {
-        if (this.genomicInput.hugo_symbol && this.genomicInput.oncokb_variant && this.genomicInput.matching_examples) {
-            const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol +'&variant=' + this.genomicInput.oncokb_variant +'&examples=' + this.genomicInput.matching_examples;
+        if (this.genomicInput.hugo_symbol && this.genomicInput.annotated_variant && this.genomicInput.matching_examples) {
+            const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol +'&variant=' + this.genomicInput.annotated_variant +'&examples=' + this.genomicInput.matching_examples;
             this.http.get(this.trialService.getAPIUrl('ExampleValidation') + variantsTobeValidated)
             .subscribe((res: Response) => {
                 const result = res.json();

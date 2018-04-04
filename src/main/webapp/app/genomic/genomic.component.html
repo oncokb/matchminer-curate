@@ -13,13 +13,13 @@
             </div>
         </div>
         <div class="row borderMargin">
-            <div class="col-sm-3">oncokb_variant:</div>
+            <div class="col-sm-3">annotated_variant:</div>
             <div class="col-sm-1">
-                <label for="no_oncokb_variant1">Not</label>
-                <input id="no_oncokb_variant1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_oncokb_variant" />
+                <label for="no_annotated_variant1">Not</label>
+                <input id="no_annotated_variant1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_annotated_variant" />
             </div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.oncokb_variant" [ngbTypeahead]="search"/>
+                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search"/>
             </div>
         </div>
         <div class="row borderMargin">
@@ -126,13 +126,13 @@
             </div>
         </div>
         <div class="row borderMargin">
-            <div class="col-sm-3">oncokb_variant:</div>
+            <div class="col-sm-3">annotated_variant:</div>
             <div class="col-sm-1">
-                <label for="no_oncokb_variant2">Not</label>
-                <input id="no_oncokb_variant2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_oncokb_variant" />
+                <label for="no_annotated_variant2">Not</label>
+                <input id="no_annotated_variant2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_annotated_variant" />
             </div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.oncokb_variant" [ngbTypeahead]="search"/>
+                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search"/>
             </div>
         </div>
         <div class="row borderMargin">
@@ -223,8 +223,8 @@
             <label>hugo_symbol: </label>
             <span>{{(unit.genomic.no_hugo_symbol ? '!' : '') + unit.genomic.hugo_symbol}}</span>
             <br/>
-            <label>oncokb_variant: </label>
-            <span>{{(unit.genomic.no_oncokb_variant ? '!' : '') + unit.genomic.oncokb_variant}}</span>
+            <label>annotated_variant: </label>
+            <span>{{(unit.genomic.no_annotated_variant ? '!' : '') + unit.genomic.annotated_variant}}</span>
             <br/>
             <span *ngIf="unit.genomic.matching_examples">
                 <label>matching_examples: </label>
