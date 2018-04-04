@@ -333,10 +333,10 @@ export class PanelComponent implements OnInit {
         this.operationPool['currentPath'] = this.path;
         this.operationPool['editing'] = true;
         if (this.unit.hasOwnProperty('genomic')) {
-            this.trialService.setGenomicInput(this.unit['genomic']);
+            this.trialService.setGenomicInput(_.clone(this.unit['genomic']));
             this.setNotLogic('genomic');
         } else if (this.unit.hasOwnProperty('clinical')) {
-            this.trialService.setClinicalInput(this.unit['clinical']);
+            this.trialService.setClinicalInput(_.clone(this.unit['clinical']));
             this.setNotLogic('clinical');
             this.setOncotree();
         } else if (this.unit.hasOwnProperty('arm_name')) {
