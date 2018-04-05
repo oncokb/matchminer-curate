@@ -1,5 +1,4 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
@@ -64,7 +63,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
 
     importTrials() {
         this.messages = [];
-        const newTrials: Array<string> = this.trialsToImport.split(',');
+        const newTrials: Array<string>  = this.trialsToImport.split(',');
         let setChosenTrial = false;
         for (const newTrial of newTrials) {
             const tempTrial = newTrial.trim();
@@ -79,11 +78,10 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 this.messages.push(tempTrial + ' is invalid trial format');
                 continue;
             }
-            this.http.get(this.trialService.getAPIUrl('ClinicalTrials') + tempTrial)
-                .subscribe((res: Response) => {
-                        const trialInfo = res.json();
-                        let armsInfo: any = [];
-                        _.each(trialInfo.arms, function (arm) {
+            this.connectionService.importTrials(tempTrial).subscribe((res) => {
+                        const trialInfo = res;
+                        let armsInfo:any = [];
+                        _.each(trialInfo.arms, function(arm) {
                             if (arm.arm_type !== null && arm.arm_description !== null) {
                                 armsInfo.push({
                                     arm_name: arm.arm_name,
@@ -103,7 +101,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                             status: trialInfo.current_trial_status,
                             treatment_list: {
                                 step: [{
-                                    arm: armsInfo,
+                                    arm:  armsInfo,
                                     match: []
                                 }]
                             }
