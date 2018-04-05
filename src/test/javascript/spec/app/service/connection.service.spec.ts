@@ -251,7 +251,7 @@ describe('Service Tests', () => {
                                             'exon': '',
                                             'hugo_symbol': 'BRAF',
                                             'matching_examples': '',
-                                            'oncokb_variant': 'p.D143G',
+                                            'annotated_variant': 'p.D143G',
                                             'protein_change': '',
                                             'variant_category': '',
                                             'variant_classification': '',

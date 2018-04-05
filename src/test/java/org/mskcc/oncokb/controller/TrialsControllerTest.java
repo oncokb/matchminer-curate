@@ -80,7 +80,7 @@ public class TrialsControllerTest {
             genomicArray.put(new JSONObject("{\"ONCOKB_GENOMIC_ID\":\"BRCA-METABRIC-S1-MB-0506&PIK3CA&p.H1047R&Missense_Mutation&MUTATION&&false&chr3&178952085&c.A900G&A&8&&0.5827659956067299&3\"," +
                 "\"TIER\":3," +
                 "\"WILDTYPE\":false," +
-                "\"ONCOKB_VARIANT\":\"[p.H1047R]\"," +
+                "\"ANNOTATED_VARIANT\":\"[p.H1047R]\"," +
                 "\"TRUE_CDNA_CHANGE\":\"c.A900G\"," +
                 "\"CHROMOSOME\":\"chr3\"," +
                 "\"POSITION\":\"178952085\"," +
@@ -94,7 +94,7 @@ public class TrialsControllerTest {
                 "\"SAMPLE_ID\":\"BRCA-METABRIC-S1-MB-0506\"," +
                 "\"TRUE_HUGO_SYMBOL\":\"PIK3CA\"}"));
             genomicArray.put(new JSONObject("{\"ONCOKB_GENOMIC_ID\":\"BRCA-METABRIC-S1-MB-0877&BRAF&T599_V600insEAT&Silent&MUTATION\"," +
-                "\"ONCOKB_VARIANT\":\"[T599_V600insEAT]\"," +
+                "\"ANNOTATED_VARIANT\":\"[T599_V600insEAT]\"," +
                 "\"TRUE_PROTEIN_CHANGE\":\"T599_V600insEAT\"," +
                 "\"TRUE_VARIANT_CLASSIFICATION\":\"Silent\"," +
                 "\"VARIANT_CATEGORY\":\"MUTATION\"," +
@@ -118,7 +118,7 @@ public class TrialsControllerTest {
             doc.put("variant_category", "MUTATION");
             doc.put("nct_id", "NCT02561962");
             doc.put("genomic_alteration", "BRAF T599_V600insEAT");
-            doc.put("match_type", "oncokb_variant");
+            doc.put("match_type", "annotated_variant");
             doc.put("trial_accrual_status", "open");
             doc.put("match_level", "step");
             trialMatchDocs.add(doc);
