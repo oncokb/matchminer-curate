@@ -69,7 +69,9 @@ export class TrialService {
     annotated_variants = {};
     trialList = [];
     trialsRef: AngularFireObject<any>;
+    nctIdChosen = '';
     constructor(public http: Http, public db: AngularFireDatabase) {
+        this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
         
         // prepare main types list
@@ -208,6 +210,7 @@ export class TrialService {
                 this.trialList.push(action.payload.val()[nctId]);
             }
             this.trialListSource.next(this.trialList);
+            this.setTrialChosen(this.nctIdChosen);
         }, error => {
             this.authorizedSource.next(false);
         });
