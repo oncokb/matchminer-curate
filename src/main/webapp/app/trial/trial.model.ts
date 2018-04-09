@@ -1,5 +1,6 @@
 export interface Trial {
     curation_status: string;
+    archived: string;
     nct_id: string;
     long_title: string;
     short_title: string;
