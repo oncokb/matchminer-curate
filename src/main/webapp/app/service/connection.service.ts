@@ -44,6 +44,10 @@ export class ConnectionService {
         }
     }
 
+    getProduction(){
+        return this.production;
+    }
+
     validateGenomicGene(hugoSymbol: string) {
         return this.http.get(this.getAPIUrl('GeneValidation') + hugoSymbol);
     }

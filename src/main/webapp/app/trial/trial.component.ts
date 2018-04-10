@@ -36,7 +36,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
 
     constructor(private connectionService: ConnectionService, private trialService: TrialService, public db: AngularFireDatabase) {
         this.production = this.connectionService.getProduction();
-        this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);
         this.trialService.trialListObs.subscribe(message => {
             this.trialList = message;
@@ -190,7 +189,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 this.mongoMessageColor = 'green';
             }
         }, (error) => {
-            this.mongoMessage = 'Request for sending trial' + this.nctIdChosen + ' failed!';
+            this.mongoMessage = 'Request for sending trial ' + this.nctIdChosen + ' failed!';
             this.mongoMessageColor = 'red';
             return Observable.throw(error);
         });

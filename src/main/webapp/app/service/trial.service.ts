@@ -12,6 +12,8 @@ import * as _ from 'underscore';
 import { currentId } from 'async_hooks';
 import { SERVER_API_URL } from '../app.constants';
 import { environment } from '../environments/environment';
+import {ConnectionService} from "./connection.service";
+
 @Injectable()
 export class TrialService {
     production = environment.production ? environment.production : false;
@@ -70,7 +72,7 @@ export class TrialService {
     trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
     nctIdChosen = '';
-    constructor(public http: Http, public db: AngularFireDatabase) {
+    constructor(private connectionService: ConnectionService, public db: AngularFireDatabase) {
         this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
 
