@@ -17,22 +17,55 @@
     </div>
     <br/>
     <br/>
-    <div class="form-group">
-        <label for="trialToCurate">Select a clinical trial to curate</label>
-        <select class="form-control" id="trialToCurate" (change)="curateTrial()" [(ngModel)]="nctIdChosen">
-            <option *ngFor="let trial of trialList" [value]="trial.nct_id">{{trial.nct_id + ' ' + trial.short_title + ' (' + trial.curation_status + ')'}}</option>
-        </select>
+    <div style="float:right">
+        <label for="hideArchived">Hide archived trials:</label>
+        <span id="hideArchived">
+            <label for="hideArchivedOption" style="margin-left:10px">Yes</label>
+            <input id="hideArchivedOption" type="radio" value="Yes" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
+            <label for="displayArchivedOption" style="margin-left:10px">No</label>
+            <input id="displayArchivedOption" type="radio" value="No" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
+        </span>
     </div>
-    <br/>
+    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+        <thead>
+          <tr>
+            <th>NCT ID</th>
+            <th>Status</th>
+            <th>Title</th>
+            <th>Curation Status</th>
+            <th>Archived</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let trial of trialList">
+            <td><a (click)="curateTrial(trial.nct_id)">{{ trial.nct_id }}</a></td>
+            <td>{{ trial.status }}</td>
+            <td>{{ trial.short_title }}</td>
+            <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
+            <td>{{ trial.archived }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <br/>
+    <div id="trialDetail"><br/></div>
     <div *ngIf="nctIdChosen" style="margin-bottom: 100px">
+        <hr></hr>
         <div>
             <label for="curation_status">Curation Status:</label>
             <span id="curation_status">
-                <label for="progress" style="color:red;margin-left:10px">In progress: </label>
-                <input id="progress" type="radio" value="In progress" [(ngModel)]="trialChosen.curation_status" (change)="updateCuationStatus()">
-                <label for="complete" style="color:green;margin-left:10px">Completed: </label>
-                <input id="complete" type="radio" value="Completed" [(ngModel)]="trialChosen.curation_status" (change)="updateCuationStatus()">
+                <label for="progress" style="color:red;margin-left:10px">In progress </label>
+                <input id="progress" type="radio" value="In progress" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
+                <label for="complete" style="color:green;margin-left:10px">Completed </label>
+                <input id="complete" type="radio" value="Completed" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
             </span>
+            <br/>
+            <label for="archive_status">Archive:</label>
+            <span id="archive_status">
+                <label for="archive" style="color:red;margin-left:10px">Yes </label>
+                <input id="archive" type="radio" value="Yes" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
+                <label for="retrieve" style="color:green;margin-left:10px">No </label>
+                <input id="retrieve" type="radio" value="No" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
+            </span>            
             <br/><br/>
             <label for="nctId">NCT ID: </label>
             <span id="nctId" style="margin-left:10px">

@@ -3,6 +3,7 @@ import './vendor.ts';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { Ng2Webstorage } from 'ngx-webstorage';
+import { DataTablesModule } from 'angular-datatables';
 
 import { MatchminerCurateSharedModule, UserRouteAccessService } from './shared';
 import { MatchminerCurateAppRoutingModule} from './app-routing.module';
@@ -41,6 +42,7 @@ import {
 @NgModule({
     imports: [
         BrowserModule,
+        DataTablesModule,
         MatchminerCurateAppRoutingModule,
         Ng2Webstorage.forRoot({ prefix: 'jhi', separator: '-'}),
         MatchminerCurateSharedModule,

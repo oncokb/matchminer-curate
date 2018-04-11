@@ -24,7 +24,7 @@ export class TrialService {
     private trialChosenSource = new BehaviorSubject<Trial>(this.trial);
     trialChosenObs = this.trialChosenSource.asObservable();
 
-    private trialListSource = new BehaviorSubject<Array<string>>([]);
+    private trialListSource = new BehaviorSubject<Array<Trial>>([]);
     trialListObs = this.trialListSource.asObservable();
 
     private authorizedSource = new BehaviorSubject<boolean>(false);
@@ -67,7 +67,7 @@ export class TrialService {
     {value: 'All Tumors', label: 'All Tumors'},
     {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
     annotated_variants = {};
-    trialList = [];
+    trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
     nctIdChosen = '';
     constructor(public http: Http, public db: AngularFireDatabase) {
@@ -193,6 +193,7 @@ export class TrialService {
     createTrial() {
         let trial: Trial= {
             curation_status: '',
+            archived: '',
             nct_id: '',
             long_title: '',
             short_title: '',
@@ -207,7 +208,7 @@ export class TrialService {
             this.authorizedSource.next(true);
             this.trialList = [];
             for (const nctId of _.keys(action.payload.val())) {
-                this.trialList.push(action.payload.val()[nctId]);
+                this.trialList.push(action.payload.val()[nctId]);                
             }
             this.trialListSource.next(this.trialList);
             this.setTrialChosen(this.nctIdChosen);
