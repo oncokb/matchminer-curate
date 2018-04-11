@@ -221,10 +221,10 @@
     <ng-template #panel>
         <div [ngStyle]="getStyle()">
             <label>hugo_symbol: </label>
-            <span>{{(unit.genomic.no_hugo_symbol ? '!' : '') + unit.genomic.hugo_symbol}}</span>
+            <span>{{getDisplayContent('hugo_symbol')}}</span>
             <br/>
             <label>annotated_variant: </label>
-            <span>{{(unit.genomic.no_annotated_variant ? '!' : '') + unit.genomic.annotated_variant}}</span>
+            <span>{{getDisplayContent('annotated_variant')}}</span>
             <br/>
             <span *ngIf="unit.genomic.matching_examples">
                 <label>matching_examples: </label>
@@ -234,32 +234,32 @@
             <div *ngIf="!oncokb">
                 <span *ngIf="unit.genomic.variant_category">
                     <label>variant_category: </label>
-                    <span>{{(unit.genomic.no_variant_category ? '!' : '') + unit.genomic.variant_category}}</span>
+                    <span>{{getDisplayContent('variant_category')}}</span>
                     <br/>
                 </span>
                 <span *ngIf="unit.genomic.protein_change">
                     <label>protein_change: </label>
-                    <span>{{(unit.genomic.no_protein_change ? '!' : '') + unit.genomic.protein_change}}</span>
+                    <span>{{getDisplayContent('protein_change')}}</span>
                     <br/>
                 </span>
                 <span *ngIf="unit.genomic.wildcard_protein_change">
                     <label>wildcard_protein_change: </label>
-                    <span>{{(unit.genomic.no_wildcard_protein_change ? '!' : '') + unit.genomic.wildcard_protein_change}}</span>
+                    <span>{{getDisplayContent('wildcard_protein_change')}}</span>
                     <br/>
                 </span>
                 <span *ngIf="unit.genomic.variant_classification">
                     <label>variant_classification: </label>
-                    <span>{{(unit.genomic.no_variant_classification ? '!' : '') + unit.genomic.variant_classification}}</span>
+                    <span>{{getDisplayContent('variant_classification')}}</span>
                     <br/>
                 </span>
                 <span *ngIf="unit.genomic.exon">
                     <label>exon: </label>
-                    <span>{{(unit.genomic.no_exon ? '!' : '') + unit.genomic.exon}}</span>
+                    <span>{{getDisplayContent('exon')}}</span>
                     <br/>
                 </span>
                 <span *ngIf="unit.genomic.cnv_call">
                     <label>cnv_call: </label>
-                    <span>{{(unit.genomic.no_cnv_call ? '!' : '') + unit.genomic.cnv_call}}</span>
+                    <span>{{getDisplayContent('cnv_call')}}</span>
                     <br/>
                 </span>
                 <span *ngIf="unit.genomic.wildtype">
