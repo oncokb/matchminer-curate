@@ -9,7 +9,6 @@ import io.swagger.annotations.*;
 import org.mskcc.oncokb.model.MatchTrialResult;
 import org.mskcc.oncokb.model.Patient;
 import org.mskcc.oncokb.model.TrialJson;
-import org.mskcc.oncokb.model.TrialMatch;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Api(value = "trials", description = "the trials API")
 public interface TrialsApi {
 
-    @ApiOperation(value = "", notes = "Load trial data into Mongo DB.", response = Void.class, tags="Mongo")
+    @ApiOperation(value = "", notes = "Load trial data into Mongo DB.", response = Void.class, tags={ })
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Load the trial successfully!", response = Void.class),
-        @ApiResponse(code = 500, message = "Load the trial failed!")})
+        @ApiResponse(code = 500, message = "Load the trial failed!", response = Void.class)})
 
     @RequestMapping(value = "/trials/create",
         consumes = {"application/json"},
@@ -29,15 +28,15 @@ public interface TrialsApi {
     ResponseEntity<Void> loadTrial(@ApiParam(value = "a trial json object ", required = true) @RequestBody TrialJson body);
 
 
-    @ApiOperation(value = "", notes = "Match trial in Mongo DB to patient", response = Void.class, tags="Mongo")
+    @ApiOperation(value = "", notes = "Match trial in Mongo DB to patient", response = MatchTrialResult.class, tags={ })
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Match trials successfully!", response = Void.class),
-        @ApiResponse(code = 500, message = "Match trials failed!")})
+        @ApiResponse(code = 200, message = "Match trials successfully!", response = MatchTrialResult.class),
+        @ApiResponse(code = 500, message = "Match trials failed!", response = Void.class)})
 
     @RequestMapping(value = "/trials/match",
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    ResponseEntity<MatchTrialResult> matchTrial(@ApiParam(value = "clinical data and genomic data lists", required = true) @RequestBody Patient body);
+    ResponseEntity<MatchTrialResult> matchTrial(@ApiParam(value = "clinical and genomic data of a patient", required = true) @RequestBody Patient body);
 
 }

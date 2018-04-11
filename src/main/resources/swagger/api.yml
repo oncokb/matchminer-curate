@@ -11,6 +11,8 @@ paths:
     post:
       description: Load trial data into Mongo DB.
       operationId: "loadTrial"
+      consumes:
+      - "application/json"
       parameters:
       - name: "TrialJson"
         in: "body"
@@ -26,9 +28,37 @@ paths:
       responses:
         '200':
           description: Load to Mongo DB successfully.
-        '400':
-          description: The json object is invalid.
-        '404':
-          description: The json object was not found.
-        default:
-          description: Unexpected error.
+        '500':
+          description: Load the trial failed!
+  '/trials/match':
+      post:
+        description: Match trial in Mongo DB to patient.
+        operationId: "matchTrial"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "Patient"
+          in: "body"
+          description: "clinical and genomic data of a patient"
+          required: true
+          schema:
+            type: object
+            required:
+              - clinical
+              - genomics
+            properties:
+              clinical:
+                type: object
+              genomics:
+                type: array
+                items:
+                    type: object
+        responses:
+          '200':
+            description: Match trials successfully!
+            schema:
+              type: object
+          '500':
+            description: Match trials failed!

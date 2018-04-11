@@ -17,27 +17,23 @@ import org.slf4j.LoggerFactory;
 public class ScheduledTask extends TimerTask {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTask.class);
-
-
     @Value("${spring.data.mongodb.uri}")
     private String uri;
-
     @Value("${application.matchengine.absolute-path}")
     private String matchengineAbsolutePath;
-
     @Autowired
     private MongoDatabase mongoDatabase;
 
     // Add your task here
     @Override
-    @Scheduled(fixedRate = 86400000) // rerun MatchEngine every 24 hours
+    @Scheduled(cron = "0 0 1 * * ?") // rerun MatchEngine at 1am everyday
     public void run() {
-        System.out.println("\n\n------Start MatchEngine match() every 24 hours------\n\n");
+        log.info("Start MatchEngine match() at 1am everyday!");
         Boolean isMatch = runMatch();
         if(isMatch) {
-            System.out.println("\nRerun MatchEngine match() successfully!\n");
+            log.info("Rerun MatchEngine match() successfully!");
         } else {
-            System.out.println("\nRerun MatchEngine match() failed!\n");
+            log.error("Rerun MatchEngine match() failed!");
         }
     }
 

@@ -10,6 +10,8 @@ import org.mskcc.oncokb.model.*;
 import org.mskcc.oncokb.service.util.FileUtil;
 import org.mskcc.oncokb.service.util.MongoUtil;
 import org.mskcc.oncokb.service.util.PythonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -32,15 +34,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class TrialsController implements TrialsApi {
 
-    @Value("${application.oncokb.api.match-variant}")
-    private String oncokbMatchVariantApi;
-
+    private static final Logger log = LoggerFactory.getLogger(TrialsController.class);
     @Value("${spring.data.mongodb.uri}")
     private String uri;
-
     @Value("${application.matchengine.absolute-path}")
     private String matchengineAbsolutePath;
-
     @Autowired
     private MongoDatabase mongoDatabase;
 
@@ -49,8 +47,8 @@ public class TrialsController implements TrialsApi {
         method = RequestMethod.POST)
     public ResponseEntity<Void> loadTrial(@RequestBody(required = true) TrialJson body) {
         // check if MatchEngine is accessible.
-        String runnableScriptPath = PythonUtil.getMatchEnginePath(this.matchengineAbsolutePath);
-        if (runnableScriptPath == null || runnableScriptPath.length() <= 0 ) {
+        if (this.matchengineAbsolutePath == null || this.matchengineAbsolutePath.length() == 0 ) {
+            log.error("Cannot' find matchminer-engine path!");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         try{
@@ -61,24 +59,23 @@ public class TrialsController implements TrialsApi {
             // this temporary file remains after the jvm exits
             File tempFile = File.createTempFile("trial", ".json");
             String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
-            System.out.println("trial temp file: " + trialPath);
 
-            ProcessBuilder pb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
+            ProcessBuilder pb = new ProcessBuilder("python", this.matchengineAbsolutePath + "/matchengine.py",
                 "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", mongoUri);
             Boolean isLoad = PythonUtil.runPythonScript(pb);
             tempFile.delete();
 
             if(!isLoad) {
-                System.out.println("Load trial json temp file failed!");
+                log.error("Load trial json temp file failed!");
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } else {
                 JSONObject trialObj = new JSONObject(json);
                 String nctId = trialObj.get("nct_id").toString();
-                System.out.println("\n\n Update trial nct_id: " + nctId + "\n\n");
+                log.info("Updated trial nct_id: " + nctId);
 
                 Boolean isDeleted = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
                 if (!isDeleted) {
-                    System.out.println("Delete the trial related matched record failed!");
+                    log.warn("Delete the trial related matched record failed!");
                 }
             }
 
@@ -96,17 +93,26 @@ public class TrialsController implements TrialsApi {
         method = RequestMethod.POST)
     public ResponseEntity<MatchTrialResult> matchTrial(@RequestBody(required = true) Patient body) {
         // check if MatchEngine is accessible.
-        String runnableScriptPath = PythonUtil.getMatchEnginePath(this.matchengineAbsolutePath);
-        if (runnableScriptPath == null || runnableScriptPath.length() == 0 ) {
-            System.out.println("Cannot' find matchengine path!");
+        if (this.matchengineAbsolutePath == null || this.matchengineAbsolutePath.length() == 0 ) {
+            log.error("Cannot' find matchminer-engine path!");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        // If the last query cause issue, some temp collections won't be dropped.
+        // They will affect next query, so they should be dropped before matching.
+        List<String> tempCollectionNames = new ArrayList<>();
+        tempCollectionNames.add("new_clinical");
+        tempCollectionNames.add("new_genomic");
+        tempCollectionNames.add("new_trial_match");
+        tempCollectionNames.add("trial_query");
+        for(String temp: tempCollectionNames){
+            MongoUtil.dropCollection(this.mongoDatabase, temp);
         }
 
         Clinical clinical = body.getClinical();
         List<Genomic> genomics = body.getGenomics();
         Set<Document> previousMatchedRecordsSet = new HashSet<>(MongoUtil.getCollection(this.mongoDatabase,
             "trial_match"));
-        System.out.println("\n\nprevious matched records set:\n" + previousMatchedRecordsSet);
         List<Document> matchedResults = new LinkedList<>();
         MatchTrialResult matchTrialResult = new MatchTrialResult();
 
@@ -150,17 +156,14 @@ public class TrialsController implements TrialsApi {
                 jsonObject.put("CANONICAL_STRAND", genomic.getCanonicalStand());
                 jsonObject.put("ALLELE_FRACTION", genomic.getAlleleFraction());
                 jsonObject.put("TIER", genomic.getTier());
-                if (genomic.getOncokbVariant() != null && genomic.getOncokbVariant().size() > 0 ) {
-                    jsonObject.put("ONCOKB_VARIANT",genomic.getOncokbVariant().toString());
-                }
                 genomicArray.put(jsonObject);
             }
 
             // check if any trials matched for query data. We check trials from history(collection "trial_match") to
             // see if any matched records can be found and save them to "matchedResults".
             if (previousMatchedRecordsSet.size() > 0) {
-                matchedResults.addAll(findMatchedTrials(previousMatchedRecordsSet, genomicArray, clinicalArray));
-                System.out.println("\n\nMatched Result: \n" + matchedResults + "\n\n");
+                List<Document> findMatchedTrialsResult = findMatchedTrials(previousMatchedRecordsSet, genomicArray, clinicalArray);
+                matchedResults.addAll(findMatchedTrialsResult);
             }
 
             // create a new collection "trial_query" to save matched trials from history(collection "trial_match").
@@ -168,7 +171,7 @@ public class TrialsController implements TrialsApi {
                 Boolean isCreated = MongoUtil.createCollection(this.mongoDatabase,
                     "trial_query", new ArrayList<>(matchedResults));
                 if (!isCreated) {
-                    System.out.println("Create trial_query collection failed!");
+                    log.error("Create trial_query collection failed!");
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }
@@ -176,16 +179,12 @@ public class TrialsController implements TrialsApi {
             String clinicalPath = FileUtil.buildJsonTempFile(clinicalArray.toString(), clinicalTempFile);
             String genomicPath = FileUtil.buildJsonTempFile(genomicArray.toString(), genomicTempFile);
 
-            ProcessBuilder loadPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
+            ProcessBuilder loadPb = new ProcessBuilder("python", this.matchengineAbsolutePath + "/matchengine.py",
                 "load", "-c", clinicalPath, "-g", genomicPath, "--patient-format", "json", "--mongo-uri", mongoUri);
             Boolean isLoad = PythonUtil.runPythonScript(loadPb);
 
             if(isLoad) {
-                // run MatchEngine match() with "--query" flag. "--query" means only match trials to
-                // current patient data that is newly added to "new_genomic" and "new_clinical" collections.
-                // In this way, MatchEngine won't match from "clinical" and "genomic" collections
-                // in case generate duplicate matched records.
-                ProcessBuilder matchPb = new ProcessBuilder("python", runnableScriptPath + "/matchengine.py",
+                ProcessBuilder matchPb = new ProcessBuilder("python", this.matchengineAbsolutePath + "/matchengine.py",
                     "match", "--mongo-uri", mongoUri);
                 Boolean isMatch = PythonUtil.runPythonScript(matchPb);
 
@@ -193,29 +192,26 @@ public class TrialsController implements TrialsApi {
                     // export matched result from collection "trial_match" in MongoDB "matchminer"
                     List<Document> matchedTrialDocs = MongoUtil.getCollection(this.mongoDatabase,
                         "new_trial_match");
-                    System.out.println("\n\nmatched trials docs:\n" + matchedTrialDocs);
                     matchedResults.addAll(matchedTrialDocs);
                 } else {
-                    System.out.println("Run match() of matchengine failed!");
+                    log.error("Run match() of matchminer-engine failed!");
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             } else {
-                System.out.println("Load genomic and clinical data into MongoDB failed!");
+                log.error("Load genomic and clinical data into MongoDB failed!");
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             matchTrialResult = capsulateTrialMatchDoc(body.getId(), matchedResults);
 
-            // drop collections "trial_query" and "new_trial_match" in case they will influence next matching result
+            // drop collections "trial_query" and "new_trial_match" in case they will effect next matching result
             Boolean isTrialQueryDropped = MongoUtil.dropCollection(this.mongoDatabase, "trial_query");
             Boolean isNewTrialMatchDropped = MongoUtil.dropCollection(this.mongoDatabase, "new_trial_match");
             if(!isTrialQueryDropped) {
-                System.out.println("Drop collection trial_query failed!");
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                log.warn("Drop collection trial_query failed!");
             }
             if(!isNewTrialMatchDropped) {
-                System.out.println("Drop collection new_trial_match failed!");
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                log.warn("Drop collection new_trial_match failed!");
             }
 
             clinicalTempFile.delete();
@@ -260,24 +256,26 @@ public class TrialsController implements TrialsApi {
 
     public List<Document> findMatchedTrials(Set<Document> matchedRecordsSet,
                                             JSONArray genomicArray, JSONArray clinicalArray) throws JSONException{
-        List<Document> matchedResults = new LinkedList<>();
+        Set<Document> matchedResults = new HashSet<>();
         for (Document doc: matchedRecordsSet) {
             for (int i = 0; i < genomicArray.length(); i++){
-                if (doc.getString("oncokb_genomic_id").equals(
+                // "Not" trial_match records don't have "oncokb_genomic_id" so skip "Not" record.
+                // "Not" trials should be rematch in matchminer-engine.
+                String oncokbGenomicId = doc.getString("oncokb_genomic_id");
+                if (oncokbGenomicId != null && oncokbGenomicId.equals(
                     genomicArray.getJSONObject(i).getString("ONCOKB_GENOMIC_ID"))){
                     for (int j = 0; j < clinicalArray.length(); j++) {
                         if (doc.getString("oncokb_clinical_id").equals(clinicalArray.getJSONObject(j)
                             .getString("ONCOKB_CLINICAL_ID"))){
                             matchedResults.add(doc);
                             if (matchedResults.size() == matchedRecordsSet.size()) {
-                                return matchedResults;
+                                return new ArrayList<>(matchedResults);
                             }
                         }
                     }
                 }
             }
         }
-        return  matchedResults;
+        return new ArrayList<>(matchedResults);
     }
 }
-
