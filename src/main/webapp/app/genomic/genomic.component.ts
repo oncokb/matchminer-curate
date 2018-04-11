@@ -93,4 +93,14 @@ export class GenomicComponent implements OnInit {
         const result = (type === 'gene' ? this.geneValidation : this.exampleValidation);
         return result === true ? { 'color': 'green' } : { 'color': 'red' };
     }
+    getDisplayContent(key: string) {
+        let result = '';
+        if (this.unit['genomic']['no_' + key]) {
+            result += '!';
+        }
+        if (this.unit['genomic'][key]) {
+            result += this.unit['genomic'][key];
+        }
+        return result;
+    }
 }
