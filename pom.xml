@@ -71,7 +71,6 @@
         <sonar.surefire.reportsPath>${project.testresult.directory}/surefire-reports</sonar.surefire.reportsPath>
         <sonar.tests>${project.basedir}/src/test/</sonar.tests>
 
-        <firebase.file.id>126ktrhFJatyKjvgDLcCxzai0vUOcglUv</firebase.file.id>
         <!-- jhipster-needle-maven-property -->
     </properties>
 
@@ -678,28 +677,6 @@
             </dependencies>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.2.1</version>
-                        <executions>
-                            <execution>
-                                <id>copy-firebase-config</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <executable>wget</executable>
-                            <arguments>
-                                <argument><![CDATA[https://drive.google.com/uc?export=download&id=${firebase.file.id}]]></argument>
-                                <argument>-O</argument>
-                                <argument>${project.basedir}/src/main/webapp/app/environments/environment.ts</argument>
-                            </arguments>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <artifactId>maven-clean-plugin</artifactId>
                         <version>${maven-clean-plugin.version}</version>
