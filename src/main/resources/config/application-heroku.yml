@@ -29,5 +29,3 @@ application:
         absolute-path: ${HOME}/matchminer-engine
         git-url: https://github.com/victoria34/matchminer-engine.git
         branch: oncokb-variant
-    firebase:
-        file-id: ${FIREBASE_FILE_ID}

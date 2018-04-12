@@ -96,6 +96,4 @@ application:
         absolute-path: ${CATALINA_HOME}/webapps/matchminer-engine
         git-url: https://github.com/victoria34/matchminer-engine.git
         branch: oncokb-variant
-    firebase:
-        file-id:
 
