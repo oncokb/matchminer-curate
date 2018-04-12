@@ -16,7 +16,6 @@ import {ConnectionService} from "./connection.service";
 
 @Injectable()
 export class TrialService {
-    production = environment.production ? environment.production : false;
     oncokb = environment.oncokb ? environment.oncokb : false;
 
     private nctIdChosenSource = new BehaviorSubject<string>('');
@@ -77,10 +76,9 @@ export class TrialService {
         this.trialsRef = db.object('Trials');
 
         // prepare main types list
-        this.http.get(this.getAPIUrl('MainType'))
-            .subscribe((res: Response) => {
+        this.connectionService.getMainType().subscribe((res) => {
                 let mainTypeQueries = [];
-                for (const item of res.json().data) {
+                for (const item of res['data']) {
                     mainTypeQueries.push({
                         "exactMatch": true,
                         "query": item.name,
@@ -95,9 +93,8 @@ export class TrialService {
                 let queries =  {
                     "queries": mainTypeQueries
                 };
-                this.http.post(this.getAPIUrl('SubType'), queries)
-                    .subscribe((res: Response) => {
-                        let tempSubTypes = res.json().data;
+            this.connectionService.getSubType(queries).subscribe((res) => {
+                        let tempSubTypes = res['data'];
                         let currentSubtype = '';
                         let currentMaintype = '';
                         for (const items of tempSubTypes) {
@@ -129,9 +126,8 @@ export class TrialService {
                     });
             });
         // prepare oncokb variant list
-        this.http.get(this.getAPIUrl('OncoKBVariant'))
-            .subscribe((res: Response) => {
-                const allAnnotatedVariants = res.json();
+        this.connectionService.getOncoKBVariant().subscribe((res) => {
+                const allAnnotatedVariants = res;
                 for(const item of  allAnnotatedVariants) {
                     if (item['gene']['hugoSymbol']) {
                         if (this.annotated_variants[item['gene']['hugoSymbol']]) {
@@ -273,38 +269,5 @@ export class TrialService {
     }
     getTrialRef(nctId: string) {
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
-    }
-    getAPIUrl(type: string) {
-        if (this.production === true) {
-            switch(type) {
-                case 'MainType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/mainTypes';
-                case 'SubType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/tumorTypes/search';
-                case 'OncoKBVariant':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
-                case 'GeneValidation':
-                    return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
-                case 'ClinicalTrials':
-                    return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-                case 'ExampleValidation':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
-            }
-        } else {
-            switch(type) {
-                case 'MainType':
-                    return 'http://oncotree.mskcc.org/oncotree/api/mainTypes';
-                case 'SubType':
-                    return 'http://oncotree.mskcc.org/oncotree/api/tumorTypes/search';
-                case 'OncoKBVariant':
-                    return 'http://oncokb.org/api/v1/variants';
-                case 'GeneValidation':
-                    return 'http://mygene.info/v3/query?species=human&q=symbol:';
-                case 'ClinicalTrials':
-                    return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-                case 'ExampleValidation':
-                    return 'http://oncokb.org/api/v1/utils/match/variant?';
-            }
-        }
     }
 }

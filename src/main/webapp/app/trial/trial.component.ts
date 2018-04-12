@@ -36,6 +36,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
 
     constructor(private connectionService: ConnectionService, private trialService: TrialService, public db: AngularFireDatabase) {
         this.production = this.connectionService.getProduction();
+        this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);
         this.trialService.trialListObs.subscribe(message => {
             this.trialList = message;
@@ -78,49 +79,47 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 continue;
             }
             this.connectionService.importTrials(tempTrial).subscribe((res) => {
-                        const trialInfo = res;
-                        let armsInfo:any = [];
-                        _.each(trialInfo.arms, function(arm) {
-                            if (arm.arm_type !== null && arm.arm_description !== null) {
-                                armsInfo.push({
-                                    arm_name: arm.arm_name,
-                                    arm_type: arm.arm_type,
-                                    arm_description: arm.arm_description,
-                                    match: []
-                                });
-                            }
+                const trialInfo = res;
+                let armsInfo:any = [];
+                _.each(trialInfo['arms'], function(arm) {
+                    if (arm.arm_type !== null && arm.arm_description !== null) {
+                        armsInfo.push({
+                            arm_name: arm.arm_name,
+                            arm_type: arm.arm_type,
+                            arm_description: arm.arm_description,
+                            match: []
                         });
-                        const trial: Trial = {
-                            curation_status: 'In progress',
-                            archived: 'No',
-                            nct_id: trialInfo.nct_id,
-                            long_title: trialInfo.official_title,
-                            short_title: trialInfo.brief_title,
-                            phase: trialInfo.phase.phase,
-                            status: trialInfo.current_trial_status,
-                            treatment_list: {
-                                step: [{
-                                    arm:  armsInfo,
-                                    match: []
-                                }]
-                            }
-                        };
-                        this.db.object('Trials/' + trialInfo.nct_id).set(trial).then(result => {
-                            this.messages.push('Successfully imported ' + trialInfo.nct_id);
-                            if (setChosenTrial === false) {
-                                this.nctIdChosen = trialInfo.nct_id;
-                                this.trialService.setTrialChosen(this.nctIdChosen);
-                                setChosenTrial = true;
-                            }
-                        }).catch(error => {
-                            this.messages.push('Fail to save to database ' + tempTrial);
-                        });
-
-                    },
-                    error => {
-                        this.messages.push(tempTrial + ' not found');
                     }
-                );
+                });
+                const trial: Trial = {
+                    curation_status: 'In progress',
+                    archived: 'No',
+                    nct_id: trialInfo['nct_id'],
+                    long_title: trialInfo['official_title'],
+                    short_title: trialInfo['brief_title'],
+                    phase: trialInfo['phase']['phase'],
+                    status: trialInfo['current_trial_status'],
+                    treatment_list: {
+                        step: [{
+                            arm:  armsInfo,
+                            match: []
+                        }]
+                    }
+                };
+                this.db.object('Trials/' + trialInfo['nct_id']).set(trial).then(result => {
+                    this.messages.push('Successfully imported ' + trialInfo['nct_id']);
+                    if (setChosenTrial === false) {
+                        this.nctIdChosen = trialInfo['nct_id'];
+                        this.trialService.setTrialChosen(this.nctIdChosen);
+                        setChosenTrial = true;
+                    }
+                }).catch(error => {
+                    this.messages.push('Fail to save to database ' + tempTrial);
+                });
+            },
+            error => {
+                this.messages.push(tempTrial + ' not found');
+            });
         }
         this.trialsToImport = '';
     }
