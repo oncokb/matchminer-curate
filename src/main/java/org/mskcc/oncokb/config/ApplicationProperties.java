@@ -11,33 +11,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
 
-    public final Oncokb oncokb = new Oncokb();
     public final Matchengine matchengine = new Matchengine();
-    public Oncokb getOncokb() {
-        return oncokb;
-    }
+
     public Matchengine getMatchengine() {
         return matchengine;
-    }
-
-    public static class Oncokb {
-        private Api api = new Api();
-        public Api getApi() {
-            return api;
-        }
-        public void setApi(Api api) {
-            this.api = api;
-        }
-        public static class Api {
-            private String matchVariant;
-            public String getMatchVariant() {
-                return matchVariant;
-            }
-            public void setMatchVariant(String matchVariant) {
-                this.matchVariant = matchVariant;
-            }
-        }
-
     }
 
     public static class Matchengine {

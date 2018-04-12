@@ -100,6 +100,7 @@ jhipster:
 
 # Everything changed in here should also be changed in src/test/resources/config/application.yml
 application:
-    oncokb:
-        api:
-            match-variant: http://oncokb.org/api/private/utils/match/variant
+    matchengine:
+        absolute-path:
+        git-url:
+        branch:
