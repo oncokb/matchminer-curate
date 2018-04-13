@@ -78,7 +78,6 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration{
     @Override
     @Bean
     public Mongo mongo() throws Exception {
-        System.out.println("\n\nthis.uri:" + this.uri + "\n\n");
         return new MongoClient(new MongoClientURI(this.uri));
     }
 

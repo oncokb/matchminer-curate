@@ -55,30 +55,44 @@ public class TrialsController implements TrialsApi {
             String mongoUri = MongoUtil.getPureMongoUri(this.uri);
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(body.getTrial());
-
-            // this temporary file remains after the jvm exits
-            File tempFile = File.createTempFile("trial", ".json");
-            String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
-
-            ProcessBuilder pb = new ProcessBuilder("python", this.matchengineAbsolutePath + "/matchengine.py",
-                "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", mongoUri);
-            Boolean isLoad = PythonUtil.runPythonScript(pb);
-            tempFile.delete();
-
-            if(!isLoad) {
-                log.error("Load trial json temp file failed!");
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            } else {
-                JSONObject trialObj = new JSONObject(json);
-                String nctId = trialObj.get("nct_id").toString();
-                log.info("Updated trial nct_id: " + nctId);
-
-                Boolean isDeleted = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
-                if (!isDeleted) {
-                    log.warn("Delete the trial related matched record failed!");
+            JSONObject trialObj = new JSONObject(json);
+            String nctId = trialObj.get("nct_id").toString();
+            String archived = trialObj.get("archived").toString();
+            String curationStatus = trialObj.get("curation_status").toString();
+            // Archived trials have to be deleted in Mongo DB.
+            if( archived.equals("Yes")) {
+                Boolean isDeletedTrialMatch = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
+                Boolean isDeletedTrial = MongoUtil.deleteMany(this.mongoDatabase, "trial", nctId);
+                if (!isDeletedTrialMatch) {
+                    log.warn("Delete the trial related matched record in MongoDB failed!");
                 }
+                if (!isDeletedTrial) {
+                    log.warn("Delete the trial in MongoDB failed!");
+                }
+                return new ResponseEntity<>(HttpStatus.OK);
             }
 
+            if (curationStatus.equals("Completed")) {
+                File tempFile = File.createTempFile("trial", ".json");
+                String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
+
+                ProcessBuilder pb = new ProcessBuilder("python", this.matchengineAbsolutePath + "/matchengine.py",
+                    "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", mongoUri);
+                Boolean isLoad = PythonUtil.runPythonScript(pb);
+                tempFile.delete();
+
+                if(!isLoad) {
+                    log.error("Load trial json temp file failed!");
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                } else {
+                    log.info("Updated trial nct_id: " + nctId);
+
+                    Boolean isDeleted = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
+                    if (!isDeleted) {
+                        log.warn("Delete the trial related matched record in MongoDB failed!");
+                    }
+                }
+            }
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -139,6 +139,8 @@ export class TrialComponent implements OnInit, AfterViewInit {
             }).then(result => {
                 console.log('success saving archive status');
                 if (this.trialChosen['archived'] === 'Yes') {
+                    // delete the archived trial in MongoDB.
+                    this.loadMongo();
                     this.curateTrial('');
                 }
             }).catch(error => {
