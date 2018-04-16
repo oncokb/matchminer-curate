@@ -233,7 +233,7 @@ export class TrialService {
                     } else {
                         _.each(trial['treatment_list'].step[0].arm, function(armItem) {
                             if (_.isUndefined(armItem.match)) {
-                                armItem.match=[];
+                                armItem.match = [];
                             }
                         });
                     }
