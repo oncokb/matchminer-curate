@@ -228,11 +228,15 @@ export class TrialService {
                         }]
                     }
                 } else {
-                    _.each(trial['treatment_list'].step[0].arm, function(armItem) {
-                        if (_.isUndefined(armItem.match)) {
-                            armItem.match = [];
-                        }
-                    });
+                    if (_.isUndefined(trial['treatment_list'].step[0].arm)) {
+                        trial['treatment_list'].step[0].arm = [];
+                    } else {
+                        _.each(trial['treatment_list'].step[0].arm, function(armItem) {
+                            if (_.isUndefined(armItem.match)) {
+                                armItem.match = [];
+                            }
+                        });
+                    }
                     if (_.isUndefined(trial['treatment_list'].step[0].match)) {
                         trial['treatment_list'].step[0].match = [];
                     }

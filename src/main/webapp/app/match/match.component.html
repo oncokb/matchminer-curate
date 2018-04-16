@@ -4,7 +4,7 @@
             <jhi-genomic [unit]="unit" [path]="path+','+i"></jhi-genomic>
         </div>
         <div *ngIf="unit.clinical" [ngStyle]="getStyle(0)">
-            <jhi-clinical [unit]="unit" [path]="path+','+i"></jhi-genomic>
+            <jhi-clinical [unit]="unit" [path]="path+','+i"></jhi-clinical>
         </div>
         <div *ngIf="unit.or">
             <div [ngStyle]="getStyle(0)">
@@ -17,7 +17,7 @@
                         <jhi-genomic [unit]="unit1" [path]="path+','+i+','+i1"></jhi-genomic>
                     </div>
                     <div *ngIf="unit1.clinical">
-                        <jhi-clinical [unit]="unit1" [path]="path+','+i+','+i1"></jhi-genomic>
+                        <jhi-clinical [unit]="unit1" [path]="path+','+i+','+i1"></jhi-clinical>
                     </div>
                     <div *ngIf="unit1.and">
                         <div>
@@ -47,7 +47,7 @@
                         <jhi-genomic [unit]="unit2" [path]="path+','+i+','++i2"></jhi-genomic>
                     </div>
                     <div *ngIf="unit2.clinical">
-                        <jhi-clinical [unit]="unit2" [path]="path+','+i+','++i2"></jhi-genomic>
+                        <jhi-clinical [unit]="unit2" [path]="path+','+i+','++i2"></jhi-clinical>
                     </div>
                     <div *ngIf="unit2.or">
                         <div>
