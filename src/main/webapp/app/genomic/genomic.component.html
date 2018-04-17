@@ -19,7 +19,12 @@
                 <input id="no_annotated_variant1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_annotated_variant" />
             </div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search"/>
+                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search" (change)="checkGenomicFields()"/>
+            </div>
+        </div>
+        <div class="row borderMargin" *ngIf="checkFieldsMessage.content.length > 0">
+            <div class="col-sm-12">
+                <span [style.color]="checkFieldsMessage.color">{{ checkFieldsMessage.content}}</span>
             </div>
         </div>
         <div class="row borderMargin">
@@ -132,7 +137,12 @@
                 <input id="no_annotated_variant2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_annotated_variant" />
             </div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search"/>
+                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search" (change)="checkGenomicFields()"/>
+            </div>
+        </div>
+        <div class="row borderMargin" *ngIf="checkFieldsMessage.content.length > 0">
+            <div class="col-sm-12">
+                <span [style.color]="checkFieldsMessage.color">{{ checkFieldsMessage.content}}</span>
             </div>
         </div>
         <div class="row borderMargin">

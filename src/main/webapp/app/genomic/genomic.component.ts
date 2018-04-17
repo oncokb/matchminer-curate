@@ -36,6 +36,10 @@ export class GenomicComponent implements OnInit {
         gene: '',
         example: ''
     };
+    checkFieldsMessage = {
+        color: '',
+        content: ''
+    };
     geneValidation = false;
     exampleValidation = false;
     search = (text$: Observable<string>) =>
@@ -72,6 +76,7 @@ export class GenomicComponent implements OnInit {
                 this.geneValidation = false;
            }  
         });
+        this.checkGenomicFields();
     }
     validateGenomicExample() {
         if (this.genomicInput.hugo_symbol && this.genomicInput.annotated_variant && this.genomicInput.matching_examples) {
@@ -102,5 +107,13 @@ export class GenomicComponent implements OnInit {
             result += this.unit['genomic'][key];
         }
         return result;
+    }
+    checkGenomicFields() {
+        if (!this.genomicInput.hugo_symbol && this.genomicInput.annotated_variant) {
+            this.checkFieldsMessage.color = 'red';
+            this.checkFieldsMessage.content = 'Matching trials by only "annotated_variant" is not be supported currently.';
+        } else {
+            this.checkFieldsMessage.content = '';
+        }
     }
 }

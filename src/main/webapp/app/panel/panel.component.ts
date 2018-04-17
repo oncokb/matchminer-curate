@@ -30,9 +30,7 @@ export class PanelComponent implements OnInit {
     currentPath = '';
     dropdownList = [
         { id: 1, itemName: 'Genomic' },
-        { id: 2, itemName: 'Clinical' },
-        { id: 3, itemName: 'And' },
-        { id: 4, itemName: 'Or' }];
+        { id: 2, itemName: 'Clinical' }];
     armInput: Arm;
     originalMatch = [];
     originalArms = [];
@@ -48,6 +46,7 @@ export class PanelComponent implements OnInit {
     clinicalFields = ['age_numerical', 'oncotree_primary_diagnosis'];
     genomicFields = ['hugo_symbol', 'annotated_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change',
     'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'];
+    oncokb: boolean;
             
     constructor(private trialService: TrialService) { 
     }
@@ -77,6 +76,7 @@ export class PanelComponent implements OnInit {
         this.trialService.armInputObs.subscribe(message => {
             this.armInput = message;
         });
+        this.oncokb = this.trialService.oncokb;
     }
     preparePath(pathParameter?: string) {
         const pathStr = pathParameter ? pathParameter : this.path;
@@ -118,7 +118,8 @@ export class PanelComponent implements OnInit {
         if (type === 'delete') {
             result = confirm('This will delete the entire section. Are you sure you want to proceed?');
         }
-        if (result) {
+        let emptyFields = this.checkEmptyFields(this.nodeType);
+        if (result && emptyFields.length === 0) {
             if (this.arm === true) {
                 this.modifyArmGroup(type);
             } else {
@@ -127,6 +128,89 @@ export class PanelComponent implements OnInit {
             }
             this.saveBacktoDB();
         }
+    }
+    checkGenomicFields(obj: any) {
+        let errorFields = [];
+        if (this.oncokb) {
+            let checkGenomicFields = ['hugo_symbol', 'annotated_variant'];
+            for (const key of checkGenomicFields) {
+                if (_.isUndefined(obj[key]) || obj[key].length === 0) {
+                    errorFields.push(key);
+                } else {
+                    // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
+                    errorFields = [];
+                    return errorFields;
+                }
+            }
+        } else {
+            let checkGenomicFields = ['hugo_symbol', 'annotated_variant', 'protein_change', 'wildcard_protein_change',
+                'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'];
+            for (const key of checkGenomicFields) {
+                if (_.isUndefined(obj[key]) || obj[key].length === 0) {
+                    errorFields.push(key);
+                } else {
+                    // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
+                    errorFields = [];
+                    return errorFields;
+                }
+            }
+        }
+        return errorFields;
+    }
+    checkClinicalFields(obj: any) {
+        let errorFields = [];
+        // Check clinical input fields
+        for (const key of this.clinicalFields) {
+            if (_.isUndefined(obj[key]) || obj[key].length === 0) {
+                if (key === 'oncotree_primary_diagnosis') {
+                   if ((_.isUndefined(obj['sub_type']) || obj['sub_type'].length === 0) &&
+                    (_.isUndefined(obj['main_type']) || obj['main_type'].length === 0)) {
+                       // TODO: Remove main_type and sub_type after they are replaced by oncotree_primary_diagnosis
+                       errorFields.push(key);
+                   } else {
+                       // If any one of those clinical fields is not empty, the clinical node is valid and can be added.
+                       errorFields = [];
+                       return errorFields;
+                   }
+                } else {
+                    errorFields.push(key);
+                }
+            } else {
+                // If any one of those clinical fields is not empty, the clinical node is valid and can be added.
+                errorFields = [];
+                return errorFields;
+            }
+        }
+        return errorFields;
+    }
+    checkEmptyFields(type: string) {
+        // Check genomic input fields
+        let emptyFields = [];
+        switch (type) {
+        case 'Genomic':
+            emptyFields = _.union(emptyFields, this.checkGenomicFields(this.genomicInput));
+            break;
+        case 'Clinical':
+            emptyFields = _.union(emptyFields, this.checkClinicalFields(this.clinicalInput));
+            break;
+        case 'And':
+        case 'Or':
+            for (let item of this.selectedItems) {
+                switch (item.itemName) {
+                    case 'Genomic':
+                        emptyFields = _.union(emptyFields, this.checkGenomicFields(this.genomicInput));
+                        break;
+                    case 'Clinical':
+                        emptyFields = _.union(emptyFields, this.checkClinicalFields(this.clinicalInput));
+                        break;
+                }
+            }
+            break;
+        }
+        if (emptyFields.length > 0) {
+            alert("Please fill empty fields:\n" + _.uniq(emptyFields).join('  '));
+        }
+        return emptyFields;
     }
     saveBacktoDB() {
         this.trialService.getTrialRef(this.nctIdChosen).set({
@@ -287,16 +371,6 @@ export class PanelComponent implements OnInit {
                             case 'Clinical':
                                 tempObj1.push({
                                     clinical: this.prepareClinicalData()
-                                });
-                                break;
-                            case 'And':
-                                tempObj1.push({
-                                    and: []
-                                });
-                                break;
-                            case 'Or':
-                                tempObj1.push({
-                                    or: []
                                 });
                                 break;
                         }
