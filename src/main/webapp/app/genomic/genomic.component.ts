@@ -109,9 +109,16 @@ export class GenomicComponent implements OnInit {
         return result;
     }
     checkGenomicFields() {
-        if (!this.genomicInput.hugo_symbol && this.genomicInput.annotated_variant) {
+        let keys = _.keys(this.genomicInput);
+        let notEmptyFields = [];
+        for (const key of keys) {
+            if (key !== 'matching_examples' && key !== 'no_matching_examples' && !_.isUndefined(this.genomicInput[key]) && this.genomicInput[key].length > 0) { 
+                notEmptyFields.push(key);
+            }    
+        }
+        if (notEmptyFields.length === 1 && notEmptyFields[0] === 'annotated_variant') {
             this.checkFieldsMessage.color = 'red';
-            this.checkFieldsMessage.content = 'Matching trials by only "annotated_variant" is not be supported currently.';
+            this.checkFieldsMessage.content = 'Matching trials by only "annotated_variant" is not be supported currently.';     
         } else {
             this.checkFieldsMessage.content = '';
         }
