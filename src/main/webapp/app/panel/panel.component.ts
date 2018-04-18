@@ -1,3 +1,4 @@
+
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { AngularFireDatabase, AngularFireObject, AngularFireList } from 'angularfire2/database';
@@ -46,6 +47,7 @@ export class PanelComponent implements OnInit {
     clinicalFields = ['age_numerical', 'oncotree_primary_diagnosis'];
     genomicFields = ['hugo_symbol', 'annotated_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change',
     'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'];
+    oncokbGenomicFields = ['hugo_symbol', 'annotated_variant'];
     oncokb: boolean;
             
     constructor(private trialService: TrialService) { 
@@ -118,8 +120,8 @@ export class PanelComponent implements OnInit {
         if (type === 'delete') {
             result = confirm('This will delete the entire section. Are you sure you want to proceed?');
         }
-        let emptyFields = this.checkEmptyFields(this.nodeType);
-        if (result && emptyFields.length === 0) {
+        let hasEmptyFields = this.checkEmptyFields(this.nodeType);
+        if (result && !hasEmptyFields) {
             if (this.arm === true) {
                 this.modifyArmGroup(type);
             } else {
@@ -130,35 +132,34 @@ export class PanelComponent implements OnInit {
         }
     }
     checkTrialGenomicFields(obj: any) {
-        let errorFields = [];
+        let hasErrorFields = false;
         if (this.oncokb) {
-            let checkGenomicFields = ['hugo_symbol', 'annotated_variant'];
-            for (const key of checkGenomicFields) {
+            for (const key of this.oncokbGenomicFields) {
                 if (_.isUndefined(obj[key]) || obj[key].length === 0) {
-                    errorFields.push('Genomic');
+                    hasErrorFields = true;
                 } else {
                     // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
-                    errorFields = [];
-                    return errorFields;
+                    hasErrorFields = false;
+                    return hasErrorFields;
                 }
             }
         } else {
-            let checkGenomicFields = ['hugo_symbol', 'annotated_variant', 'protein_change', 'wildcard_protein_change',
-                'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'];
-            for (const key of checkGenomicFields) {
-                if (_.isUndefined(obj[key]) || obj[key].length === 0) {
-                    errorFields.push('Genomic');
-                } else {
-                    // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
-                    errorFields = [];
-                    return errorFields;
+            for (const key of this.genomicFields) {
+                if (key !== 'matching_examples') {
+                    if (_.isUndefined(obj[key]) || obj[key].length === 0) {
+                        hasErrorFields = true;
+                    } else {
+                        // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
+                        hasErrorFields = false;
+                        return hasErrorFields;
+                    }
                 }
             }
         }
-        return errorFields;
+        return hasErrorFields;
     }
     checkTrialClinicalFields(obj: any) {
-        let errorFields = [];
+        let hasErrorFields = false;
         // Check clinical input fields
         for (const key of this.clinicalFields) {
             if (_.isUndefined(obj[key]) || obj[key].length === 0) {
@@ -166,48 +167,58 @@ export class PanelComponent implements OnInit {
                    if ((_.isUndefined(obj['sub_type']) || obj['sub_type'].length === 0) &&
                     (_.isUndefined(obj['main_type']) || obj['main_type'].length === 0)) {
                        // TODO: Remove main_type and sub_type after they are replaced by oncotree_primary_diagnosis
-                       errorFields.push('Clinical');
+                       hasErrorFields = true;
                    } else {
                        // If any one of those clinical fields is not empty, the clinical node is valid and can be added.
-                       errorFields = [];
-                       return errorFields;
+                       hasErrorFields = false;
+                       return hasErrorFields;
                    }
                 } else {
-                    errorFields.push('Clinical');
+                    hasErrorFields = true;
                 }
             } else {
                 // If any one of those clinical fields is not empty, the clinical node is valid and can be added.
-                errorFields = [];
-                return errorFields;
+                hasErrorFields = false;
+                return hasErrorFields;
             }
         }
-        return errorFields;
+        return hasErrorFields;
     }
     checkEmptyFields(type: string) {
         // Check genomic input fields
         let emptyFields = [];
+        let hasEmptyFields = false;
         switch (type) {
         case 'Genomic':
-            emptyFields = _.union(emptyFields, this.checkTrialGenomicFields(this.genomicInput));
+            if (this.checkTrialGenomicFields(this.genomicInput)) {
+                emptyFields.push('Genomic');
+            }
             break;
         case 'Clinical':
-            emptyFields = _.union(emptyFields, this.checkTrialClinicalFields(this.clinicalInput));
+            if (this.checkTrialClinicalFields(this.clinicalInput)) {
+                emptyFields.push('Clinical');
+            }
             break;
         case 'And':
         case 'Or':
             for (let item of this.selectedItems) {
                 switch (item.itemName) {
                     case 'Genomic':
-                        emptyFields = _.union(emptyFields, this.checkTrialGenomicFields(this.genomicInput));
+                        if (this.checkTrialGenomicFields(this.genomicInput)) {
+                            emptyFields.push('Genomic');
+                        }
                         break;
                     case 'Clinical':
-                        emptyFields = _.union(emptyFields, this.checkTrialClinicalFields(this.clinicalInput));
+                        if (this.checkTrialClinicalFields(this.clinicalInput)) {
+                            emptyFields.push('Clinical');
+                        }
                         break;
                 }
             }
             break;
         }
         if (emptyFields.length > 0) {
+            hasEmptyFields = true;
             emptyFields = _.uniq(emptyFields);
             let warnMessage = "Please enter information in " + emptyFields.join(' and ');
             if (emptyFields.length > 1) {
@@ -217,7 +228,7 @@ export class PanelComponent implements OnInit {
             }
             alert(warnMessage);
         }
-        return emptyFields;
+        return hasEmptyFields;
     }
     saveBacktoDB() {
         this.trialService.getTrialRef(this.nctIdChosen).set({
