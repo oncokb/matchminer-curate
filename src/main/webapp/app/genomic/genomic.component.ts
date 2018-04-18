@@ -109,18 +109,21 @@ export class GenomicComponent implements OnInit {
         return result;
     }
     checkGenomicFields() {
-        let keys = _.keys(this.genomicInput);
-        let notEmptyFields = [];
-        for (const key of keys) {
-            if (key !== 'matching_examples' && key !== 'no_matching_examples' && !_.isUndefined(this.genomicInput[key]) && this.genomicInput[key].length > 0) { 
-                notEmptyFields.push(key);
-            }    
-        }
-        if (notEmptyFields.length === 1 && notEmptyFields[0] === 'annotated_variant') {
-            this.checkFieldsMessage.color = 'red';
-            this.checkFieldsMessage.content = 'Matching trials by only "annotated_variant" is not be supported currently.';     
-        } else {
-            this.checkFieldsMessage.content = '';
+        // run when annotated_variant is not empty
+        if (!_.isUndefined(this.genomicInput['annotated_variant']) && this.genomicInput['annotated_variant'].length > 0) {
+            let keys = _.keys(this.genomicInput);
+            let notEmptyFields = [];
+            for (const key of keys) {
+                if (key !== 'matching_examples' && key !== 'no_matching_examples' && !_.isUndefined(this.genomicInput[key]) && this.genomicInput[key].length > 0) { 
+                    notEmptyFields.push(key);
+                }    
+            }
+            if (notEmptyFields.length === 1 && notEmptyFields[0] === 'annotated_variant') {
+                this.checkFieldsMessage.color = 'red';
+                this.checkFieldsMessage.content = 'Matching trials by only "annotated_variant" is not be supported currently.';     
+            } else {
+                this.checkFieldsMessage.content = '';
+            }
         }
     }
 }
