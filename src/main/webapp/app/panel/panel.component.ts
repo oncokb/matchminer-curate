@@ -129,13 +129,13 @@ export class PanelComponent implements OnInit {
             this.saveBacktoDB();
         }
     }
-    checkGenomicFields(obj: any) {
+    checkTrialGenomicFields(obj: any) {
         let errorFields = [];
         if (this.oncokb) {
             let checkGenomicFields = ['hugo_symbol', 'annotated_variant'];
             for (const key of checkGenomicFields) {
                 if (_.isUndefined(obj[key]) || obj[key].length === 0) {
-                    errorFields.push(key);
+                    errorFields.push('Genomic');
                 } else {
                     // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
                     errorFields = [];
@@ -147,7 +147,7 @@ export class PanelComponent implements OnInit {
                 'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'];
             for (const key of checkGenomicFields) {
                 if (_.isUndefined(obj[key]) || obj[key].length === 0) {
-                    errorFields.push(key);
+                    errorFields.push('Genomic');
                 } else {
                     // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
                     errorFields = [];
@@ -157,7 +157,7 @@ export class PanelComponent implements OnInit {
         }
         return errorFields;
     }
-    checkClinicalFields(obj: any) {
+    checkTrialClinicalFields(obj: any) {
         let errorFields = [];
         // Check clinical input fields
         for (const key of this.clinicalFields) {
@@ -166,14 +166,14 @@ export class PanelComponent implements OnInit {
                    if ((_.isUndefined(obj['sub_type']) || obj['sub_type'].length === 0) &&
                     (_.isUndefined(obj['main_type']) || obj['main_type'].length === 0)) {
                        // TODO: Remove main_type and sub_type after they are replaced by oncotree_primary_diagnosis
-                       errorFields.push(key);
+                       errorFields.push('Clinical');
                    } else {
                        // If any one of those clinical fields is not empty, the clinical node is valid and can be added.
                        errorFields = [];
                        return errorFields;
                    }
                 } else {
-                    errorFields.push(key);
+                    errorFields.push('Clinical');
                 }
             } else {
                 // If any one of those clinical fields is not empty, the clinical node is valid and can be added.
@@ -188,27 +188,27 @@ export class PanelComponent implements OnInit {
         let emptyFields = [];
         switch (type) {
         case 'Genomic':
-            emptyFields = _.union(emptyFields, this.checkGenomicFields(this.genomicInput));
+            emptyFields = _.union(emptyFields, this.checkTrialGenomicFields(this.genomicInput));
             break;
         case 'Clinical':
-            emptyFields = _.union(emptyFields, this.checkClinicalFields(this.clinicalInput));
+            emptyFields = _.union(emptyFields, this.checkTrialClinicalFields(this.clinicalInput));
             break;
         case 'And':
         case 'Or':
             for (let item of this.selectedItems) {
                 switch (item.itemName) {
                     case 'Genomic':
-                        emptyFields = _.union(emptyFields, this.checkGenomicFields(this.genomicInput));
+                        emptyFields = _.union(emptyFields, this.checkTrialGenomicFields(this.genomicInput));
                         break;
                     case 'Clinical':
-                        emptyFields = _.union(emptyFields, this.checkClinicalFields(this.clinicalInput));
+                        emptyFields = _.union(emptyFields, this.checkTrialClinicalFields(this.clinicalInput));
                         break;
                 }
             }
             break;
         }
         if (emptyFields.length > 0) {
-            alert("Please fill empty fields:\n" + _.uniq(emptyFields).join('  '));
+            alert("Please enter information in " + _.uniq(emptyFields).join(' and ') + ' section(s)!');
         }
         return emptyFields;
     }
