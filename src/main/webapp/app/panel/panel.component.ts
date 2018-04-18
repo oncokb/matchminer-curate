@@ -208,7 +208,14 @@ export class PanelComponent implements OnInit {
             break;
         }
         if (emptyFields.length > 0) {
-            alert("Please enter information in " + _.uniq(emptyFields).join(' and ') + ' section(s)!');
+            emptyFields = _.uniq(emptyFields);
+            let warnMessage = "Please enter information in " + emptyFields.join(' and ');
+            if (emptyFields.length > 1) {
+                warnMessage += ' sections!';
+            } else {
+                warnMessage += ' section!';
+            }
+            alert(warnMessage);
         }
         return emptyFields;
     }
