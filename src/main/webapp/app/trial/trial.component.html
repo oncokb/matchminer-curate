@@ -65,12 +65,14 @@
                 <input id="archive" type="radio" value="Yes" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
                 <label for="retrieve" style="color:green;margin-left:10px">No </label>
                 <input id="retrieve" type="radio" value="No" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
-            </span>            
+            </span>
             <br/><br/>
             <label for="nctId">NCT ID: </label>
             <span id="nctId" style="margin-left:10px">
                 <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{trialChosen.nct_id}}">{{ trialChosen.nct_id }}</a>
             </span>
+            <button class="btn btn-primary" [hidden]="!production || trialChosen.archived === 'Yes' || trialChosen.curation_status === 'In progress'" (click)="loadMongo()" style="margin-left: 10px;">Finish Curation</button>
+            <span style="margin-left: 20px;" [hidden]="!production || trialChosen.archived === 'Yes' || trialChosen.curation_status === 'In progress'" [style.color]="mongoMessageColor"> {{mongoMessage}} </span>
             <br/>
             <label for="phase">Phase: </label>
             <span id="phase" style="margin-left:10px">{{ trialChosen.phase }}</span>
@@ -110,7 +112,7 @@
                         <i class="fa fa-pencil noteEdit" aria-hidden="true"></i>: Edit
                     </p>
                     <p>Click (<i class="fa fa-exchange noteExchange"></i>) to switch logic between "and" and "or"</p>
-                    <p>Click (<i class="fa fa-arrows noteMove" aria-hidden="true"></i>) to move this section; click again to cancel. 
+                    <p>Click (<i class="fa fa-arrows noteMove" aria-hidden="true"></i>) to move this section; click again to cancel.
                         Click (<i class="fa fa-arrows noteDestination" aria-hidden="true"></i>) to use as your destination.</p>
                 </div>
             </div>

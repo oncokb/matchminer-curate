@@ -33,7 +33,7 @@ spring:
     data:
         mongodb:
             uri: mongodb://localhost:27017
-            database: matchminerCurate
+            database: matchminer
     mail:
         host: localhost
         port: 25
@@ -123,3 +123,7 @@ jhipster:
 # ===================================================================
 
 application:
+    matchengine:
+        absolute-path: ${CATALINA_HOME}/webapps/matchminer-engine
+        git-url: https://github.com/victoria34/matchminer-engine.git
+        branch: oncokb-variant

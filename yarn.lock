@@ -359,6 +359,10 @@ angular2-multiselect-dropdown@^2.3.0:
   dependencies:
     font-awesome "*"
 
+angular2-select@^1.0.0-beta.3:
+  version "1.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/angular2-select/-/angular2-select-1.0.0-beta.3.tgz#9010e9683f2563a493acca1cd11658bbe0c28b98"
+
 angular2-template-loader@0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/angular2-template-loader/-/angular2-template-loader-0.6.2.tgz#c0d44e90fff0fac95e8b23f043acda7fd1c51d7c"

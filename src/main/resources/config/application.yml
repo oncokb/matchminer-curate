@@ -98,4 +98,9 @@ jhipster:
 # http://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
+# Everything changed in here should also be changed in src/test/resources/config/application.yml
 application:
+    matchengine:
+        absolute-path:
+        git-url:
+        branch:
