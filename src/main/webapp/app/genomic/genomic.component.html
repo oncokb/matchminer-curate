@@ -19,7 +19,12 @@
                 <input id="no_annotated_variant1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_annotated_variant" />
             </div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search"/>
+                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search" (change)="checkGenomicFields()"/>
+            </div>
+        </div>
+        <div class="row borderMargin" *ngIf="checkFieldsMessage.content.length > 0">
+            <div class="col-sm-12">
+                <span [style.color]="checkFieldsMessage.color">{{ checkFieldsMessage.content}}</span>
             </div>
         </div>
         <div class="row borderMargin">
@@ -38,7 +43,7 @@
                     <input id="no_variant_category1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_variant_category" />
                 </div>
                 <div class="col-sm-8">
-                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category" (change)="checkGenomicFields()">
                         <option *ngFor="let item of variant_categorys" [value]="item">{{item}}</option>
                     </select>
                 </div>
@@ -50,7 +55,7 @@
                     <input id="no_protein_change1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_protein_change" />
                 </div>
                 <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.protein_change" size="36" />
+                    <input [(ngModel)]="genomicInput.protein_change" size="36" (change)="checkGenomicFields()"/>
                 </div>
             </div>
             <div class="row borderMargin">
@@ -61,7 +66,7 @@
                     />
                 </div>
                 <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.wildcard_protein_change" size="36" />
+                    <input [(ngModel)]="genomicInput.wildcard_protein_change" size="36" (change)="checkGenomicFields()"/>
                 </div>
             </div>
             <div class="row borderMargin">
@@ -72,7 +77,7 @@
                     />
                 </div>
                 <div class="col-sm-8">
-                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_classification">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_classification" (change)="checkGenomicFields()">
                         <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
                     </select>
                 </div>
@@ -84,7 +89,7 @@
                     <input id="no_exon1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_exon" />
                 </div>
                 <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.exon" size="36" />
+                    <input [(ngModel)]="genomicInput.exon" size="36" (change)="checkGenomicFields()"/>
                 </div>
             </div>
             <div class="row borderMargin">
@@ -94,13 +99,13 @@
                     <input id="no_cnv_call1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_cnv_call" />
                 </div>
                 <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.cnv_call" size="36" />
+                    <input [(ngModel)]="genomicInput.cnv_call" size="36" (change)="checkGenomicFields()"/>
                 </div>
             </div>
             <div class="row borderMargin">
                 <div class="col-sm-4">wildtype:</div>
                 <div class="col-sm-8">
-                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.wildtype">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.wildtype" (change)="checkGenomicFields()">
                         <option *ngFor="let item of wiltypes" [value]="item">{{item}}</option>
                     </select>
                 </div>
@@ -132,7 +137,12 @@
                 <input id="no_annotated_variant2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_annotated_variant" />
             </div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search"/>
+                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search" (change)="checkGenomicFields()"/>
+            </div>
+        </div>
+        <div class="row borderMargin" *ngIf="checkFieldsMessage.content.length > 0">
+            <div class="col-sm-12">
+                <span [style.color]="checkFieldsMessage.color">{{ checkFieldsMessage.content}}</span>
             </div>
         </div>
         <div class="row borderMargin">
@@ -151,7 +161,7 @@
                     <input id="no_variant_category2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_variant_category" />
                 </div>
                 <div class="col-sm-8">
-                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_category" (change)="checkGenomicFields()">
                         <option *ngFor="let item of variant_categorys" [value]="item">{{item}}</option>
                     </select>
                 </div>
@@ -163,7 +173,7 @@
                     <input id="no_protein_change2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_protein_change" />
                 </div>
                 <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.protein_change" size="36" />
+                    <input [(ngModel)]="genomicInput.protein_change" size="36" (change)="checkGenomicFields()"/>
                 </div>
             </div>
             <div class="row borderMargin">
@@ -173,7 +183,7 @@
                     <input id="no_wildcard_protein_change2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_wildcard_protein_change" />
                 </div>
                 <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.wildcard_protein_change" size="36" />
+                    <input [(ngModel)]="genomicInput.wildcard_protein_change" size="36" (change)="checkGenomicFields()"/>
                 </div>
             </div>
             <div class="row borderMargin">
@@ -183,7 +193,7 @@
                     <input id="no_variant_classification2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_variant_classification" />
                 </div>
                 <div class="col-sm-8">
-                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_classification">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.variant_classification" (change)="checkGenomicFields()">
                         <option *ngFor="let item of variant_classifications" [value]="item">{{item}}</option>
                     </select>
                 </div>
@@ -195,7 +205,7 @@
                     <input id="no_exon2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_exon" />
                 </div>
                 <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.exon" size="36" />
+                    <input [(ngModel)]="genomicInput.exon" size="36" (change)="checkGenomicFields()"/>
                 </div>
             </div>
             <div class="row borderMargin">
@@ -205,13 +215,13 @@
                     <input id="no_cnv_call2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_cnv_call" />
                 </div>
                 <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.cnv_call" size="36" />
+                    <input [(ngModel)]="genomicInput.cnv_call" size="36" (change)="checkGenomicFields()"/>
                 </div>
             </div>
             <div class="row borderMargin">
                 <div class="col-sm-4">wildtype:</div>
                 <div class="col-sm-8">
-                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.wildtype">
+                    <select class="form-control selectStyle" [(ngModel)]="genomicInput.wildtype" (change)="checkGenomicFields()">
                         <option *ngFor="let item of wiltypes" [value]="item">{{item}}</option>
                     </select>
                 </div>
