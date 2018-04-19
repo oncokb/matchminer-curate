@@ -420,6 +420,7 @@ export class PanelComponent implements OnInit {
             let armToAdd: Arm = {
                 arm_name: this.unit['arm_name'],
                 arm_description: this.unit['arm_description'],
+                eligibility: this.unit['eligibility'],
                 match: this.unit['match']
             };
             this.trialService.setArmInput(armToAdd);
@@ -484,8 +485,7 @@ export class PanelComponent implements OnInit {
         this.operationPool['editing'] = false;
     }
     saveModification() {
-        let updateDone = this.modifyNode('update');
-        if (updateDone) {
+        if (this.modifyNode('update')) {
             this.operationPool['currentPath'] = '';
             this.operationPool['editing'] = false;
         }
@@ -586,6 +586,7 @@ export class PanelComponent implements OnInit {
             let armToAdd: Arm = {
                 arm_name: this.armInput.arm_name,
                 arm_description: this.armInput.arm_description,
+                eligibility: this.armInput.eligibility,
                 match: []
             };
             this.originalArms.push(armToAdd);
@@ -596,6 +597,7 @@ export class PanelComponent implements OnInit {
             const tempIndex = this.path.split(',')[1].trim();
             this.originalArms[tempIndex].arm_name = this.armInput['arm_name'];
             this.originalArms[tempIndex].arm_description = this.armInput['arm_description'];
+            this.originalArms[tempIndex].eligibility = this.armInput['eligibility'];
         }
     }
 }
