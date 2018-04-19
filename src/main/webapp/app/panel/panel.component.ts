@@ -113,13 +113,25 @@ export class PanelComponent implements OnInit {
             }
         }
     }
+    getNodeType(type: string) {
+        if (this.arm) {
+            return 'Arm';
+        } else if (_.isUndefined(type) || type.length === 0) {
+            let keys = _.keys(this.unit);
+            if (keys.length === 1) {
+                return keys[0].replace(/\b\w/g, l => l.toUpperCase());
+            }
+        }
+        return type;
+    }
     modifyNode(type: string) {
         let result = true;
         // validate the need to proceed
         if (type === 'delete') {
             result = confirm('This will delete the entire section. Are you sure you want to proceed?');
         }
-        let hasEmptySections = this.hasEmptySections(this.nodeType);
+        let nodeType = this.getNodeType(this.nodeType);
+        let hasEmptySections = this.hasEmptySections(nodeType);
         if (result && !hasEmptySections) {
             if (this.arm === true) {
                 this.modifyArmGroup(type);
@@ -128,6 +140,9 @@ export class PanelComponent implements OnInit {
                 this.modifyData(this.dataToModify, this.finalPath, type);  
             }
             this.saveBacktoDB();
+            return true;
+        } else {
+            return false;
         }
     }
     hasEmptyGenomicFields(obj: any) {
@@ -140,17 +155,22 @@ export class PanelComponent implements OnInit {
                 return false;
             }
         }
-        
         return true;
     }
     hasEmptyClinicalFields(obj: any) {
         // Check clinical input fields
-        // TODO: Remove sub_type and main_type after we remove main_type input field
-        let clinicalFieldsToCheck = _.union(this.clinicalFields, ['sub_type', 'main_type']);
+        // TODO: Use clinicalFields to replace the array after we remove main_type input field
+        let clinicalFieldsToCheck = ['age_numerical', 'sub_type', 'main_type'];
         for (const key of clinicalFieldsToCheck) {
             if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
                 return false;
             }
+        }
+        return true;
+    }
+    hasEmptyArmFields(obj: any) {
+        if (!_.isUndefined(obj['arm_name']) && obj['arm_name'].length > 0) {
+            return false;
         }
         return true;
     }
@@ -164,6 +184,11 @@ export class PanelComponent implements OnInit {
         case 'Clinical':
             if (this.hasEmptyClinicalFields(this.clinicalInput)) {
                 emptySections.push('Clinical');
+            }
+            break;
+        case 'Arm':
+            if (this.hasEmptyArmFields(this.armInput)) {
+                emptySections.push('Arm');
             }
             break;
         case 'And':
@@ -362,7 +387,6 @@ export class PanelComponent implements OnInit {
                     }
                     obj.push(tempObj2);
                     break;
-
             }
         } else {
             obj.push(this.dataBlockToMove);
@@ -460,9 +484,11 @@ export class PanelComponent implements OnInit {
         this.operationPool['editing'] = false;
     }
     saveModification() {
-        this.operationPool['currentPath'] = '';
-        this.operationPool['editing'] = false;
-        this.modifyNode('update');
+        let updateDone = this.modifyNode('update');
+        if (updateDone) {
+            this.operationPool['currentPath'] = '';
+            this.operationPool['editing'] = false;
+        }
     }
     dropDownNode() {
         this.operationPool['relocate'] = false;
