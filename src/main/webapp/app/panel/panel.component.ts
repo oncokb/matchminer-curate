@@ -132,57 +132,27 @@ export class PanelComponent implements OnInit {
         }
     }
     checkTrialGenomicFields(obj: any) {
-        let hasErrorFields = false;
-        if (this.oncokb) {
-            for (const key of this.oncokbGenomicFields) {
-                if (_.isUndefined(obj[key]) || obj[key].length === 0) {
-                    hasErrorFields = true;
-                } else {
-                    // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
-                    hasErrorFields = false;
-                    return hasErrorFields;
-                }
-            }
-        } else {
-            for (const key of this.genomicFields) {
-                if (key !== 'matching_examples') {
-                    if (_.isUndefined(obj[key]) || obj[key].length === 0) {
-                        hasErrorFields = true;
-                    } else {
-                        // If any one of those genomic fields is not empty, the genomic node is valid and can be added.
-                        hasErrorFields = false;
-                        return hasErrorFields;
-                    }
-                }
-            }
+        let genomicFieldsToCheck = this.oncokbGenomicFields;
+        if (!this.oncokb) {
+            genomicFieldsToCheck = _.without(this.genomicFields, 'matching_examples');
+        } 
+        for (const key of genomicFieldsToCheck) {
+            if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
+                return false;
         }
-        return hasErrorFields;
+        
+        return true;
     }
     checkTrialClinicalFields(obj: any) {
-        let hasErrorFields = false;
         // Check clinical input fields
+        // TODO: Remove sub_type and main_type after we remove main_type input field
+        let clinicalFieldsToCheck = _.union(this.clinicalFields, ['sub_type', 'main_type']);
         for (const key of this.clinicalFields) {
-            if (_.isUndefined(obj[key]) || obj[key].length === 0) {
-                if (key === 'oncotree_primary_diagnosis') {
-                   if ((_.isUndefined(obj['sub_type']) || obj['sub_type'].length === 0) &&
-                    (_.isUndefined(obj['main_type']) || obj['main_type'].length === 0)) {
-                       // TODO: Remove main_type and sub_type after they are replaced by oncotree_primary_diagnosis
-                       hasErrorFields = true;
-                   } else {
-                       // If any one of those clinical fields is not empty, the clinical node is valid and can be added.
-                       hasErrorFields = false;
-                       return hasErrorFields;
-                   }
-                } else {
-                    hasErrorFields = true;
-                }
-            } else {
-                // If any one of those clinical fields is not empty, the clinical node is valid and can be added.
-                hasErrorFields = false;
-                return hasErrorFields;
+            if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
+                return false;
             }
         }
-        return hasErrorFields;
+        return true;
     }
     checkEmptyFields(type: string) {
         // Check genomic input fields
