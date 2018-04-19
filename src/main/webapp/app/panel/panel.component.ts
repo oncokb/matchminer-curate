@@ -130,7 +130,7 @@ export class PanelComponent implements OnInit {
             this.saveBacktoDB();
         }
     }
-    hasTrialGenomicFields(obj: any) {
+    hasEmptyGenomicFields(obj: any) {
         let genomicFieldsToCheck = this.oncokbGenomicFields;
         if (!this.oncokb) {
             genomicFieldsToCheck = _.without(this.genomicFields, 'matching_examples');
@@ -143,7 +143,7 @@ export class PanelComponent implements OnInit {
         
         return true;
     }
-    hasTrialClinicalFields(obj: any) {
+    hasEmptyClinicalFields(obj: any) {
         // Check clinical input fields
         // TODO: Remove sub_type and main_type after we remove main_type input field
         let clinicalFieldsToCheck = _.union(this.clinicalFields, ['sub_type', 'main_type']);
@@ -157,12 +157,12 @@ export class PanelComponent implements OnInit {
     getEmptySectionNames(type: string, emptySections: Array<string>) {
         switch (type) {
         case 'Genomic':
-            if (this.hasTrialGenomicFields(this.genomicInput)) {
+            if (this.hasEmptyGenomicFields(this.genomicInput)) {
                 emptySections.push('Genomic');
             }
             break;
         case 'Clinical':
-            if (this.hasTrialClinicalFields(this.clinicalInput)) {
+            if (this.hasEmptyClinicalFields(this.clinicalInput)) {
                 emptySections.push('Clinical');
             }
             break;
@@ -177,8 +177,7 @@ export class PanelComponent implements OnInit {
     }
     hasEmptySections(type: string) {
         // Check genomic input fields
-        let emptySections = [];
-        emptySections  = this.getEmptySectionNames(type, emptySections);
+        let emptySections = this.getEmptySectionNames(type, []);
         if (emptySections.length > 0) {
             emptySections = _.uniq(emptySections);
             let warnMessage = "Please enter information in " + emptySections.join(' and ');
@@ -188,7 +187,7 @@ export class PanelComponent implements OnInit {
                 warnMessage += ' section!';
             }
             alert(warnMessage);
-            return true
+            return true;
         }
         return false;
     }
