@@ -139,6 +139,7 @@ export class PanelComponent implements OnInit {
         for (const key of genomicFieldsToCheck) {
             if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
                 return false;
+            }
         }
         
         return true;
@@ -147,7 +148,7 @@ export class PanelComponent implements OnInit {
         // Check clinical input fields
         // TODO: Remove sub_type and main_type after we remove main_type input field
         let clinicalFieldsToCheck = _.union(this.clinicalFields, ['sub_type', 'main_type']);
-        for (const key of this.clinicalFields) {
+        for (const key of clinicalFieldsToCheck) {
             if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
                 return false;
             }
