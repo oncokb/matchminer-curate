@@ -1,4 +1,3 @@
-
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { AngularFireDatabase, AngularFireObject, AngularFireList } from 'angularfire2/database';
@@ -120,8 +119,8 @@ export class PanelComponent implements OnInit {
         if (type === 'delete') {
             result = confirm('This will delete the entire section. Are you sure you want to proceed?');
         }
-        let hasEmptyFields = this.checkEmptyFields(this.nodeType);
-        if (result && !hasEmptyFields) {
+        let hasEmptySections = this.hasEmptySections(this.nodeType);
+        if (result && !hasEmptySections) {
             if (this.arm === true) {
                 this.modifyArmGroup(type);
             } else {
@@ -131,7 +130,7 @@ export class PanelComponent implements OnInit {
             this.saveBacktoDB();
         }
     }
-    checkTrialGenomicFields(obj: any) {
+    hasTrialGenomicFields(obj: any) {
         let genomicFieldsToCheck = this.oncokbGenomicFields;
         if (!this.oncokb) {
             genomicFieldsToCheck = _.without(this.genomicFields, 'matching_examples');
@@ -144,7 +143,7 @@ export class PanelComponent implements OnInit {
         
         return true;
     }
-    checkTrialClinicalFields(obj: any) {
+    hasTrialClinicalFields(obj: any) {
         // Check clinical input fields
         // TODO: Remove sub_type and main_type after we remove main_type input field
         let clinicalFieldsToCheck = _.union(this.clinicalFields, ['sub_type', 'main_type']);
@@ -155,51 +154,43 @@ export class PanelComponent implements OnInit {
         }
         return true;
     }
-    checkEmptyFields(type: string) {
-        // Check genomic input fields
-        let emptyFields = [];
-        let hasEmptyFields = false;
+    getEmptySectionNames(type: string, emptySections: Array<string>) {
         switch (type) {
         case 'Genomic':
-            if (this.checkTrialGenomicFields(this.genomicInput)) {
-                emptyFields.push('Genomic');
+            if (this.hasTrialGenomicFields(this.genomicInput)) {
+                emptySections.push('Genomic');
             }
             break;
         case 'Clinical':
-            if (this.checkTrialClinicalFields(this.clinicalInput)) {
-                emptyFields.push('Clinical');
+            if (this.hasTrialClinicalFields(this.clinicalInput)) {
+                emptySections.push('Clinical');
             }
             break;
         case 'And':
         case 'Or':
             for (let item of this.selectedItems) {
-                switch (item.itemName) {
-                    case 'Genomic':
-                        if (this.checkTrialGenomicFields(this.genomicInput)) {
-                            emptyFields.push('Genomic');
-                        }
-                        break;
-                    case 'Clinical':
-                        if (this.checkTrialClinicalFields(this.clinicalInput)) {
-                            emptyFields.push('Clinical');
-                        }
-                        break;
-                }
+                this.getEmptySectionNames(item.itemName, emptySections);
             }
             break;
         }
-        if (emptyFields.length > 0) {
-            hasEmptyFields = true;
-            emptyFields = _.uniq(emptyFields);
-            let warnMessage = "Please enter information in " + emptyFields.join(' and ');
-            if (emptyFields.length > 1) {
+        return emptySections;
+    }
+    hasEmptySections(type: string) {
+        // Check genomic input fields
+        let emptySections = [];
+        emptySections  = this.getEmptySectionNames(type, emptySections);
+        if (emptySections.length > 0) {
+            emptySections = _.uniq(emptySections);
+            let warnMessage = "Please enter information in " + emptySections.join(' and ');
+            if (emptySections.length > 1) {
                 warnMessage += ' sections!';
             } else {
                 warnMessage += ' section!';
             }
             alert(warnMessage);
+            return true
         }
-        return hasEmptyFields;
+        return false;
     }
     saveBacktoDB() {
         this.trialService.getTrialRef(this.nctIdChosen).set({
