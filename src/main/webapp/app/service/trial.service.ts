@@ -54,7 +54,7 @@ export class TrialService {
     armInput: Arm = {
         arm_name: '',
         arm_description: '',
-        eligibility: '',
+        arm_eligibility: '',
         match: []
     };
     private armInputSource = new BehaviorSubject<Arm>(this.armInput);

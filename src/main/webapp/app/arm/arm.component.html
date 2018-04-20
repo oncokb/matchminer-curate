@@ -7,9 +7,9 @@
     <div class="armContent">
         <textarea id="description" rows="3" cols="100" [(ngModel)]="armInput.arm_description"></textarea>
     </div>
-    <span class="indent1">-eligibility: </span><br/>
+    <span class="indent1">-arm eligibility: </span><br/>
     <div class="armContent">
-        <textarea id="eligibility" rows="3" cols="100" [(ngModel)]="armInput.eligibility"></textarea>
+        <textarea id="arm-eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
     </div>
 </div>
 <ng-template #dispalyArm>
@@ -17,7 +17,7 @@
     <span class="armContent">{{unit.arm_name}}</span><br/>
     <span class="indent1">-arm description: </span><br/>
     <div class="armContent">{{unit.arm_description}}</div>
-    <span class="indent1">-eligibility: </span><br/>
-    <div class="armContent">{{unit.eligibility}}</div>
+    <span class="indent1">-arm eligibility: </span><br/>
+    <div class="armContent">{{unit.arm_eligibility}}</div>
 </ng-template>
 
