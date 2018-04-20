@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(value = "trials", description = "the trials API")
+@Api(value = "trials", description = "Trials Resource")
 public interface TrialsApi {
 
     @ApiOperation(value = "", notes = "Load trial data into Mongo DB.", response = Void.class, tags={ })
@@ -25,7 +25,7 @@ public interface TrialsApi {
     @RequestMapping(value = "/trials/create",
         consumes = {"application/json"},
         method = RequestMethod.POST)
-    ResponseEntity<Void> loadTrial(@ApiParam(value = "a trial json object ", required = true) @RequestBody TrialJson body);
+    ResponseEntity<Void> loadTrial(@ApiParam(value = "A trial json object.", required = true) @RequestBody TrialJson body);
 
 
     @ApiOperation(value = "", notes = "Match trial in Mongo DB to patient", response = MatchTrialResult.class, tags={ })
@@ -37,6 +37,6 @@ public interface TrialsApi {
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    ResponseEntity<MatchTrialResult> matchTrial(@ApiParam(value = "clinical and genomic data of a patient", required = true) @RequestBody Patient body);
+    ResponseEntity<MatchTrialResult> matchTrial(@ApiParam(value = "Clinical and genomic data of a patient.", required = true) @RequestBody Patient body);
 
 }

@@ -1,7 +1,9 @@
 package org.mskcc.oncokb.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -10,12 +12,18 @@ import java.util.List;
 
 public class Patient {
     @JsonProperty("id")
+    @ApiModelProperty(required = true, value = "", example = "id1")
+    @NotNull
     String id;
 
     @JsonProperty("clinical")
+    @ApiModelProperty(required = true, value = "")
+    @NotNull
     Clinical clinical;
 
     @JsonProperty("genomics")
+    @ApiModelProperty(required = true, value = "")
+    @NotNull
     List<Genomic> genomics;
 
     public String getId() {

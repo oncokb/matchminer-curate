@@ -1,6 +1,7 @@
 package org.mskcc.oncokb.controller;
 
 import com.mongodb.client.MongoDatabase;
+import io.swagger.annotations.ApiParam;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,7 +46,7 @@ public class TrialsController implements TrialsApi {
     @RequestMapping(value = "/trials/create",
         consumes = {"application/json"},
         method = RequestMethod.POST)
-    public ResponseEntity<Void> loadTrial(@RequestBody(required = true) TrialJson body) {
+    public ResponseEntity<Void> loadTrial(@ApiParam(value = "A trial json object.", required = true) @RequestBody(required = true)  TrialJson body) {
         // check if MatchEngine is accessible.
         if (this.matchengineAbsolutePath == null || this.matchengineAbsolutePath.length() == 0 ) {
             log.error("Cannot' find matchminer-engine path!");
@@ -105,7 +106,7 @@ public class TrialsController implements TrialsApi {
         consumes = {"application/json"},
         produces = {"application/json"},
         method = RequestMethod.POST)
-    public ResponseEntity<MatchTrialResult> matchTrial(@RequestBody(required = true) Patient body) {
+    public ResponseEntity<MatchTrialResult> matchTrial(@ApiParam(value = "Clinical and genomic data of a patient.", required = true) @RequestBody Patient body) {
         // check if MatchEngine is accessible.
         if (this.matchengineAbsolutePath == null || this.matchengineAbsolutePath.length() == 0 ) {
             log.error("Cannot' find matchminer-engine path!");

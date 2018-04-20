@@ -74,14 +74,9 @@ public class MongoUtil {
     }
 
     public static String getPureMongoUri(String uri) {
-        String pureUri = "";
         if(uri.contains("?authMode=scram-sha1")) {
-            pureUri = uri.replace("?authMode=scram-sha1", "");
-        } else {
-            pureUri = uri;
+            uri = uri.replace("?authMode=scram-sha1", "");
         }
-        System.out.println("\n\nmongo uri: " + uri);
-        System.out.println("\n\npure mongo uri: " + pureUri + "\n\n");
-        return pureUri;
+        return uri;
     }
 }

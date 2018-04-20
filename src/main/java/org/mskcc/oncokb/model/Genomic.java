@@ -1,8 +1,10 @@
 package org.mskcc.oncokb.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,20 +14,36 @@ import java.util.List;
 
 public class Genomic implements java.io.Serializable{
 
+    @ApiModelProperty(required = true, value = "", example = "TCGA-D3-A5GT-01")
+    @NotNull
     private String sampleId;
+    @ApiModelProperty(example = "BRAF")
     private String trueHugoSymbol;
+    @ApiModelProperty(example = "D143G")
     private String trueProteinChange;
+    @ApiModelProperty(example = "Missense_Mutation")
     private String trueVariantClassification;
+    @ApiModelProperty(example = "MUTATION")
     private String variantCategory;
+    @ApiModelProperty(example = " ")
     private String cnvCall;
+    @ApiModelProperty(example = "false")
     private Boolean wildtype;
+    @ApiModelProperty(example = "chr7")
     private String chromosome;
+    @ApiModelProperty(example = "140534485")
     private String position;
+    @ApiModelProperty(example = "T325C")
     private String trueCdnaChange;
+    @ApiModelProperty(example = "T")
     private String referenceAllele;
+    @ApiModelProperty(example = "14")
     private Integer trueTranscriptExon;
+    @ApiModelProperty(example = "-")
     private String canonicalStand;
+    @ApiModelProperty(example = "0.7180051974024381")
     private Double alleleFraction;
+    @ApiModelProperty(example = "2")
     private Integer tier;
     @JsonIgnore
     private List<String> oncokbVariant;

@@ -6,6 +6,9 @@ info:
   version: 0.0.1
 schemes:
 - "http"
+tags:
+- name: "trials"
+  description: "Trials Resource"
 paths:
   '/trials/create':
     post:
@@ -46,9 +49,12 @@ paths:
           schema:
             type: object
             required:
+              - id
               - clinical
               - genomics
             properties:
+              id:
+                type: string
               clinical:
                 type: object
               genomics:

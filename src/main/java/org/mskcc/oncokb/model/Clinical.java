@@ -1,8 +1,10 @@
 package org.mskcc.oncokb.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,15 +14,26 @@ import java.util.List;
 
 public class Clinical implements java.io.Serializable {
 
+    @ApiModelProperty(required = true, value = "", example = "TCGA-D3-A5GT-01")
+    @NotNull
     private String sampleId;
+    @ApiModelProperty(example = "Parker Swinford [fake] M.D.")
     private String ordPhysicianName;
+    @ApiModelProperty(example = "Parker@fake_email.com")
     private String ordPhysicianEmail;
+    @ApiModelProperty(example = "Melanoma")
     private String oncotreePrimaryDiagnosisName;
+    @ApiModelProperty(example = "2015-06-15")
     private String reportDate; // format: yyyy-mm-dd
+    @ApiModelProperty(example = "alive")
     private String vitalStatus;
+    @ApiModelProperty(example = "Shirley Kavanagh[Fake]")
     private String firstLast;
+    @ApiModelProperty(example = "1975-03-01")
     private String birthDate; // format: yyyy-mm-dd
+    @ApiModelProperty(example = "mrn123")
     private Integer mrn;
+    @ApiModelProperty(example = "Male")
     private String gender;
 
     public Clinical(){
