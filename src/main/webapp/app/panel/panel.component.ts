@@ -467,7 +467,7 @@ export class PanelComponent implements OnInit {
     preAddNode() {
         this.addNode = true;
         if (this.arm === true) {
-            this.clearInputForm(['arm_name', 'arm_description'], 'arm');
+            this.clearInputForm(['arm_name', 'arm_description', 'arm_eligibility'], 'arm');
         }
     }
     moveNode() {
