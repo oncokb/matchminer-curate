@@ -58,6 +58,12 @@
         <div style="margin-top: -20px; margin-left:150px">
             <textarea id="description" rows="3" cols="100" [(ngModel)]="armInput.arm_description"></textarea>
         </div>
+        <div>
+            <label style="width:150px" for="eligibility">arm eligibility: </label>
+        </div>
+        <div style="margin-top: -20px; margin-left:150px">
+            <textarea id="eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
+        </div>
         <button class="btn btn-success addButon" (click)="modifyNode('add')">Add</button>
         <button class="btn btn-warning cancelButton" (click)="clearInput()">Cancel</button>
     </ng-template>
