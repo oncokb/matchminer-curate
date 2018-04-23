@@ -62,6 +62,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
 
     importTrials() {
+        this.mongoMessage = "";
         this.messages = [];
         const newTrials: Array<string>  = this.trialsToImport.split(',');
         let setChosenTrial = false;
@@ -125,6 +126,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
 
     updateStatus(type: string) {
+        this.mongoMessage = "";
         if (type === 'curation') {
             this.db.object('Trials/' + this.nctIdChosen).update({
                 curation_status: this.trialChosen['curation_status']
