@@ -5,7 +5,8 @@ import { Title } from '@angular/platform-browser';
 import { TrialService } from '../../service/trial.service';
 @Component({
     selector: 'jhi-main',
-    templateUrl: './main.component.html'
+    templateUrl: './main.component.html',
+    styleUrls: ['main.scss']
 })
 export class JhiMainComponent implements OnInit {
     authorized = false;

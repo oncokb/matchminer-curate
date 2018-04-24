@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Patient {
     @JsonProperty("id")
-    @ApiModelProperty(required = true, value = "", example = "id1")
+    @ApiModelProperty(required = true, value = "", example = "TCGA-D3-A5GT")
     @NotNull
     String id;
 

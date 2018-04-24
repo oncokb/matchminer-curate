@@ -14,36 +14,36 @@ import java.util.List;
 
 public class Genomic implements java.io.Serializable{
 
-    @ApiModelProperty(required = true, value = "", example = "TCGA-D3-A5GT-01")
+    @ApiModelProperty(required = true, example = "TCGA-D3-A5GT-01")
     @NotNull
     private String sampleId;
     @ApiModelProperty(example = "BRAF")
     private String trueHugoSymbol;
-    @ApiModelProperty(example = "D143G")
+    @ApiModelProperty(example = "V600E")
     private String trueProteinChange;
-    @ApiModelProperty(example = "Missense_Mutation")
+    @ApiModelProperty(example = " ")
     private String trueVariantClassification;
-    @ApiModelProperty(example = "MUTATION")
+    @ApiModelProperty(example = " ")
     private String variantCategory;
     @ApiModelProperty(example = " ")
     private String cnvCall;
-    @ApiModelProperty(example = "false")
+    @ApiModelProperty(example = " ")
     private Boolean wildtype;
-    @ApiModelProperty(example = "chr7")
+    @ApiModelProperty(example = " ")
     private String chromosome;
-    @ApiModelProperty(example = "140534485")
+    @ApiModelProperty(example = " ")
     private String position;
-    @ApiModelProperty(example = "T325C")
+    @ApiModelProperty(example = " ")
     private String trueCdnaChange;
-    @ApiModelProperty(example = "T")
+    @ApiModelProperty(example = " ")
     private String referenceAllele;
-    @ApiModelProperty(example = "14")
+    @ApiModelProperty(example = " ")
     private Integer trueTranscriptExon;
-    @ApiModelProperty(example = "-")
+    @ApiModelProperty(example = " ")
     private String canonicalStand;
-    @ApiModelProperty(example = "0.7180051974024381")
+    @ApiModelProperty(example = " ")
     private Double alleleFraction;
-    @ApiModelProperty(example = "2")
+    @ApiModelProperty(example = " ")
     private Integer tier;
     @JsonIgnore
     private List<String> oncokbVariant;

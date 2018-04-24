@@ -1,0 +1,12 @@
+.wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border-radius: 0.15rem;
+    padding: 1.5%;
+    border: none;
+    min-height: 90vh;
+}

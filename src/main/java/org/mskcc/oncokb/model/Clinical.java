@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,21 +18,23 @@ public class Clinical implements java.io.Serializable {
     @ApiModelProperty(required = true, value = "", example = "TCGA-D3-A5GT-01")
     @NotNull
     private String sampleId;
-    @ApiModelProperty(example = "Parker Swinford [fake] M.D.")
+    @ApiModelProperty(example = " ")
     private String ordPhysicianName;
-    @ApiModelProperty(example = "Parker@fake_email.com")
+    @ApiModelProperty(example = " ")
     private String ordPhysicianEmail;
     @ApiModelProperty(example = "Melanoma")
     private String oncotreePrimaryDiagnosisName;
-    @ApiModelProperty(example = "2015-06-15")
+    @Pattern(regexp="/(\\d{4}[-]\\d{2}[-]\\d{2})/", message="Invalid report date format! Report date should be yyyy-mm-dd.")
+    @ApiModelProperty(example = "2018-03-01")
     private String reportDate; // format: yyyy-mm-dd
-    @ApiModelProperty(example = "alive")
+    @ApiModelProperty(example = " ")
     private String vitalStatus;
-    @ApiModelProperty(example = "Shirley Kavanagh[Fake]")
+    @ApiModelProperty(example = " ")
     private String firstLast;
+    @Pattern(regexp="/(\\d{4}[-]\\d{2}[-]\\d{2})/", message="Invalid birth date format! Birth date should be yyyy-mm-dd.")
     @ApiModelProperty(example = "1975-03-01")
     private String birthDate; // format: yyyy-mm-dd
-    @ApiModelProperty(example = "mrn123")
+    @ApiModelProperty(example = " ")
     private Integer mrn;
     @ApiModelProperty(example = "Male")
     private String gender;
