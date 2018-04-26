@@ -155,15 +155,12 @@ public class Clinical implements java.io.Serializable {
     @JsonIgnore
     public String getClinicalId() {
         String clinicalId = "";
-        if (this.mrn != null){
-            clinicalId = Integer.toString(this.mrn);
+        List<String> content = new ArrayList<>();
+        if (this.sampleId != null) {
+            content.add(this.sampleId);
         } else {
-            List<String> content = new ArrayList<>();
-            if (this.sampleId != null) {
-                content.add(this.sampleId);
-            } else {
-                content.add("");
-            }
+            content.add("");
+        }
 //            if (this.ordPhysicianName != null) {
 //                content.add(this.ordPhysicianName);
 //            } else {
@@ -174,38 +171,42 @@ public class Clinical implements java.io.Serializable {
 //            } else {
 //                content.add("");
 //            }
-            if (this.oncotreePrimaryDiagnosisName != null) {
-                content.add(this.oncotreePrimaryDiagnosisName);
-            } else {
-                content.add("");
-            }
+        if (this.oncotreePrimaryDiagnosisName != null) {
+            content.add(this.oncotreePrimaryDiagnosisName);
+        } else {
+            content.add("");
+        }
 //            if (this.reportDate != null) {
 //                content.add(this.reportDate);
 //            } else {
 //                content.add("");
 //            }
-            if (this.vitalStatus != null) {
-                content.add(this.vitalStatus);
-            } else {
-                content.add("");
-            }
-            if (this.firstLast != null) {
-                content.add(this.firstLast);
-            } else {
-                content.add("");
-            }
-            if (this.birthDate != null) {
-                content.add(this.birthDate);
-            } else {
-                content.add("");
-            }
-            if (this.gender != null) {
-                content.add(this.gender);
-            } else {
-                content.add("");
-            }
-            clinicalId = StringUtils.join(content.toArray(), "&");
+        if (this.vitalStatus != null) {
+            content.add(this.vitalStatus);
+        } else {
+            content.add("");
         }
+        if (this.firstLast != null) {
+            content.add(this.firstLast);
+        } else {
+            content.add("");
+        }
+        if (this.birthDate != null) {
+            content.add(this.birthDate);
+        } else {
+            content.add("");
+        }
+        if (this.gender != null) {
+            content.add(this.gender);
+        } else {
+            content.add("");
+        }
+        if (this.mrn != null) {
+            content.add(Integer.toString(this.mrn));
+        } else {
+            content.add("");
+        }
+        clinicalId = StringUtils.join(content.toArray(), "&");
 
         return clinicalId;
     }

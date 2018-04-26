@@ -139,7 +139,7 @@ public class TrialsController implements TrialsApi {
             JSONArray genomicArray = new JSONArray();
 
             JSONObject clinicalObject = new JSONObject();
-            clinicalObject.put("ONCOKB_CLINICAL_ID", clinical.getClinicalId());
+            clinicalObject.put("UNIQUE_CLINICAL_ID", clinical.getClinicalId());
             clinicalObject.put("SAMPLE_ID", clinical.getSampleId());
             clinicalObject.put("ORD_PHYSICIAN_NAME", clinical.getOrdPhysicianName());
             clinicalObject.put("ORD_PHYSICIAN_EMAIL", clinical.getOrdPhysicianEmail());
@@ -155,7 +155,7 @@ public class TrialsController implements TrialsApi {
 
             for(Genomic genomic: genomics){
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("ONCOKB_GENOMIC_ID", genomic.getGenomicId());
+                jsonObject.put("UNIQUE_GENOMIC_ID", genomic.getGenomicId());
                 jsonObject.put("SAMPLE_ID", genomic.getSampleId());
                 jsonObject.put("TRUE_HUGO_SYMBOL", genomic.getTrueHugoSymbol());
                 jsonObject.put("TRUE_PROTEIN_CHANGE", genomic.getTrueProteinChange());
@@ -274,14 +274,14 @@ public class TrialsController implements TrialsApi {
         Set<Document> matchedResults = new HashSet<>();
         for (Document doc: matchedRecordsSet) {
             for (int i = 0; i < genomicArray.length(); i++){
-                // "Not" trial_match records don't have "oncokb_genomic_id" so skip "Not" record.
+                // "Not" trial_match records don't have "unique_genomic_id" so skip "Not" record.
                 // "Not" trials should be rematch in matchminer-engine.
-                String oncokbGenomicId = doc.getString("oncokb_genomic_id");
-                if (oncokbGenomicId != null && oncokbGenomicId.equals(
-                    genomicArray.getJSONObject(i).getString("ONCOKB_GENOMIC_ID"))){
+                String uniqueGenomicId = doc.getString("unique_genomic_id");
+                if (uniqueGenomicId != null && uniqueGenomicId.equals(
+                    genomicArray.getJSONObject(i).getString("UNIQUE_GENOMIC_ID"))){
                     for (int j = 0; j < clinicalArray.length(); j++) {
-                        if (doc.getString("oncokb_clinical_id").equals(clinicalArray.getJSONObject(j)
-                            .getString("ONCOKB_CLINICAL_ID"))){
+                        if (doc.getString("unique_clinical_id").equals(clinicalArray.getJSONObject(j)
+                            .getString("UNIQUE_CLINICAL_ID"))){
                             matchedResults.add(doc);
                             if (matchedResults.size() == matchedRecordsSet.size()) {
                                 return new ArrayList<>(matchedResults);
