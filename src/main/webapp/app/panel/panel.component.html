@@ -52,6 +52,12 @@
             <label style="width: 150px; margin-right: -30px">arm name: </label>
             <input [(ngModel)]="armInput.arm_name" size="100"/>
         </div>
+         <div>
+            <label style="width: 150px; margin-right: -30px">arm status: </label>
+            <div style="min-width: 300px; display: inline-block; margin-top: 10px;">
+                <ng-select class="selectStyle" [options]="statusOptions" [(ngModel)]="armInput.arm_status" [allowClear]="true"></ng-select>
+            </div>
+        </div>
         <div>
             <label style="width:150px" for="description">arm description: </label>
         </div>

@@ -12,6 +12,7 @@ export class ArmComponent implements OnInit {
     @Input() path = '';
     operationPool: {};
     armInput: Arm;
+    statusOptions = this.trialService.getStatusOptions();
     constructor(private trialService: TrialService) { }
 
     ngOnInit() {

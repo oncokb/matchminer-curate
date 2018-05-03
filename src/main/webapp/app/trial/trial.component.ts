@@ -31,6 +31,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
   dtOptions: DataTables.Settings = {};
   dtTrigger: Subject<any> = new Subject();
   hideArchived = 'Yes';
+  statusOptions = this.trialService.getStatusOptions();
   constructor(public http: Http, private trialService: TrialService, public db: AngularFireDatabase) {
     this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
     this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);

@@ -37,7 +37,8 @@ export class PanelComponent implements OnInit {
     dataToModify = [];
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
     subToMainMapping = this.trialService.getSubToMainMapping();
-    mainTypesOptions = this.trialService.getMainTypesOptions(); 
+    mainTypesOptions = this.trialService.getMainTypesOptions();
+    statusOptions = this.trialService.getStatusOptions(); 
     isPermitted = true; 
     nctIdChosen:string;
     trialChosen: {};
@@ -419,6 +420,7 @@ export class PanelComponent implements OnInit {
         } else if (this.unit.hasOwnProperty('arm_name')) {
             let armToAdd: Arm = {
                 arm_name: this.unit['arm_name'],
+                arm_status: this.unit['arm_status'],
                 arm_description: this.unit['arm_description'],
                 arm_eligibility: this.unit['arm_eligibility'],
                 match: this.unit['match']
@@ -467,7 +469,7 @@ export class PanelComponent implements OnInit {
     preAddNode() {
         this.addNode = true;
         if (this.arm === true) {
-            this.clearInputForm(['arm_name', 'arm_description', 'arm_eligibility'], 'arm');
+            this.clearInputForm(['arm_name', 'arm_status', 'arm_description', 'arm_eligibility'], 'arm');
         }
     }
     moveNode() {
@@ -585,6 +587,7 @@ export class PanelComponent implements OnInit {
         if (type === 'add') {
             let armToAdd: Arm = {
                 arm_name: this.armInput.arm_name,
+                arm_status: this.armInput.arm_status,
                 arm_description: this.armInput.arm_description,
                 arm_eligibility: this.armInput.arm_eligibility,
                 match: []
@@ -596,6 +599,7 @@ export class PanelComponent implements OnInit {
         } else if (type === 'update') {
             const tempIndex = this.path.split(',')[1].trim();
             this.originalArms[tempIndex].arm_name = this.armInput['arm_name'];
+            this.originalArms[tempIndex].arm_status = this.armInput['arm_status'];
             this.originalArms[tempIndex].arm_description = this.armInput['arm_description'];
             this.originalArms[tempIndex].arm_eligibility = this.armInput['arm_eligibility'];
         }
