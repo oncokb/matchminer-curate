@@ -49,7 +49,7 @@
       <br/>
     <div id="trialDetail"><br/></div>
     <div *ngIf="nctIdChosen" style="margin-bottom: 100px">
-        <hr />
+        <hr>
         <div>
             <label for="curation_status">Curation Status:</label>
             <span id="curation_status">
@@ -78,7 +78,7 @@
             <label for="status">Status: </label>
             <span id="status" style="margin-left:10px">
                 <div style="min-width: 300px; display: inline-block">
-                    <ng-select class="selectStyle" [options]="statusOptions" [(ngModel)]="trialChosen.status" (selected)="updateTrialStatusInDB($event)"></ng-select>
+                    <ng-select class="selectStyle" [options]="statusOptions" [(ngModel)]="trialChosen.status" (selected)="updateTrialStatusInDB()"></ng-select>
                 </div>
             </span>
             <br/>

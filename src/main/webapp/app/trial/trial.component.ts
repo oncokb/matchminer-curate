@@ -81,8 +81,10 @@ export class TrialComponent implements OnInit, AfterViewInit{
                if (arm.arm_type !== null && arm.arm_description !== null) {
                     armsInfo.push({
                         arm_name: arm.arm_name,
+                        arm_status: '',
                         arm_type: arm.arm_type,
                         arm_description: arm.arm_description,
+                        arm_eligibility: '',
                         match: []
                     });
                }
@@ -167,8 +169,8 @@ export class TrialComponent implements OnInit, AfterViewInit{
         });
       }
   }
-  updateTrialStatusInDB(option) {
-      this.trialService.getTrialRef(this.nctIdChosen, 'status').set(option.value).then(result => {
+  updateTrialStatusInDB() {
+      this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
           console.log("Save to DB Successfully!");
       }).catch(error => {
           console.log('Failed to save to DB ', error);
