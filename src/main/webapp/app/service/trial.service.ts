@@ -53,6 +53,7 @@ export class TrialService {
 
     armInput: Arm = {
         arm_name: '',
+        arm_status: '',
         arm_description: '',
         arm_eligibility: '',
         match: []
@@ -67,6 +68,17 @@ export class TrialService {
     {value: 'All Liquid Tumors', label: 'All Liquid Tumors'},
     {value: 'All Tumors', label: 'All Tumors'},
     {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
+    statusOptions = [{label:'Active', value: 'Active'},
+        {label:'Administratively Complete', value: 'Administratively Complete'},
+        {label:'Approved', value: 'Approved'},
+        {label:'Closed to Accrual', value: 'Closed to Accrual'},
+        {label:'Closed to Accrual and Intervention', value: 'Closed to Accrual and Intervention'},
+        {label:'Complete', value: 'Complete'},
+        {label:'Enrolling by Invitation', value: 'Enrolling by Invitation'},
+        {label:'In Review', value: 'In Review'},
+        {label:'Temporarily Closed to Accrual', value: 'Temporarily Closed to Accrual'},
+        {label:'Temporarily Closed to Accrual and Intervention', value: 'Temporarily Closed to Accrual and Intervention'},
+        {label:'Withdrawn', value: 'Withdrawn'}];
     annotated_variants = {};
     trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
@@ -259,6 +271,9 @@ export class TrialService {
     getStyle(indent: number) {
         return { 'margin-left': (indent * 40) + 'px' };
     }
+    getStatusOptions() {
+        return this.statusOptions;
+    }
     getSubTypesOptions() {
         return this.subTypesOptions;
     }
@@ -274,7 +289,10 @@ export class TrialService {
     getOncokbVariants() {
         return this.annotated_variants;
     }
-    getTrialRef(nctId: string) {
+    getTrialRef(nctId: string, path?: string) {
+        if (!_.isUndefined(path) && !_.isEmpty(path)) {
+            return this.db.object('Trials/' + nctId + '/' + path);
+        }
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
     }
     getAPIUrl(type: string) {

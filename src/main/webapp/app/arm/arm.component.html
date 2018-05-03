@@ -3,6 +3,12 @@
     <div class="indent2">
         <input [(ngModel)]="armInput.arm_name" size="100"/>
     </div>
+    <span class="indent1">-arm status: </span><br/>
+    <div class="indent2">
+        <div style="min-width: 300px; display: inline-block">
+            <ng-select class="selectStyle" [options]="statusOptions" [(ngModel)]="armInput.arm_status" [allowClear]="true"></ng-select>
+        </div>
+    </div>
     <span class="indent1">-arm description: </span><br/>
     <div class="armContent">
         <textarea id="description" rows="3" cols="100" [(ngModel)]="armInput.arm_description"></textarea>
@@ -15,6 +21,8 @@
 <ng-template #dispalyArm>
     <br/>
     <span class="armContent">{{unit.arm_name}}</span><br/>
+    <span class="indent1">-arm status: </span><br/>
+    <div class="armContent">{{unit.arm_status}}</div>
     <span class="indent1">-arm description: </span><br/>
     <div class="armContent">{{unit.arm_description}}</div>
     <span class="indent1">-arm eligibility: </span><br/>

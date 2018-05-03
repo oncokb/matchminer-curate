@@ -31,6 +31,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
   dtOptions: DataTables.Settings = {};
   dtTrigger: Subject<any> = new Subject();
   hideArchived = 'Yes';
+  statusOptions = this.trialService.getStatusOptions();
   constructor(public http: Http, private trialService: TrialService, public db: AngularFireDatabase) {
     this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
     this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);
@@ -80,8 +81,10 @@ export class TrialComponent implements OnInit, AfterViewInit{
                if (arm.arm_type !== null && arm.arm_description !== null) {
                     armsInfo.push({
                         arm_name: arm.arm_name,
+                        arm_status: '',
                         arm_type: arm.arm_type,
                         arm_description: arm.arm_description,
+                        arm_eligibility: '',
                         match: []
                     });
                }
@@ -165,5 +168,13 @@ export class TrialComponent implements OnInit, AfterViewInit{
             this.dtTrigger.next();
         });
       }
-   }
+  }
+  updateTrialStatusInDB() {
+      this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
+          console.log("Save to DB Successfully!");
+      }).catch(error => {
+          console.log('Failed to save to DB ', error);
+      });
+  }
+
 }
