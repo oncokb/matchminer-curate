@@ -166,5 +166,13 @@ export class TrialComponent implements OnInit, AfterViewInit{
             this.dtTrigger.next();
         });
       }
-   }
+  }
+  updateTrialStatusInDB(option) {
+      this.trialService.getTrialRef(this.nctIdChosen, 'status').set(option.value).then(result => {
+          console.log("Save to DB Successfully!");
+      }).catch(error => {
+          console.log('Failed to save to DB ', error);
+      });
+  }
+
 }

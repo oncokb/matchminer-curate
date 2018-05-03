@@ -289,7 +289,10 @@ export class TrialService {
     getOncokbVariants() {
         return this.annotated_variants;
     }
-    getTrialRef(nctId: string) {
+    getTrialRef(nctId: string, path?: string) {
+        if (!_.isUndefined(path) && !_.isEmpty(path)) {
+            return this.db.object('Trials/' + nctId + '/' + path);
+        }
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
     }
     getAPIUrl(type: string) {
