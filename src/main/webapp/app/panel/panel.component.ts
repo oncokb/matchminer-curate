@@ -597,11 +597,22 @@ export class PanelComponent implements OnInit {
             const tempIndex = Number(this.path.split(',')[1].trim());
             this.originalArms.splice(tempIndex, 1);
         } else if (type === 'update') {
+            this.setFieldDefaultValue(_.keys(this.armInput), 'arm');
             const tempIndex = this.path.split(',')[1].trim();
             this.originalArms[tempIndex].arm_name = this.armInput['arm_name'];
             this.originalArms[tempIndex].arm_status = this.armInput['arm_status'];
             this.originalArms[tempIndex].arm_description = this.armInput['arm_description'];
             this.originalArms[tempIndex].arm_eligibility = this.armInput['arm_eligibility'];
+        }
+    }
+
+    setFieldDefaultValue(keys: Array<string>, type: string) {
+        if (type === 'arm') {
+            for (let key of keys) {
+                if (_.isUndefined(this.armInput[key])){
+                    this.armInput[key] = '';
+                }
+            }
         }
     }
 }
