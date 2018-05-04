@@ -83,6 +83,7 @@ export class TrialService {
     trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
     nctIdChosen = '';
+    addNewFields = true;
     constructor(public http: Http, public db: AngularFireDatabase) {
         this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
@@ -221,7 +222,9 @@ export class TrialService {
             this.authorizedSource.next(true);
             this.trialList = [];
             for (const nctId of _.keys(action.payload.val())) {
-                this.addNewFields(nctId, action.payload.val()[nctId]);
+                if (this.addNewFields) {
+                   this.addArmNewFields(nctId, action.payload.val()[nctId]); 
+                }
                 this.trialList.push(action.payload.val()[nctId]);                
             }
             this.trialListSource.next(this.trialList);
@@ -231,7 +234,7 @@ export class TrialService {
         });
     }
     // add arm_status and arm_eligibility for imported trials
-    addNewFields(nctId:string, trial: Trial){
+    addArmNewFields(nctId:string, trial: Trial){
         let arms = [];
         if(!_.isUndefined(trial['treatment_list']['step']['0']['arm'])) {
             arms = trial['treatment_list']['step']['0']['arm'];
