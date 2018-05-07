@@ -76,6 +76,8 @@ export class TrialService {
         {label:'Complete', value: 'Complete'},
         {label:'Enrolling by Invitation', value: 'Enrolling by Invitation'},
         {label:'In Review', value: 'In Review'},
+        {label:'IRB Approved Pending Change', value: 'IRB Approved Pending Change'},
+        {label:'Open to Accrual', value: 'Open to Accrual'},
         {label:'Temporarily Closed to Accrual', value: 'Temporarily Closed to Accrual'},
         {label:'Temporarily Closed to Accrual and Intervention', value: 'Temporarily Closed to Accrual and Intervention'},
         {label:'Withdrawn', value: 'Withdrawn'}];
