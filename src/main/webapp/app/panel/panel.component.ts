@@ -230,7 +230,7 @@ export class PanelComponent implements OnInit {
                 console.log('Failed to save to DB ', error);
             });
         } catch (error) {
-            const errorMessage = "Sorry, this node is failed to save to database. Please check your network connection or try again later. Thanks!";
+            const errorMessage = "Sorry, this node is failed to save to database. Please make a copy of your data. Thanks!";
             this.trialService.saveErrors(
                 errorMessage, 
                 {
@@ -452,7 +452,7 @@ export class PanelComponent implements OnInit {
         this.clinicalInput['main_type'] = '';
         let isSubtype = false;
         for (let item of this.allSubTypesOptions) {
-            if (item.value === oncotree_primary_diagnosis) {
+            if (item === oncotree_primary_diagnosis) {
                 this.clinicalInput['sub_type'] = oncotree_primary_diagnosis;
                 this.clinicalInput['main_type'] = this.subToMainMapping[oncotree_primary_diagnosis];
                 isSubtype = true;
@@ -460,7 +460,7 @@ export class PanelComponent implements OnInit {
         }
         if (isSubtype === false) {
             for (let item of this.mainTypesOptions) {
-                if (item.value === oncotree_primary_diagnosis) {
+                if (item === oncotree_primary_diagnosis) {
                     this.clinicalInput['main_type'] = oncotree_primary_diagnosis;
                 }
             }

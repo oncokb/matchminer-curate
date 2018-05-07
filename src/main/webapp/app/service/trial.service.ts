@@ -64,21 +64,10 @@ export class TrialService {
     subTypesOptions = {};
     allSubTypesOptions = [];
     subToMainMapping = {};
-    mainTypesOptions = [{value: 'All Solid Tumors', label: 'All Solid Tumors'},
-    {value: 'All Liquid Tumors', label: 'All Liquid Tumors'},
-    {value: 'All Tumors', label: 'All Tumors'},
-    {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
-    statusOptions = [{label:'Active', value: 'Active'},
-        {label:'Administratively Complete', value: 'Administratively Complete'},
-        {label:'Approved', value: 'Approved'},
-        {label:'Closed to Accrual', value: 'Closed to Accrual'},
-        {label:'Closed to Accrual and Intervention', value: 'Closed to Accrual and Intervention'},
-        {label:'Complete', value: 'Complete'},
-        {label:'Enrolling by Invitation', value: 'Enrolling by Invitation'},
-        {label:'In Review', value: 'In Review'},
-        {label:'Temporarily Closed to Accrual', value: 'Temporarily Closed to Accrual'},
-        {label:'Temporarily Closed to Accrual and Intervention', value: 'Temporarily Closed to Accrual and Intervention'},
-        {label:'Withdrawn', value: 'Withdrawn'}];
+    mainTypesOptions = ['All Solid Tumors', 'All Liquid Tumors', 'All Tumors', 'All Pediatric Tumors'];
+    statusOptions = ['Active', 'Administratively Complete', 'Approved', 'Closed to Accrual', 'Closed to Accrual and Intervention', 
+    'Complete', 'Enrolling by Invitation', 'In Review', 'Temporarily Closed to Accrual', 'Temporarily Closed to Accrual and Intervention', 
+    'Withdrawn'];
     annotated_variants = {};
     trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
@@ -98,10 +87,7 @@ export class TrialService {
                     "query": item.name,
                     "type": "mainType"
                 });
-                this.mainTypesOptions.push({
-                    value: item.name,
-                    label: item.name
-                });
+                this.mainTypesOptions.push(item.name);
             }
             // prepare subtypes by maintype
             let queries =  {
@@ -116,25 +102,16 @@ export class TrialService {
                     for (const item of items) {
                         currentMaintype = item.mainType.name;
                         currentSubtype = item.name;
-                        this.allSubTypesOptions.push({
-                            value: currentSubtype,
-                            label: currentSubtype
-                        });
+                        this.allSubTypesOptions.push(currentSubtype);
                         this.subToMainMapping[currentSubtype] = currentMaintype;
                         if (this.subTypesOptions[currentMaintype] == undefined) {
-                            this.subTypesOptions[currentMaintype] = [{
-                                value: currentSubtype,
-                                label: currentSubtype
-                            }];
+                            this.subTypesOptions[currentMaintype] = [currentSubtype];
                         } else {
-                            this.subTypesOptions[currentMaintype].push({
-                                value: currentSubtype,
-                                label: currentSubtype
-                            });
+                            this.subTypesOptions[currentMaintype].push(currentSubtype);
                         }
                     }
                     this.subTypesOptions[currentMaintype].sort(function(a, b) {
-                        return a.value > b.value;
+                        return a > b;
                     });
                     this.subTypesOptions[''] = this.allSubTypesOptions;
                 }
@@ -298,7 +275,7 @@ export class TrialService {
     }
     saveErrors(info: string, content: object, error: object) {
         this.errorList.push({
-            info: "Sorry, this node is failed to save to database. Please check your network connection or try again later. Thanks!",
+            info: info,
             content: content,
             error: error
         });

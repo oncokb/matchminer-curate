@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Clinical } from './clinical.model';
+import * as _ from 'underscore';
+
 @Component({
     selector: 'jhi-clinical',
     templateUrl: './clinical.component.html',
@@ -18,6 +20,7 @@ export class ClinicalComponent implements OnInit {
     validation = false;
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
+    currentSubTypeOptions = [];
 
     constructor(private trialService: TrialService) { }
 
@@ -49,15 +52,16 @@ export class ClinicalComponent implements OnInit {
         }
     }
     onSingleSelected(option){
-        if (option.value && this.clinicalInput.main_type !== this.subToMainMapping[option.value]) {
-            this.clinicalInput.main_type = this.subToMainMapping[option.value]; 
+        if (!_.isUndefined(option)) {
+            this.clinicalInput.sub_type = '';
+        } else {
+            if (option && this.clinicalInput.main_type !== this.subToMainMapping[option]) {
+                this.clinicalInput.main_type = this.subToMainMapping[option]; 
+            }
         }
     }
     onSingleDeselectedMaintype() {
         this.clinicalInput.sub_type = '';
         this.clinicalInput.main_type = '';
-    }
-    onSingleDeselectedSubtype() {
-        this.clinicalInput.sub_type = '';
     }
 }

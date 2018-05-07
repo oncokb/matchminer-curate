@@ -17,7 +17,8 @@ import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
-import {SelectModule} from 'angular2-select';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 // customized coponent
 import { TrialComponent } from './trial/trial.component';
@@ -54,7 +55,8 @@ import {
         AngularFireAuthModule,
         AngularFireDatabaseModule,
         AngularMultiSelectModule,
-        SelectModule
+        NgSelectModule,
+        FormsModule
     ],
     declarations: [
         JhiMainComponent,
