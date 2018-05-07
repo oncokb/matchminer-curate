@@ -32,6 +32,8 @@ export class TrialComponent implements OnInit, AfterViewInit{
   dtTrigger: Subject<any> = new Subject();
   hideArchived = 'Yes';
   statusOptions = this.trialService.getStatusOptions();
+  originalTrialStatus = '';
+
   constructor(public http: Http, private trialService: TrialService, public db: AngularFireDatabase) {
     this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
     this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);
@@ -109,6 +111,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
             if (setChosenTrial === false) {
                  this.nctIdChosen = trialInfo.nct_id;
                  this.trialService.setTrialChosen(this.nctIdChosen);
+                 this.originalTrialStatus = this.trialChosen['status'];
                  setChosenTrial = true;
             }
            }).catch(error => {
@@ -151,6 +154,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
   }
   curateTrial(nctId: string) {
       this.trialService.setTrialChosen(nctId);
+      this.originalTrialStatus = this.trialChosen['status'];
       document.querySelector('#trialDetail').scrollIntoView();
   }
   getStatus(status: string) {
@@ -170,11 +174,38 @@ export class TrialComponent implements OnInit, AfterViewInit{
       }
   }
   updateTrialStatusInDB() {
-      this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
-          console.log("Save to DB Successfully!");
-      }).catch(error => {
-          console.log('Failed to save to DB ', error);
-      });
+    console.log(this.originalTrialStatus, this.trialChosen['status']);
+    if (this.originalTrialStatus !== this.trialChosen['status']) {
+      let result = confirm('Are you sure to change trial status?');
+      console.log(result);
+      if (result) {
+        // try {
+        //   this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
+        //       console.log('Save to DB Successfully!');
+        //   }).catch(error => {
+        //     console.log('Failed to save to DB ', error);
+        //   });
+        // } catch (error) {
+          let error = {};
+          this.trialChosen['status'] = this.originalTrialStatus;
+          let errorMessage = 'Sorry, the trial status is failed to save to database. Please check your network connection or try again later. Thanks!';
+          this.trialService.saveErrors(
+            errorMessage, 
+            {
+              trialStatus: this.trialChosen['status']
+            }, 
+            error
+          );
+          let emailContent = 'Data to save in DB: \n trial status:  ' + 
+          this.trialChosen['status'] + '\n Error: \n' + error;
+          // this.trialService.notifyDeveloper('Failed to save trial status.' );
+          alert(errorMessage);
+        // }
+      }
+    }
+  }
+  compareStatus(old, option) {
+    console.log(old,option);
   }
 
 }

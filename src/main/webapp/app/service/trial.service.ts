@@ -83,6 +83,7 @@ export class TrialService {
     trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
     nctIdChosen = '';
+    errorList: Array<object> = [];
     constructor(public http: Http, public db: AngularFireDatabase) {
         this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
@@ -295,6 +296,24 @@ export class TrialService {
         }
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
     }
+    saveErrors(info: string, content: object, error: object) {
+        this.errorList.push({
+            info: "Sorry, this node is failed to save to database. Please check your network connection or try again later. Thanks!",
+            content: content,
+            error: error
+        });
+        console.log(this.errorList);
+    }
+    /**
+     * Copy from Oncokb
+     * Util to send email to developer account
+     * @param {string} subject The email subject
+     * @param {string} content The email content
+     * @return Promise
+     * */
+    // notifyDeveloper(subject, content) {
+    //     sendEmail('victoriasu1994@gmail.com', subject, content);
+    // }
     getAPIUrl(type: string) {
         if (this.production === true) {
             switch(type) {

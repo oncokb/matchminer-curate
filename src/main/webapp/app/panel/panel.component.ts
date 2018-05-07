@@ -140,8 +140,9 @@ export class PanelComponent implements OnInit {
                 this.preparePath();
                 this.modifyData(this.dataToModify, this.finalPath, type);  
             }
-            this.saveBacktoDB();
-            return true;
+            let saveToDB = this.saveBacktoDB();
+            console.log("saveToDB:", saveToDB);
+            return saveToDB;
         } else {
             return false;
         }
@@ -218,14 +219,31 @@ export class PanelComponent implements OnInit {
         return false;
     }
     saveBacktoDB() {
-        this.trialService.getTrialRef(this.nctIdChosen).set({
-            arm: this.originalArms,
-            match: this.originalMatch
-        }).then(result => {
-            this.clearInput();
-        }).catch(error => {
-            console.log('Failed to save to DB ', error);
-        });
+        try{
+            this.trialService.getTrialRef(this.nctIdChosen).set({
+                arm: this.originalArms,
+                match: this.originalMatch
+            }).then(result => {
+                console.log("save successfully!");
+                this.clearInput();
+            }).catch(error => {
+                console.log('Failed to save to DB ', error);
+            });
+        } catch (error) {
+            const errorMessage = "Sorry, this node is failed to save to database. Please check your network connection or try again later. Thanks!";
+            this.trialService.saveErrors(
+                errorMessage, 
+                {
+                    arm: this.originalArms,
+                    match: this.originalMatch
+                }, 
+                error);
+            alert(errorMessage);
+            this.cancelModification();
+            return false;
+        }
+        return true;
+        
     }
     modifyData(obj: Array<any>, path: Array<string>, type: string) {
         switch (type) {
@@ -488,8 +506,7 @@ export class PanelComponent implements OnInit {
     }
     saveModification() {
         if (this.modifyNode('update')) {
-            this.operationPool['currentPath'] = '';
-            this.operationPool['editing'] = false;
+            this.cancelModification();
         }
     }
     dropDownNode() {
