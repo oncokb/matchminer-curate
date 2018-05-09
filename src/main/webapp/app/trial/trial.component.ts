@@ -1,19 +1,17 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
 import * as _ from 'underscore';
 import { Trial } from './trial.model';
-import { SERVER_API_URL } from '../app.constants';
 import * as $ from 'jquery';
 import "../../../../../node_modules/jquery/dist/jquery.js";
 import "../../../../../node_modules/datatables.net/js/jquery.dataTables.js";
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
+import { NgModel } from "@angular/forms";
 @Component({
   selector: 'jhi-trial',
   templateUrl: './trial.component.html',
@@ -33,6 +31,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
   hideArchived = 'Yes';
   statusOptions = this.trialService.getStatusOptions();
   originalTrialStatus = '';
+  @ViewChild('selectModel') private selectModel: NgModel;
 
   constructor(public http: Http, private trialService: TrialService, public db: AngularFireDatabase) {
     this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
@@ -117,7 +116,6 @@ export class TrialComponent implements OnInit, AfterViewInit{
            }).catch(error => {
             this.messages.push('Fail to save to database ' + tempTrial);
            });
-           
         },
         error => {
             this.messages.push(tempTrial + ' not found');
@@ -174,34 +172,29 @@ export class TrialComponent implements OnInit, AfterViewInit{
       }
   }
   updateTrialStatusInDB() {
-    console.log(this.originalTrialStatus, this.trialChosen['status']);
     if (this.originalTrialStatus !== this.trialChosen['status']) {
-        // try {
-        //   this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
-        //       console.log('Save to DB Successfully!');
-        //   }).catch(error => {
-        //     console.log('Failed to save to DB ', error);
-        //   });
-        // } catch (error) {
-          let error = {};
-          let errorMessage = 'Sorry, the trial status is failed to save to database.';
-          this.trialService.saveErrors(
-            errorMessage, 
-            {
-              nctId: this.trialChosen['nct_id'],
-              oldContent: 'trial status: ' + this.originalTrialStatus,
-              newContent: 'trial status: ' + this.trialChosen['status']
-            }, 
-            error
-          );
-          let emailContent = 'Data to save in DB: \n trial status:  ' + 
-          this.trialChosen['status'] + '\n Error: \n' + error;
-          // this.trialService.notifyDeveloper('Failed to save trial status.' );
-          this.trialChosen['status'] = this.originalTrialStatus;
-          alert(errorMessage);
-          this.rerender();
-        // }
+        try {
+            this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
+                console.log('Save to DB Successfully!');
+            }).catch(error => {
+                console.log('Failed to save to DB ', error);
+            });
+        } catch (error) {
+            let errorMessage = 'Sorry, the trial status is failed to save to database.';
+            this.trialService.saveErrors(
+                errorMessage,
+                {
+                    nctId: this.trialChosen['nct_id'],
+                    oldContent: 'trial status: ' + this.originalTrialStatus,
+                    newContent: 'trial status: ' + this.trialChosen['status']
+                },
+                error
+            );
+            alert(errorMessage);
+            // Rollback the trial status in ng-select option
+            this.selectModel.reset(this.originalTrialStatus);
+            this.trialChosen['status'] = this.originalTrialStatus;
+        }
     }
   }
-
 }

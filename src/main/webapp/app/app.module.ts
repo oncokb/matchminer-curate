@@ -39,6 +39,7 @@ import {
     PageRibbonComponent,
     ErrorComponent
 } from './layouts';
+import { EmailService } from "./service/email.service";
 
 @NgModule({
     imports: [
@@ -77,7 +78,8 @@ import {
         customHttpProvider(),
         PaginationConfig,
         UserRouteAccessService,
-        TrialService
+        TrialService,
+        EmailService
     ],
     bootstrap: [ JhiMainComponent ]
 })

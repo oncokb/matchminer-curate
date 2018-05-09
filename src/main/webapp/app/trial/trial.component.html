@@ -78,7 +78,8 @@
             <label for="status">Status: </label>
             <span id="status" style="margin-left:10px">
                 <div style="min-width: 300px; display: inline-block">
-                    <ng-select class="selectStyle" [items]="statusOptions" [(ngModel)]="trialChosen.status" [clearable]="false" (change)="updateTrialStatusInDB()"></ng-select>
+                    <ng-select class="selectStyle" #selectModel="ngModel" [items]="statusOptions" [(ngModel)]="trialChosen.status"
+                               [clearable]="false" (change)="updateTrialStatusInDB()"></ng-select>
                 </div>
             </span>
             <br/>

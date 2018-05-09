@@ -12,6 +12,7 @@ import * as _ from 'underscore';
 import { currentId } from 'async_hooks';
 import { SERVER_API_URL } from '../app.constants';
 import { environment } from '../environments/environment';
+import { EmailService } from "./email.service";
 @Injectable()
 export class TrialService {
     production = environment.production ? environment.production : false;
@@ -73,7 +74,7 @@ export class TrialService {
     trialsRef: AngularFireObject<any>;
     nctIdChosen = '';
     errorList: Array<object> = [];
-    constructor(public http: Http, public db: AngularFireDatabase) {
+    constructor(public http: Http, public db: AngularFireDatabase, private emailService: EmailService) {
         this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
         
@@ -279,18 +280,14 @@ export class TrialService {
             content: content,
             error: error
         });
-        console.log(this.errorList);
+        if (info.includes('failed') && info.includes('database')) {
+            this.emailService.sendEmail({
+                sendTo: environment.devEmail,
+                subject: info,
+                content: 'Content: \n' + JSON.stringify(content) + '\n\n Error: \n' + JSON.stringify(error)
+            });
+        }
     }
-    /**
-     * Copy from Oncokb
-     * Util to send email to developer account
-     * @param {string} subject The email subject
-     * @param {string} content The email content
-     * @return Promise
-     * */
-    // notifyDeveloper(subject, content) {
-    //     sendEmail('victoriasu1994@gmail.com', subject, content);
-    // }
     getAPIUrl(type: string) {
         if (this.production === true) {
             switch(type) {
