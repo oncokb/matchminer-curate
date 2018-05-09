@@ -275,16 +275,17 @@ export class TrialService {
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
     }
     saveErrors(info: string, content: object, error: object) {
-        this.errorList.push({
-            info: info,
-            content: content,
-            error: error
-        });
         if (info.includes('failed') && info.includes('database')) {
             this.emailService.sendEmail({
                 sendTo: environment.devEmail,
                 subject: info,
                 content: 'Content: \n' + JSON.stringify(content) + '\n\n Error: \n' + JSON.stringify(error)
+            });
+        } else {
+            this.errorList.push({
+                info: info,
+                content: content,
+                error: error
             });
         }
     }
