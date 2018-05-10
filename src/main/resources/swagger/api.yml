@@ -1,6 +1,218 @@
 # API-first development with swagger
 # This file will be used at compile time to generate Spring-MVC endpoint stubs using swagger-codegen
-swagger: "2.0"
+swagger: '2.0'
 info:
+  title: Matchminer Curate API
   version: 0.0.1
-paths: {}
+schemes:
+- "http"
+tags:
+- name: "trials"
+  description: "Trials Resource"
+paths:
+  '/trials/createTrial':
+    post:
+      description: Load trial data into Mongo DB.
+      operationId: "createTrial"
+      consumes:
+      - "application/json"
+      parameters:
+      - name: "Trial"
+        in: "body"
+        description: "a trial json object "
+        required: true
+        schema:
+            $ref: "#/definitions/Trial"
+      responses:
+        '200':
+          description: Load to Mongo DB successfully.
+        '500':
+          description: Load the trial failed!
+  '/trials/loadPatientData':
+    post:
+      description: Load patient data into Mongo DB.
+      operationId: "loadPatient"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Patient"
+        in: "body"
+        description: "clinical and genomic data of a patient"
+        required: true
+        schema:
+          $ref: "#/definitions/PatientData"
+      responses:
+        '200':
+          description: Save patient data to Mongo DB successfully!
+        '500':
+          description: Save patient data to Mongo DB failed!
+  '/trials/match':
+    get:
+      description: Match trial in Mongo DB to patient.
+      operationId: "matchTrial"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        '200':
+          description: Match trials successfully!
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/TrialMatch"
+        '500':
+          description: Match trials failed!
+definitions:
+  PatientData:
+    type: "object"
+    required:
+    - "clinicals"
+    - "genomics"
+    properties:
+      clinicals:
+        type: array
+        items:
+          $ref: '#/definitions/Clinical'
+      genomics:
+        type: array
+        items:
+          $ref: '#/definitions/Genomic'
+  TrialMatch:
+    properties:
+      clinicalId:
+        type: "string"
+      clinical:
+        $ref: '#/definitions/Clinical'
+      genomicId:
+        type: "string"
+      genomic:
+        $ref: '#/definitions/Genomic'
+      protocolNo:
+        type: "string"
+      nctId:
+        type: "string"
+      genomicAlteration:
+        type: "string"
+      matchType:
+        type: "string"
+      trialAccrualStatus:
+        type: "string"
+      matchLevel:
+        type: "string"
+      code:
+        type: "string"
+      internalId:
+        type: "string"
+  Trial:
+    type: "object"
+    required:
+    - "nctId"
+    properties:
+      archived:
+        type: "string"
+      curationStatus:
+        type: "string"
+      nctId:
+        type: "string"
+      longTitle:
+        type: "string"
+      phase:
+        type: "string"
+      shortTitle:
+        type: "string"
+      status:
+        type: "string"
+      treatmentList:
+        type: "string"
+  Clinical:
+    type: "object"
+    required:
+    - "sampleId"
+    properties:
+      sampleId:
+        type: "string"
+        example: "TCGA-D3-A5GT-01"
+      ordPhysicianName:
+        type: "string"
+        example: ""
+      ordPhysicianEmail:
+        type: "string"
+        example: ""
+      oncotreePrimaryDiagnosisName:
+        type: "string"
+        example: "Cutaneous Melanoma"
+      reportDate:
+        type: "string"
+        format: "date"
+        example: "2018-03-01"
+      vitalStatus:
+        type: "string"
+        example: ""
+      firstLast:
+        type: "string"
+        example: ""
+      birthDate:
+        type: "string"
+        format: "date"
+        example: "1975-03-01"
+      mrn:
+        type: "string"
+        example: ""
+      gender:
+        type: "string"
+        example: "Male"
+  Genomic:
+    type: "object"
+    required:
+    - "sampleId"
+    properties:
+      sampleId:
+        type: "string"
+        example: "TCGA-D3-A5GT-01"
+      trueHugoSymbol:
+        type: "string"
+        example: "BRAF"
+      trueProteinChange:
+        type: "string"
+        example: "V600E"
+      trueVariantClassification:
+        type: "string"
+        example: ""
+      variantCategory:
+        type: "string"
+        example: ""
+      cnvCall:
+        type: "string"
+        example: ""
+      wildtype:
+        type: "boolean"
+        example: "false"
+      chromosome:
+        type: "string"
+        example: ""
+      position:
+        type: "string"
+        example: ""
+      trueCdnaChange:
+        type: "string"
+        example: ""
+      referenceAllele:
+        type: "string"
+        example: ""
+      trueTranscriptExon:
+        type: "integer"
+        example: 0
+      canonicalStand:
+        type: "string"
+        example: ""
+      alleleFraction:
+        type: "number"
+        format: "double"
+        example: 0.0
+      tier:
+        type: "integer"
+        example: 0
