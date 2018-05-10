@@ -2,8 +2,8 @@ package org.mskcc.oncokb.controller;
 
 import com.mongodb.client.MongoDatabase;
 import io.swagger.annotations.ApiParam;
+import org.json.JSONObject;
 import org.mskcc.oncokb.controller.api.TrialsApi;
-import org.mskcc.oncokb.model.*;
 import org.mskcc.oncokb.service.util.FileUtil;
 import org.mskcc.oncokb.service.util.MongoUtil;
 import org.mskcc.oncokb.service.util.PythonUtil;
@@ -43,7 +43,7 @@ public class TrialsController implements TrialsApi {
     @RequestMapping(value = "/trials/create",
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    public ResponseEntity<Void> create(@ApiParam(value = "a trial json object " ,required=true )  @Valid @RequestBody Trial trial) {
+    public ResponseEntity<Void> create(@ApiParam(value = "a trial json object " ,required=true )  @Valid @RequestBody Object trial) {
         // check if MatchEngine is accessible.
         if (this.matchenginePath == null || this.matchenginePath.length() == 0 ) {
             log.error("Cannot' find matchminer-engine path!");
@@ -53,9 +53,12 @@ public class TrialsController implements TrialsApi {
             String mongoUri = MongoUtil.getPureMongoUri(this.uri);
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(trial);
-            String nctId = trial.getNctId();
+            JSONObject trialObj = new JSONObject(json);
+            String nctId = trialObj.get("nct_id").toString();
+            String archived = trialObj.get("archived").toString();
+            String curationStatus = trialObj.get("curation_status").toString();
             // Archived trials have to be deleted in Mongo DB.
-            if( trial.getArchived().equals("Yes")) {
+            if( archived.equals("Yes")) {
                 Boolean isDeletedTrialMatch = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
                 Boolean isDeletedTrial = MongoUtil.deleteMany(this.mongoDatabase, "trial", nctId);
                 if (!isDeletedTrialMatch) {
@@ -67,7 +70,7 @@ public class TrialsController implements TrialsApi {
                 return new ResponseEntity<>(HttpStatus.OK);
             }
 
-            if (trial.getCurationStatus().equals("Completed")) {
+            if (curationStatus.equals("Completed")) {
                 File tempFile = File.createTempFile("trial", ".json");
                 String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
 

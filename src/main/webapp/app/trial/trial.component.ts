@@ -13,7 +13,6 @@ import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
 import { NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NgModel } from "@angular/forms";
 import { ConnectionService } from "../service/connection.service";
 
 @Component({
@@ -146,33 +145,32 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
     this.trialsToImport = '';
   }
-  updateStatus(type: string) {
-      this.mongoMessage.content = "";
-      if (type === 'curation') {
-        this.db.object('Trials/' + this.nctIdChosen).update({
-            curation_status: this.trialChosen['curation_status']
-        }).then((result) => {
-            console.log('success saving curation status');
-        }).catch((error) => {
-            console.log('error', error);
-        });
-      } else if (type === 'archive') {
-        this.db.object('Trials/' + this.nctIdChosen).update({
-            archived: this.trialChosen['archived']
-        }).then((result) => {
-            console.log('success saving archive status');
-            if (this.trialChosen['archived'] === 'Yes') {
-                this.curateTrial('');
-            }
-        }).catch((error) => {
-            console.log('error', error);
-        });
-      } else if (type === 'hideArchived') {
-          this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-            dtInstance.draw();
-          });
-      }
-  }
+    updateStatus(type: string) {
+        if (type === 'curation') {
+            this.db.object('Trials/' + this.nctIdChosen).update({
+                curation_status: this.trialChosen['curation_status']
+            }).then((result) => {
+                console.log('success saving curation status');
+            }).catch((error) => {
+                console.log('error', error);
+            });
+        } else if (type === 'archive') {
+            this.db.object('Trials/' + this.nctIdChosen).update({
+                archived: this.trialChosen['archived']
+            }).then((result) => {
+                console.log('success saving archive status');
+                if (this.trialChosen['archived'] === 'Yes') {
+                    this.curateTrial('');
+                }
+            }).catch((error) => {
+                console.log('error', error);
+            });
+        } else if (type === 'hideArchived') {
+            this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+                dtInstance.draw();
+            });
+        }
+    }
   curateTrial(nctId: string) {
       this.mongoMessage.content = "";
       this.trialService.setTrialChosen(nctId);
@@ -222,11 +220,13 @@ export class TrialComponent implements OnInit, AfterViewInit {
   loadMongo() {
     this.mongoMessage.content = "Loading the trial ......";
     this.mongoMessage.color = '#ffc107';
-    let trial = {
-        'trial': this.trialChosen
-    }
-    this.connectionService.loadMongo(trial).subscribe((res) => {
+    this.connectionService.loadMongo(this.trialChosen).subscribe((res) => {
         if (res.status === 200) {
+            if (this.trialChosen['archived'] === 'Yes') {
+                // Remove archived trials from database
+                alert("This archived trial has been removed from database");
+                return;
+            }
             this.mongoMessage.content = 'Send trial ' + this.nctIdChosen + ' successfully!';
             this.mongoMessage.color = 'green';
         }

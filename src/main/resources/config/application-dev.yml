@@ -126,4 +126,4 @@ application:
     matchengine:
         path: ${CATALINA_HOME}/webapps/matchminer-engine
         git-url: https://github.com/victoria34/matchminer-engine.git
-        branch: annotated-variant
+        branch: annotated_variant

@@ -22,31 +22,9 @@ paths:
         description: "a trial json object "
         required: true
         schema:
-            $ref: "#/definitions/Trial"
+          type: "object"
       responses:
         '200':
           description: Load to Mongo DB successfully.
         '500':
           description: Load the trial failed!
-definitions:
-  Trial:
-    type: "object"
-    required:
-    - "nctId"
-    properties:
-      archived:
-        type: "string"
-      curationStatus:
-        type: "string"
-      nctId:
-        type: "string"
-      longTitle:
-        type: "string"
-      phase:
-        type: "string"
-      shortTitle:
-        type: "string"
-      status:
-        type: "string"
-      treatmentList:
-        type: "string"

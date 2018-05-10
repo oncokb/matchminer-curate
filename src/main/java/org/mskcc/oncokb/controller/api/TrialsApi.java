@@ -5,7 +5,6 @@
  */
 package org.mskcc.oncokb.controller.api;
 
-import org.mskcc.oncokb.model.Trial;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,5 +25,5 @@ public interface TrialsApi {
     @RequestMapping(value = "/trials/create",
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    public ResponseEntity<Void> create(@ApiParam(value = "a trial json object " ,required=true )  @Valid @RequestBody Trial trial);
+    public ResponseEntity<Void> create(@ApiParam(value = "a trial json object " ,required=true )  @Valid @RequestBody Object trial);
 }
