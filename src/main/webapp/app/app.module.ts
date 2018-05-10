@@ -40,6 +40,7 @@ import {
 } from './layouts';
 import { EmailService } from './service/email.service';
 import { ConverterComponent } from './converter/converter.component';
+import { ConnectionService } from "./service/connection.service";
 
 @NgModule({
     imports: [
@@ -79,7 +80,7 @@ import { ConverterComponent } from './converter/converter.component';
         PaginationConfig,
         UserRouteAccessService,
         TrialService,
-        EmailService
+        ConnectionService
     ],
     bootstrap: [ JhiMainComponent ]
 })
