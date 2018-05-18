@@ -38,8 +38,8 @@ export class PanelComponent implements OnInit {
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
-    statusOptions = this.trialService.getStatusOptions();
-    isPermitted = true;
+    statusOptions = this.trialService.getStatusOptions(); 
+    isPermitted = true; 
     nctIdChosen:string;
     trialChosen: {};
     genomicInput: Genomic;
@@ -49,8 +49,8 @@ export class PanelComponent implements OnInit {
     'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'];
     oncokbGenomicFields = ['hugo_symbol', 'annotated_variant'];
     oncokb: boolean;
-
-    constructor(private trialService: TrialService) {
+            
+    constructor(private trialService: TrialService) { 
     }
 
     ngOnInit() {
@@ -138,7 +138,7 @@ export class PanelComponent implements OnInit {
                 this.modifyArmGroup(type);
             } else {
                 this.preparePath();
-                this.modifyData(this.dataToModify, this.finalPath, type);
+                this.modifyData(this.dataToModify, this.finalPath, type);  
             }
             return this.saveBacktoDB();
         } else {
@@ -149,7 +149,7 @@ export class PanelComponent implements OnInit {
         let genomicFieldsToCheck = this.oncokbGenomicFields;
         if (!this.oncokb) {
             genomicFieldsToCheck = _.without(this.genomicFields, 'matching_examples');
-        }
+        } 
         for (const key of genomicFieldsToCheck) {
             if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
                 return false;
@@ -289,7 +289,7 @@ export class PanelComponent implements OnInit {
                     const index = path.shift();
                     this.modifyData(obj[index], path, type);
                 }
-                break;
+                break;    
             default:
                 break;
         }
@@ -309,16 +309,16 @@ export class PanelComponent implements OnInit {
             for (let key of keys) {
                 this.genomicInput[key] = '';
                 this.genomicInput['no_'+key] = false;
-            }
+            }    
         } else if (type === 'Clinical') {
             for (let key of keys) {
                 this.clinicalInput[key] = '';
                 this.clinicalInput['no_'+key] = false;
-            }
+            }    
         } else if (type === 'arm') {
             for (let key of keys) {
                 this.armInput[key] = '';
-            }
+            } 
         }
     }
     getOncotree() {
@@ -358,9 +358,9 @@ export class PanelComponent implements OnInit {
             // apply not logic
             if (nodeData['no_' + key]) {
                 nodeData[key] = '!' + nodeData[key];
-            }
-            delete nodeData['no_' + key];
-        }
+            }   
+            delete nodeData['no_' + key];     
+        } 
     }
     addNewNode(obj: Array<any>) {
         if (_.isEmpty(this.dataBlockToMove)) {
@@ -419,7 +419,7 @@ export class PanelComponent implements OnInit {
         const keys = ['genomic', 'clinical', 'and', 'or'];
         return keys.indexOf(Object.keys(a)[0]) - keys.indexOf(Object.keys(b)[0]);
     }
-    editNode() {
+    editNode() { 
         this.operationPool['currentPath'] = this.path;
         this.operationPool['editing'] = true;
         if (this.unit.hasOwnProperty('genomic')) {
@@ -476,7 +476,6 @@ export class PanelComponent implements OnInit {
                 }
             }
         }
-
     }
     preAddNode() {
         this.addNode = true;
@@ -561,7 +560,7 @@ export class PanelComponent implements OnInit {
     // 2) The section is inside the current chosen section.
     displayDestination() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true
+        return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true 
         && this.operationPool['currentPath'] !== this.path && !this.isNestedInside(this.operationPool['currentPath'], this.path);
     }
     displayPencil() {
