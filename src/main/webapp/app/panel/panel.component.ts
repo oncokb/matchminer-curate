@@ -140,8 +140,7 @@ export class PanelComponent implements OnInit {
                 this.preparePath();
                 this.modifyData(this.dataToModify, this.finalPath, type);  
             }
-            this.saveBacktoDB();
-            return true;
+            return this.saveBacktoDB();
         } else {
             return false;
         }
@@ -222,9 +221,22 @@ export class PanelComponent implements OnInit {
             arm: this.originalArms,
             match: this.originalMatch
         }).then(result => {
+            console.log("save successfully!");
             this.clearInput();
+            return true;
         }).catch(error => {
             console.log('Failed to save to DB ', error);
+            const errorMessage = "Sorry, this node is failed to save to database. Please make a copy of your data. Thanks!";
+            this.trialService.saveErrors(
+                errorMessage,
+                {
+                    arm: this.originalArms,
+                    match: this.originalMatch
+                },
+                error);
+            alert(errorMessage);
+            this.cancelModification();
+            return false;
         });
     }
     modifyData(obj: Array<any>, path: Array<string>, type: string) {
@@ -434,7 +446,7 @@ export class PanelComponent implements OnInit {
         this.clinicalInput['main_type'] = '';
         let isSubtype = false;
         for (let item of this.allSubTypesOptions) {
-            if (item.value === oncotree_primary_diagnosis) {
+            if (item === oncotree_primary_diagnosis) {
                 this.clinicalInput['sub_type'] = oncotree_primary_diagnosis;
                 this.clinicalInput['main_type'] = this.subToMainMapping[oncotree_primary_diagnosis];
                 isSubtype = true;
@@ -442,7 +454,7 @@ export class PanelComponent implements OnInit {
         }
         if (isSubtype === false) {
             for (let item of this.mainTypesOptions) {
-                if (item.value === oncotree_primary_diagnosis) {
+                if (item === oncotree_primary_diagnosis) {
                     this.clinicalInput['main_type'] = oncotree_primary_diagnosis;
                 }
             }
@@ -464,7 +476,6 @@ export class PanelComponent implements OnInit {
                 }
             }
         }
-        
     }
     preAddNode() {
         this.addNode = true;
@@ -488,8 +499,7 @@ export class PanelComponent implements OnInit {
     }
     saveModification() {
         if (this.modifyNode('update')) {
-            this.operationPool['currentPath'] = '';
-            this.operationPool['editing'] = false;
+            this.cancelModification();
         }
     }
     dropDownNode() {

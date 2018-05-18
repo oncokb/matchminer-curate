@@ -6,7 +6,7 @@
     <span class="indent1">-arm status: </span><br/>
     <div class="indent2">
         <div style="min-width: 300px; display: inline-block">
-            <ng-select class="selectStyle" [options]="statusOptions" [(ngModel)]="armInput.arm_status" [allowClear]="true"></ng-select>
+            <ng-select class="selectStyle" [items]="statusOptions" [(ngModel)]="armInput.arm_status" [clearable]="true"></ng-select>
         </div>
     </div>
     <span class="indent1">-arm description: </span><br/>

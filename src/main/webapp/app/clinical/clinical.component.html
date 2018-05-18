@@ -21,13 +21,12 @@
             </div>
             <div class="col-sm-8">
                 <div>
-                    <ng-select class="selectStyle" [options]="mainTypesOptions" [(ngModel)]="clinicalInput.main_type" [allowClear]="true" placeholder="Select Maintype"
-                        (deselected)="onSingleDeselectedMaintype($event)">
+                    <ng-select class="selectStyle" [items]="mainTypesOptions" [(ngModel)]="clinicalInput.main_type" [clearable]="true" placeholder="Select Maintype" (clear)="onSingleDeselectedMaintype()">
                     </ng-select>
                 </div>
                 <div class="subTypeStyle">
-                    <ng-select class="selectStyle" [options]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
-                        [allowClear]="true" placeholder="Select Subtype" (selected)="onSingleSelected($event)" (deselected)="onSingleDeselectedSubtype($event)">
+                    <ng-select class="selectStyle" [items]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
+                        [clearable]="true" placeholder="Select Subtype" (change)="onSingleSelected($event)">
                     </ng-select>
                 </div>
             </div>
@@ -61,13 +60,12 @@
             </div>
             <div class="col-sm-7">
                 <div>
-                    <ng-select class="selectStyle" [options]="mainTypesOptions" [(ngModel)]="clinicalInput.main_type" [allowClear]="true" placeholder="Select Maintype"
-                        (deselected)="onSingleDeselectedMaintype($event)">
+                    <ng-select class="selectStyle" [items]="mainTypesOptions" [(ngModel)]="clinicalInput.main_type" [clearable]="true" placeholder="Select Maintype" (clear)="onSingleDeselectedMaintype()">
                     </ng-select>
                 </div>
                 <div class="subTypeStyle">
-                    <ng-select class="selectStyle" [options]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
-                        [allowClear]="true" placeholder="Select Subtype" (selected)="onSingleSelected($event)" (deselected)="onSingleDeselectedSubtype($event)">
+                    <ng-select class="selectStyle" [items]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
+                        [clearable]="true" placeholder="Select Subtype" (change)="onSingleSelected($event)">
                     </ng-select>
                 </div>
             </div>

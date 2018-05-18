@@ -12,6 +12,7 @@ import * as _ from 'underscore';
 import { currentId } from 'async_hooks';
 import { SERVER_API_URL } from '../app.constants';
 import { environment } from '../environments/environment';
+import { EmailService } from "./email.service";
 @Injectable()
 export class TrialService {
     production = environment.production ? environment.production : false;
@@ -64,28 +65,16 @@ export class TrialService {
     subTypesOptions = {};
     allSubTypesOptions = [];
     subToMainMapping = {};
-    mainTypesOptions = [{value: 'All Solid Tumors', label: 'All Solid Tumors'},
-    {value: 'All Liquid Tumors', label: 'All Liquid Tumors'},
-    {value: 'All Tumors', label: 'All Tumors'},
-    {value: 'All Pediatric Tumors', label: 'All Pediatric Tumors'}];
-    statusOptions = [{label:'Active', value: 'Active'},
-        {label:'Administratively Complete', value: 'Administratively Complete'},
-        {label:'Approved', value: 'Approved'},
-        {label:'Closed to Accrual', value: 'Closed to Accrual'},
-        {label:'Closed to Accrual and Intervention', value: 'Closed to Accrual and Intervention'},
-        {label:'Complete', value: 'Complete'},
-        {label:'Enrolling by Invitation', value: 'Enrolling by Invitation'},
-        {label:'In Review', value: 'In Review'},
-        {label:'IRB Approved Pending Change', value: 'IRB Approved Pending Change'},
-        {label:'Open to Accrual', value: 'Open to Accrual'},
-        {label:'Temporarily Closed to Accrual', value: 'Temporarily Closed to Accrual'},
-        {label:'Temporarily Closed to Accrual and Intervention', value: 'Temporarily Closed to Accrual and Intervention'},
-        {label:'Withdrawn', value: 'Withdrawn'}];
+    mainTypesOptions = ['All Solid Tumors', 'All Liquid Tumors', 'All Tumors', 'All Pediatric Tumors'];
+    statusOptions = ['Active', 'Administratively Complete', 'Approved', 'Closed to Accrual', 'Closed to Accrual and Intervention', 
+    'Complete', 'Enrolling by Invitation', 'In Review', 'Temporarily Closed to Accrual', 'Temporarily Closed to Accrual and Intervention', 
+    'Withdrawn'];
     annotated_variants = {};
     trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
     nctIdChosen = '';
-    constructor(public http: Http, public db: AngularFireDatabase) {
+    errorList: Array<object> = [];
+    constructor(public http: Http, public db: AngularFireDatabase, private emailService: EmailService) {
         this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
         
@@ -99,10 +88,7 @@ export class TrialService {
                     "query": item.name,
                     "type": "mainType"
                 });
-                this.mainTypesOptions.push({
-                    value: item.name,
-                    label: item.name
-                });
+                this.mainTypesOptions.push(item.name);
             }
             // prepare subtypes by maintype
             let queries =  {
@@ -117,25 +103,16 @@ export class TrialService {
                     for (const item of items) {
                         currentMaintype = item.mainType.name;
                         currentSubtype = item.name;
-                        this.allSubTypesOptions.push({
-                            value: currentSubtype,
-                            label: currentSubtype
-                        });
+                        this.allSubTypesOptions.push(currentSubtype);
                         this.subToMainMapping[currentSubtype] = currentMaintype;
                         if (this.subTypesOptions[currentMaintype] == undefined) {
-                            this.subTypesOptions[currentMaintype] = [{
-                                value: currentSubtype,
-                                label: currentSubtype
-                            }];
+                            this.subTypesOptions[currentMaintype] = [currentSubtype];
                         } else {
-                            this.subTypesOptions[currentMaintype].push({
-                                value: currentSubtype,
-                                label: currentSubtype
-                            });
+                            this.subTypesOptions[currentMaintype].push(currentSubtype);
                         }
                     }
                     this.subTypesOptions[currentMaintype].sort(function(a, b) {
-                        return a.value > b.value;
+                        return a > b;
                     });
                     this.subTypesOptions[''] = this.allSubTypesOptions;
                 }
@@ -296,6 +273,21 @@ export class TrialService {
             return this.db.object('Trials/' + nctId + '/' + path);
         }
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
+    }
+    saveErrors(info: string, content: object, error: object) {
+        if (info.includes('failed') && info.includes('database')) {
+            this.emailService.sendEmail({
+                sendTo: environment.devEmail,
+                subject: info,
+                content: 'Content: \n' + JSON.stringify(content) + '\n\n Error: \n' + JSON.stringify(error)
+            });
+        } else {
+            this.errorList.push({
+                info: info,
+                content: content,
+                error: error
+            });
+        }
     }
     getAPIUrl(type: string) {
         if (this.production === true) {
