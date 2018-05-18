@@ -148,7 +148,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
           this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
             dtInstance.draw();
           });
-      }    
+      }
   }
   curateTrial(nctId: string) {
       this.trialService.setTrialChosen(nctId);
@@ -173,13 +173,10 @@ export class TrialComponent implements OnInit, AfterViewInit{
   }
   updateTrialStatusInDB() {
     if (this.originalTrialStatus !== this.trialChosen['status']) {
-        try {
-            this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
-                console.log('Save to DB Successfully!');
-            }).catch(error => {
-                console.log('Failed to save to DB ', error);
-            });
-        } catch (error) {
+        this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
+            console.log('Save to DB Successfully!');
+        }).catch(error => {
+            console.log('Failed to save to DB ', error);
             let errorMessage = 'Sorry, the trial status is failed to save to database.';
             this.trialService.saveErrors(
                 errorMessage,
@@ -194,7 +191,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
             // Rollback the trial status in ng-select option
             this.selectModel.reset(this.originalTrialStatus);
             this.trialChosen['status'] = this.originalTrialStatus;
-        }
+        });
     }
   }
 }
