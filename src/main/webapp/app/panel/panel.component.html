@@ -5,7 +5,7 @@
 <i class="fa fa-arrows moveIcon" aria-hidden="true" *ngIf="displayMove()" (click)="moveNode()" title="Click to choose this section as to be moved"></i>
 <i class="fa fa-arrows destinationIcon" aria-hidden="true" *ngIf="displayDestination()" (click)="dropDownNode()"  title="Click to choose as destination"></i>
 <span *ngIf="operationPool['relocate'] !== true && operationPool['currentPath'] === path">
-    <button class="btn btn-success editButtonStyle" (click)="saveModification()">Save</button>
+    <button class="btn btn-success editButtonStyle" (click)="saveModification()" [disabled]="hasErrorInputField">Save</button>
     <button class="btn btn-warning editButtonStyle" (click)="cancelModification()">Cancel</button>
 </span>
 
@@ -13,13 +13,10 @@
     <div *ngIf="arm === false; else armSection">
         <br/>
         <label>Specify criterion type
-            <button *ngIf="nodeType" class="btn btn-success addButon" (click)="modifyNode('add')">Add</button>
+            <button *ngIf="nodeType" class="btn btn-success addButon" [disabled]="hasErrorInputField" (click)="modifyNode('add')">Add</button>
             <button class="btn btn-warning cancelButton" (click)="clearInput()">Cancel</button>
         </label>
-        <select class="form-control" [(ngModel)]="nodeType" (change)="clearNodeInput()">
-            <option></option>
-            <option *ngFor="let node of nodeOptions" [value]="node">{{ node }}</option>
-        </select>
+        <ng-select [(ngModel)]="nodeType" [items]="nodeOptions" (change)="clearNodeInput()"></ng-select>
         <br/>
         <div *ngIf="nodeType === 'Genomic'; else section1">
             <jhi-genomic [type]="'add'"></jhi-genomic>
@@ -32,14 +29,14 @@
         <ng-template #section2>
             <div *ngIf="nodeType === 'And' || nodeType === 'Or'">
                 <label>Specify nodes in the {{nodeType}} logic</label>
-                <angular2-multiselect [data]="dropdownList" [(ngModel)]="selectedItems"></angular2-multiselect>
+                <ng-select [items]="dropdownList" [multiple]="true" [closeOnSelect]="false" [(ngModel)]="selectedItems"></ng-select>
                 <br/>
                 <div *ngFor="let x of selectedItems">
-                    <div *ngIf="x.itemName == 'Genomic'">
+                    <div *ngIf="x == 'Genomic'">
                         <h6>Genomic:</h6>
                         <jhi-genomic [type]="'add'"></jhi-genomic>
                     </div>
-                    <div *ngIf="x.itemName == 'Clinical'">
+                    <div *ngIf="x == 'Clinical'">
                         <h6>Clinical:</h6>
                         <jhi-clinical [type]="'add'"></jhi-clinical>
                     </div>

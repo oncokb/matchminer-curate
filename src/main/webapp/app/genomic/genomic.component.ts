@@ -67,10 +67,13 @@ export class GenomicComponent implements OnInit {
            if (result.hits.length > 0) {
                 this.validationMessage['gene'] = 'Valid gene';
                 this.geneValidation = true;
+               this.trialService.setHasErrorInputField(false);
            } else {
                 this.validationMessage['gene'] = 'Invalid gene';
                 this.geneValidation = false;
-           }  
+               // Disable "Add" or "Save" button
+               this.trialService.setHasErrorInputField(true);
+           }
         });
     }
     validateGenomicExample() {
