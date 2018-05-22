@@ -43,7 +43,9 @@ export class GenomicComponent implements OnInit {
         .debounceTime(200)
         .distinctUntilChanged()
         .map(term => (term.length < 1 || _.isUndefined(this.annotated_variants[this.genomicInput.hugo_symbol])) ? []
-            : this.annotated_variants[this.genomicInput.hugo_symbol].filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
+            : this.annotated_variants[this.genomicInput.hugo_symbol]
+            .filter(v => v.toLowerCase().indexOf(term.split(',').slice(-1)[0].trim().toLowerCase()) > -1)
+            .slice(0, 10));
 
     constructor(private trialService: TrialService, public http: Http) { 
     }
