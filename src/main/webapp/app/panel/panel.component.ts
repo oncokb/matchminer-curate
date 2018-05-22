@@ -267,19 +267,9 @@ export class PanelComponent implements OnInit {
             case 'update':
                 if (path.length === 1) {
                     if (obj[path[0]].hasOwnProperty('genomic')) {
-                        let tempGenomicNode = this.prepareGenomicData();
-                        if (tempGenomicNode['annotated_variant'].includes(',')) {
-                            obj[path[0]] = this.prepareAnnotatedVariantArray(tempGenomicNode, [])[0];
-                        } else {
-                            obj[path[0]]['genomic'] = tempGenomicNode;
-                        }
+                        obj[path[0]] = this.prepareGenomicNodes(this.prepareGenomicData());
                     } else if (obj[path[0]].hasOwnProperty('clinical')) {
-                        let tempClinicalNode = this.prepareClinicalData();
-                        if (tempClinicalNode['age_numerical'].includes(',')) {
-                            obj[path[0]] = this.prepareAgeArray(tempClinicalNode);
-                        } else {
-                            obj[path[0]]['clinical'] = tempClinicalNode;
-                        }
+                        obj[path[0]] = this.prepareClinicalNodes(this.prepareClinicalData());
                     }
                 } else {
                     const index = path.shift();
@@ -393,65 +383,58 @@ export class PanelComponent implements OnInit {
         }
     }
     // Generate multiple genomic nodes if annotated_variant is an array.
-    prepareAnnotatedVariantArray(genomicNode: object, obj: Array<any>) {
-        if (!_.isUndefined(genomicNode['annotated_variant']) && !_.isEmpty(genomicNode['annotated_variant'])) {
+    prepareGenomicNodes(genomicNode: object) {
+        if (!_.isUndefined(genomicNode['annotated_variant']) && genomicNode['annotated_variant'].includes(',')) {
             let annotatedVariants = genomicNode['annotated_variant'].split(',');
-            if (annotatedVariants.length > 1) {
-                let genomicNodeToSave = { and: [] };
-                _.each(annotatedVariants, function(variant) {
+            let genomicNodeToSave = { and: [] };
+            _.each(annotatedVariants, function(variant) {
+                if (!_.isEmpty(variant)) {
                     let genomicNodeCopy = _.clone(genomicNode);
                     genomicNodeCopy['annotated_variant'] = variant.trim();
                     genomicNodeToSave['and'].push({
                         genomic: genomicNodeCopy
                     });
-                });
-                obj.push(genomicNodeToSave);
-            } else {
-                obj.push({
-                    genomic: genomicNode
-                });
-            }
+                }
+            });
+            return genomicNodeToSave;
+        } else {
+            return { genomic: genomicNode };
         }
-        return obj;
     }
-    // Generate "And"/"Or" node for age range
-    prepareAgeArray(clinicalNode: Clinical) {
-        let ageGroups = clinicalNode['age_numerical'].split(',');
-        // There would be only 2 range elements, either A<age<B(and node) or A>B, age>A, age<B(or node).
-        ageGroups[0] = ageGroups[0].trim();
-        ageGroups[1] = ageGroups[1].trim();
-        let ageNumber0 = ageGroups[0].match(/\d\d?$/);
-        let ageNumber1 = ageGroups[1].match(/\d\d?$/);
-        let clinicalNodeToSave = {};
-        if ((ageGroups[0].includes('>') && ageGroups[1].includes('<') && ageNumber0 <= ageNumber1) ||
-            (ageGroups[0].includes('<') && ageGroups[1].includes('>') && ageNumber0 > ageNumber1)) {
-            clinicalNodeToSave = {
-                and: []
-            };
-            let tempClinicalNode0 = _.clone(clinicalNode);
-            tempClinicalNode0['age_numerical'] = ageGroups[0];
-            clinicalNodeToSave['and'].push({ clinical: tempClinicalNode0});
-            let tempClinicalNode1 = _.clone(clinicalNode);
-            tempClinicalNode1['age_numerical'] = ageGroups[1];
-            clinicalNodeToSave['and'].push({ clinical: tempClinicalNode1});
+    // Generate "And" node for age range
+    prepareClinicalNodes(clinicalNode: Clinical) {
+        if (!_.isUndefined(clinicalNode['age_numerical']) && clinicalNode['age_numerical'].includes(',')) {
+            let ageGroups = clinicalNode['age_numerical'].split(',');
+            ageGroups[0] = ageGroups[0].trim();
+            ageGroups[1] = ageGroups[1].trim();
+            let ageNumber0 = Number(ageGroups[0].match(/\d\d?$/));
+            let ageNumber1 = Number(ageGroups[1].match(/\d\d?$/));
+            let clinicalNodeToSave = {};
+            if ((ageGroups[0].includes('>') && ageGroups[1].includes('<') && ageNumber0 <= ageNumber1) ||
+                (ageGroups[0].includes('<') && ageGroups[1].includes('>') && ageNumber0 > ageNumber1)) {
+                clinicalNodeToSave = {
+                    and: []
+                };
+                let tempClinicalNode0 = _.clone( clinicalNode );
+                tempClinicalNode0[ 'age_numerical' ] = ageGroups[0];
+                clinicalNodeToSave[ 'and' ].push( { clinical: tempClinicalNode0 } );
+                let tempClinicalNode1 = _.clone( clinicalNode );
+                tempClinicalNode1[ 'age_numerical' ] = ageGroups[1];
+                clinicalNodeToSave[ 'and' ].push( { clinical: tempClinicalNode1 } );
+            }
+            return clinicalNodeToSave;
         } else {
             return {clinical: clinicalNode};
         }
-        return clinicalNodeToSave;
     }
     addNewNode(obj: Array<any>) {
         if (_.isEmpty(this.dataBlockToMove)) {
             switch (this.nodeType) {
                 case 'Genomic':
-                    obj = this.prepareAnnotatedVariantArray(this.prepareGenomicData(), obj);
+                    obj.push(this.prepareGenomicNodes(this.prepareGenomicData()));
                     break;
                 case 'Clinical':
-                    let tempClinicalNode = this.prepareClinicalData();
-                    if (tempClinicalNode['age_numerical'].includes(',')) {
-                        obj.push(this.prepareAgeArray(tempClinicalNode));
-                    } else {
-                        obj.push({ clinical: tempClinicalNode });
-                    }
+                    obj.push(this.prepareClinicalNodes(this.prepareClinicalData()));
                     break;
                 case 'And':
                 case 'Or':
@@ -459,15 +442,10 @@ export class PanelComponent implements OnInit {
                     for (let item of this.selectedItems) {
                         switch (item) {
                             case 'Genomic':
-                                tempObj1 = this.prepareAnnotatedVariantArray(this.prepareGenomicData(), tempObj1);
+                                tempObj1.push(this.prepareGenomicNodes(this.prepareGenomicData()));
                                 break;
                             case 'Clinical':
-                                let tempClinicalNode = this.prepareClinicalData();
-                                if (tempClinicalNode['age_numerical'].includes(',')) {
-                                    tempObj1.push(this.prepareAgeArray(tempClinicalNode));
-                                } else {
-                                    tempObj1.push({ clinical: tempClinicalNode });
-                                }
+                                tempObj1.push(this.prepareClinicalNodes(this.prepareClinicalData()));
                                 break;
                         }
                     }
