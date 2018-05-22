@@ -434,17 +434,6 @@ export class PanelComponent implements OnInit {
             let tempClinicalNode1 = _.clone(clinicalNode);
             tempClinicalNode1['age_numerical'] = ageGroups[1];
             clinicalNodeToSave['and'].push({ clinical: tempClinicalNode1});
-        } else if ((ageGroups[0].includes('<') && ageGroups[1].includes('>') && ageNumber0 <= ageNumber1) ||
-            (ageGroups[0].includes('>') && ageGroups[1].includes('<') && ageNumber0 > ageNumber1)) {
-            clinicalNodeToSave = {
-                or: []
-            };
-            let tempClinicalNode0 = _.clone(clinicalNode);
-            tempClinicalNode0['age_numerical'] = ageGroups[0];
-            clinicalNodeToSave['or'].push({ clinical: tempClinicalNode0});
-            let tempClinicalNode1 = _.clone(clinicalNode);
-            tempClinicalNode1['age_numerical'] = ageGroups[1];
-            clinicalNodeToSave['or'].push({ clinical: tempClinicalNode1});
         } else {
             return {clinical: clinicalNode};
         }
