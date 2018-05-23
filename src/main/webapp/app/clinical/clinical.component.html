@@ -1,14 +1,11 @@
 <div *ngIf="type === 'add'; else editPanel">
     <div>
-        <div class="row" style="margin-bottom:5px">
+        <div class="row ageNumericalMargin">
             <div class="col-sm-3">
                 age_numerical:
                 <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
             </div>
-            <div class="col-sm-1">
-                <label for="no_age_numerical1">Not</label>
-                <input id="no_age_numerical1" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_age_numerical" />
-            </div>
+            <div class="col-sm-1"></div>
             <div class="col-sm-8">
                 <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
             </div>
@@ -38,16 +35,13 @@
     <jhi-panel [type]="'delete,edit,relocate'" [unit]="unit" [path]="path"></jhi-panel>
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="operationPool['relocate'] !== true && operationPool['currentPath'] === path; else panel">
-        <div class="row">
+        <div class="row ageNumericalMargin">
             <div class="col-sm-4">
                 <label>age_numerical:
                     <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
                 </label>
             </div>
-            <div class="col-sm-1 editMargin">
-                <label for="no_age_numerical2">Not</label>
-                <input id="no_age_numerical2" class="notLabel" type="checkbox" [(ngModel)]="clinicalInput.no_age_numerical" />
-            </div>
+            <div class="col-sm-1 editMargin"></div>
             <div class="col-sm-7">
                 <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
             </div>
@@ -73,11 +67,22 @@
     </div>
     <ng-template #panel>
         <div [ngStyle]="getStyle()">
-            <label>age_numerical:</label>
-            <span>{{unit.clinical.age_numerical}}</span>
-            <br/>
-            <label>oncotree_primary_diagnosis:</label>
-            <span>{{unit.clinical.oncotree_primary_diagnosis}}</span>
+            <div class="row">
+                <div class="col-sm-3">
+                    <label>age_numerical:</label>
+                </div>
+                <div class="col-sm-9">
+                    <span>{{unit.clinical.age_numerical}}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <label>oncotree_primary_diagnosis:</label>
+                </div>
+                <div class="col-sm-9">
+                    <span>{{unit.clinical.oncotree_primary_diagnosis}}</span>
+                </div>
+            </div>
         </div>
     </ng-template>
 </ng-template>

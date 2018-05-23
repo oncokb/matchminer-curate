@@ -2,7 +2,6 @@ import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Http, Response } from '@angular/http';
 import { environment } from '../environments/environment';
-import { SERVER_API_URL } from '../app.constants';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
@@ -43,7 +42,17 @@ export class GenomicComponent implements OnInit {
         .debounceTime(200)
         .distinctUntilChanged()
         .map(term => (term.length < 1 || _.isUndefined(this.annotated_variants[this.genomicInput.hugo_symbol])) ? []
-            : this.annotated_variants[this.genomicInput.hugo_symbol].filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
+            : this.annotated_variants[this.genomicInput.hugo_symbol]
+            .filter(v => v.toLowerCase().indexOf(term.split(',').slice(-1)[0].trim().toLowerCase()) > -1)
+            .slice(0, 10));
+    selectAnnotatedVariant($event) {
+        if(this.genomicInput.annotated_variant.includes(',')) {
+            $event.preventDefault();
+            let variantArray = this.genomicInput.annotated_variant.split(',').slice(0, -1);
+            variantArray.push($event.item);
+            this.genomicInput.annotated_variant = variantArray.join(',');
+        }
+    }
 
     constructor(private trialService: TrialService, public http: Http) { 
     }
@@ -61,16 +70,26 @@ export class GenomicComponent implements OnInit {
     }
     // This validation function will be executed the moment the input box lose focus
     validateGenomicGene() {
+        // hugo_symbol can be empty.
+        if (_.isEmpty(this.genomicInput.hugo_symbol)) {
+            this.validationMessage['gene'] = '';
+            this.geneValidation = true;
+            this.trialService.setHasErrorInputField(false);
+            return;
+        }
         this.http.get(this.trialService.getAPIUrl('GeneValidation') + this.genomicInput.hugo_symbol)
         .subscribe((res: Response) => {
            const result = res.json();
            if (result.hits.length > 0) {
                 this.validationMessage['gene'] = 'Valid gene';
                 this.geneValidation = true;
+               this.trialService.setHasErrorInputField(false);
            } else {
                 this.validationMessage['gene'] = 'Invalid gene';
                 this.geneValidation = false;
-           }  
+               // Disable "Add" or "Save" button
+               this.trialService.setHasErrorInputField(true);
+           }
         });
     }
     validateGenomicExample() {

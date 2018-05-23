@@ -52,6 +52,10 @@ export class TrialService {
     private clinicalInputSource = new BehaviorSubject<Clinical>(this.clinicalInput);
     clinicalInputObs = this.clinicalInputSource.asObservable();
 
+    hasErrorInputField = false;
+    private hasErrorInputFieldSource = new BehaviorSubject<boolean>(this.hasErrorInputField);
+    hasErrorInputFieldObs = this.hasErrorInputFieldSource.asObservable();
+
     armInput: Arm = {
         arm_name: '',
         arm_status: '',
@@ -74,6 +78,7 @@ export class TrialService {
     trialsRef: AngularFireObject<any>;
     nctIdChosen = '';
     errorList: Array<object> = [];
+
     constructor(public http: Http, public db: AngularFireDatabase, private emailService: EmailService) {
         this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
@@ -177,7 +182,6 @@ export class TrialService {
             oncotree_primary_diagnosis: '',
             main_type: '',
             sub_type: '',
-            no_age_numerical: false,
             no_oncotree_primary_diagnosis: false
         };
         return clinicalInput;
@@ -246,6 +250,9 @@ export class TrialService {
     }
     setArmInput(armInput: Arm) {
         this.armInputSource.next(armInput);
+    }
+    setHasErrorInputField(hasErrorInputField: boolean) {
+        this.hasErrorInputFieldSource.next(hasErrorInputField);
     }
     getStyle(indent: number) {
         return { 'margin-left': (indent * 40) + 'px' };

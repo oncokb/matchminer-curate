@@ -28,9 +28,7 @@ export class PanelComponent implements OnInit {
     movingPath: MovingPath;
     dataBlockToMove = {};
     currentPath = '';
-    dropdownList = [
-        { id: 1, itemName: 'Genomic' },
-        { id: 2, itemName: 'Clinical' }];
+    dropdownList = ['Genomic', 'Clinical'];
     armInput: Arm;
     originalMatch = [];
     originalArms = [];
@@ -49,6 +47,7 @@ export class PanelComponent implements OnInit {
     'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype'];
     oncokbGenomicFields = ['hugo_symbol', 'annotated_variant'];
     oncokb: boolean;
+    hasErrorInputField: boolean;
             
     constructor(private trialService: TrialService) { 
     }
@@ -77,6 +76,9 @@ export class PanelComponent implements OnInit {
         });
         this.trialService.armInputObs.subscribe(message => {
             this.armInput = message;
+        });
+        this.trialService.hasErrorInputFieldObs.subscribe(message => {
+            this.hasErrorInputField = message;
         });
         this.oncokb = this.trialService.oncokb;
     }
@@ -127,22 +129,27 @@ export class PanelComponent implements OnInit {
     }
     modifyNode(type: string) {
         let result = true;
+        let hasEmptySections = false;
         // validate the need to proceed
         if (type === 'delete') {
             result = confirm('This will delete the entire section. Are you sure you want to proceed?');
+        } else {
+            let nodeType = this.getNodeType(this.nodeType);
+            hasEmptySections = this.hasEmptySections(nodeType);
         }
-        let nodeType = this.getNodeType(this.nodeType);
-        let hasEmptySections = this.hasEmptySections(nodeType);
-        if (result && !hasEmptySections) {
+
+        if (result && (type === 'delete' || !hasEmptySections)) {
             if (this.arm === true) {
                 this.modifyArmGroup(type);
             } else {
                 this.preparePath();
                 this.modifyData(this.dataToModify, this.finalPath, type);  
             }
-            return this.saveBacktoDB();
-        } else {
-            return false;
+            this.saveBacktoDB().then((isSaved) => {
+                if (isSaved && type === 'update') {
+                    this.cancelModification();
+                }
+            });
         }
     }
     hasEmptyGenomicFields(obj: any) {
@@ -194,7 +201,7 @@ export class PanelComponent implements OnInit {
         case 'And':
         case 'Or':
             for (let item of this.selectedItems) {
-                this.getEmptySectionNames(item.itemName, emptySections);
+                this.getEmptySectionNames(item, emptySections);
             }
             break;
         }
@@ -217,26 +224,27 @@ export class PanelComponent implements OnInit {
         return false;
     }
     saveBacktoDB() {
-        this.trialService.getTrialRef(this.nctIdChosen).set({
-            arm: this.originalArms,
-            match: this.originalMatch
-        }).then(result => {
-            console.log("save successfully!");
-            this.clearInput();
-            return true;
-        }).catch(error => {
-            console.log('Failed to save to DB ', error);
-            const errorMessage = "Sorry, this node is failed to save to database. Please make a copy of your data. Thanks!";
-            this.trialService.saveErrors(
-                errorMessage,
-                {
-                    arm: this.originalArms,
-                    match: this.originalMatch
-                },
-                error);
-            alert(errorMessage);
-            this.cancelModification();
-            return false;
+        return new Promise((resolve, reject) => {
+            this.trialService.getTrialRef(this.nctIdChosen).set({
+                arm: this.originalArms,
+                match: this.originalMatch
+            }).then(result => {
+                console.log("save successfully!");
+                this.clearInput();
+                resolve(true);
+            }).catch(error => {
+                console.log('Failed to save to DB ', error);
+                const errorMessage = "Sorry, this node is failed to save to database. Please make a copy of your data. Thanks!";
+                this.trialService.saveErrors(
+                    errorMessage,
+                    {
+                        arm: this.originalArms,
+                        match: this.originalMatch
+                    },
+                    error);
+                alert(errorMessage);
+                reject(false);
+            });
         });
     }
     modifyData(obj: Array<any>, path: Array<string>, type: string) {
@@ -259,9 +267,9 @@ export class PanelComponent implements OnInit {
             case 'update':
                 if (path.length === 1) {
                     if (obj[path[0]].hasOwnProperty('genomic')) {
-                        obj[path[0]]['genomic'] = this.prepareGenomicData();
+                        obj[path[0]] = this.prepareGenomicNodes(this.prepareGenomicData());
                     } else if (obj[path[0]].hasOwnProperty('clinical')) {
-                        obj[path[0]]['clinical'] = this.prepareClinicalData();
+                        obj[path[0]] = this.prepareClinicalNodes(this.prepareClinicalData());
                     }
                 } else {
                     const index = path.shift();
@@ -357,38 +365,87 @@ export class PanelComponent implements OnInit {
             }
             // apply not logic
             if (nodeData['no_' + key]) {
-                nodeData[key] = '!' + nodeData[key];
-            }   
-            delete nodeData['no_' + key];     
-        } 
+                if (key === 'annotated_variant'){
+                    let annotatedVariants = nodeData[key].split(',');
+                    nodeData[key] = '!' + nodeData[key];
+                    if (annotatedVariants.length > 1) {
+                        nodeData[key] = '';
+                        _.each(annotatedVariants, function(variant) {
+                            nodeData[key] += '!' + variant.trim() + ',';
+                        });
+                        nodeData[key] = nodeData[key].slice(0, -1);
+                    }
+                } else {
+                    nodeData[key] = '!' + nodeData[key];
+                }
+            }
+            delete nodeData['no_' + key];
+        }
+    }
+    // Generate multiple genomic nodes if annotated_variant is an array.
+    prepareGenomicNodes(genomicNode: object) {
+        if (!_.isUndefined(genomicNode['annotated_variant']) && genomicNode['annotated_variant'].includes(',')) {
+            let annotatedVariants = genomicNode['annotated_variant'].split(',');
+            let genomicNodeToSave = { and: [] };
+            _.each(annotatedVariants, function(variant) {
+                if (!_.isEmpty(variant)) {
+                    let genomicNodeCopy = _.clone(genomicNode);
+                    genomicNodeCopy['annotated_variant'] = variant.trim();
+                    genomicNodeToSave['and'].push({
+                        genomic: genomicNodeCopy
+                    });
+                }
+            });
+            return genomicNodeToSave;
+        } else {
+            return { genomic: genomicNode };
+        }
+    }
+    // Generate "And" node for age range
+    prepareClinicalNodes(clinicalNode: Clinical) {
+        if (!_.isUndefined(clinicalNode['age_numerical']) && clinicalNode['age_numerical'].includes(',')) {
+            let ageGroups = clinicalNode['age_numerical'].split(',');
+            ageGroups[0] = ageGroups[0].trim();
+            ageGroups[1] = ageGroups[1].trim();
+            let ageNumber0 = Number(ageGroups[0].match(/\d\d?$/));
+            let ageNumber1 = Number(ageGroups[1].match(/\d\d?$/));
+            let clinicalNodeToSave = {};
+            if ((ageGroups[0].includes('>') && ageGroups[1].includes('<') && ageNumber0 <= ageNumber1) ||
+                (ageGroups[0].includes('<') && ageGroups[1].includes('>') && ageNumber0 > ageNumber1)) {
+                clinicalNodeToSave = {
+                    and: []
+                };
+                let tempClinicalNode0 = _.clone( clinicalNode );
+                tempClinicalNode0[ 'age_numerical' ] = ageGroups[0];
+                clinicalNodeToSave[ 'and' ].push( { clinical: tempClinicalNode0 } );
+                let tempClinicalNode1 = _.clone( clinicalNode );
+                tempClinicalNode1[ 'age_numerical' ] = ageGroups[1];
+                clinicalNodeToSave[ 'and' ].push( { clinical: tempClinicalNode1 } );
+            }
+            return clinicalNodeToSave;
+        } else {
+            return {clinical: clinicalNode};
+        }
     }
     addNewNode(obj: Array<any>) {
         if (_.isEmpty(this.dataBlockToMove)) {
             switch (this.nodeType) {
                 case 'Genomic':
-                    obj.push({
-                        genomic: this.prepareGenomicData()
-                    });
+                    obj.push(this.prepareGenomicNodes(this.prepareGenomicData()));
                     break;
                 case 'Clinical':
-                    obj.push({
-                        clinical: this.prepareClinicalData()
-                    });
+                    obj.push(this.prepareClinicalNodes(this.prepareClinicalData()));
                     break;
                 case 'And':
                 case 'Or':
                     let tempObj1: any = [];
                     for (let item of this.selectedItems) {
-                        switch (item.itemName) {
+                        switch (item) {
                             case 'Genomic':
-                                tempObj1.push({
-                                    genomic: this.prepareGenomicData()
-                                });
+                                tempObj1.push(this.prepareGenomicNodes(this.prepareGenomicData()));
                                 break;
                             case 'Clinical':
-                                tempObj1.push({
-                                    clinical: this.prepareClinicalData()
-                                });
+                                tempObj1.push(this.prepareClinicalNodes(this.prepareClinicalData()));
                                 break;
                         }
                     }
@@ -498,9 +555,7 @@ export class PanelComponent implements OnInit {
         this.operationPool['editing'] = false;
     }
     saveModification() {
-        if (this.modifyNode('update')) {
-            this.cancelModification();
-        }
+        this.modifyNode('update');
     }
     dropDownNode() {
         this.operationPool['relocate'] = false;

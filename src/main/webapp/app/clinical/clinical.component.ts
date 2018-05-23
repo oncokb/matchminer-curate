@@ -43,21 +43,71 @@ export class ClinicalComponent implements OnInit {
         }
     }
     validateAgeInput() {
-        if (this.clinicalInput.age_numerical.match(/^(>|>=|<|<=)?[0-9][0-9]$/)) {
-            this.validationMessage = 'Valid Age Entry';
-            this.validation = true;
+        let isValidated = false;
+        if(this.clinicalInput.age_numerical.includes(',')) {
+            let ageGroups = this.clinicalInput.age_numerical.split(',');
+            // Age input cannot only accepts age range groups greater than 2.
+            if (ageGroups.length === 2) {
+                let ageNumber0 = Number(ageGroups[0].match(/\d\d?$/));
+                let ageNumber1 = Number(ageGroups[1].match(/\d\d?$/));
+                // Do no allow age range like '>15, >=30' or '<=60, <40' or '<10, >60' or '>50, <20'
+                if ((ageGroups[0].includes('>') && ageGroups[1].includes('>')) ||
+                    (ageGroups[0].includes('<') && ageGroups[1].includes('<')) ||
+                    (ageGroups[0].includes('<') && ageGroups[1].includes('>') && ageNumber0 <= ageNumber1) ||
+                    (ageGroups[0].includes('>') && ageGroups[1].includes('<') && ageNumber0 >= ageNumber1)) {
+                    this.setValidationMessage(false, 'Invalid Age Entry');
+                    return;
+                }
+                ageGroups.forEach(age => {
+                    isValidated = this.validateSingleAgeStr(age.trim());
+                    if (!isValidated) {
+                        this.setValidationMessage(false, 'Invalid Age Entry');
+                        return;
+                    }
+                });
+            } else {
+                // Age input invalid format like ">=18,".
+                this.setValidationMessage(false, 'Invalid Age Entry');
+                return;
+            }
         } else {
-            this.validationMessage = 'Invalid Age Entry';
-            this.validation = false;
+            // Allow age_numerical to be empty.
+            if (_.isEmpty(this.clinicalInput.age_numerical)) {
+                this.setValidationMessage(true, '');
+                return;
+            }
+            isValidated = this.validateSingleAgeStr(this.clinicalInput.age_numerical);
+            if (!isValidated) {
+                this.setValidationMessage(false, 'Invalid Age Entry');
+                return;
+            }
+        }
+        if(isValidated) {
+            this.setValidationMessage(true, 'Valid Age Entry');
+        }
+    }
+    validateSingleAgeStr(age_numerical: string) {
+        if (age_numerical.match(/^(>|>=|<|<=)\d\d?$/)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    setValidationMessage(isPassed: boolean, message: string) {
+        this.validationMessage = message;
+        this.validation = isPassed;
+        if (isPassed) {
+            this.trialService.setHasErrorInputField(false);
+        } else {
+            // Disable "Add" or "Save" button
+            this.trialService.setHasErrorInputField(true);
         }
     }
     onSingleSelected(option){
-        if (!_.isUndefined(option)) {
+        if (_.isUndefined(option)) {
             this.clinicalInput.sub_type = '';
-        } else {
-            if (option && this.clinicalInput.main_type !== this.subToMainMapping[option]) {
-                this.clinicalInput.main_type = this.subToMainMapping[option]; 
-            }
+        } else if (option && this.clinicalInput.main_type !== this.subToMainMapping[option]) {
+            this.clinicalInput.main_type = this.subToMainMapping[option];
         }
     }
     onSingleDeselectedMaintype() {
