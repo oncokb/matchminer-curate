@@ -1,6 +1,6 @@
 <div *ngIf="type === 'add'; else editPanel">
     <div>
-        <div class="row" style="margin-bottom:10px">
+        <div class="row ageNumericalMargin">
             <div class="col-sm-3">
                 age_numerical:
                 <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
@@ -35,7 +35,7 @@
     <jhi-panel [type]="'delete,edit,relocate'" [unit]="unit" [path]="path"></jhi-panel>
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="operationPool['relocate'] !== true && operationPool['currentPath'] === path; else panel">
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row ageNumericalMargin">
             <div class="col-sm-4">
                 <label>age_numerical:
                     <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
