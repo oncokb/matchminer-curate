@@ -1,5 +1,7 @@
 package org.mskcc.oncokb.controller;
 
+import com.google.firebase.database.*;
+import com.google.gson.Gson;
 import com.mongodb.client.MongoDatabase;
 import io.swagger.annotations.ApiParam;
 import org.json.JSONObject;
@@ -17,9 +19,7 @@ import java.io.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -38,6 +38,10 @@ public class TrialsController implements TrialsApi {
     private String matchenginePath;
     @Autowired
     private MongoDatabase mongoDatabase;
+    @Autowired
+    private FirebaseDatabase firebaseDatabase;
+    String trialJson = "";
+    String trialsJson = "";
 
     @Override
     @RequestMapping(value = "/trials/create",
@@ -97,4 +101,34 @@ public class TrialsController implements TrialsApi {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<String> getTrialById(@ApiParam(value = "Search by NCT ID.",required=true )
+                                                 @PathVariable("id") String id) {
+        DatabaseReference ref = firebaseDatabase.getReference("Trials");
+        // Attach a listener to read the data at our posts reference
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Object obj = dataSnapshot.getValue(Object.class);
+                Gson gson = new Gson();
+                trialJson = gson.toJson(obj);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                log.error("The read failed: " + databaseError.getCode());
+            }
+        });
+        return new ResponseEntity<>(trialJson, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> getTrialsData(@ApiParam(value = "Size of results.") @RequestParam(value = "size", required = false) String size,
+                                              @ApiParam(value = "Search by NCT ID.") @RequestParam(value = "nctId", required = false) String nctId,
+                                              @ApiParam(value = "Search by trial status.") @RequestParam(value = "trialStatus", required = false) String trialStatus) {
+
+        return new ResponseEntity<>(trialsJson, HttpStatus.OK);
+    }
+
 }

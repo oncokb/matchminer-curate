@@ -7,9 +7,8 @@ package org.mskcc.oncokb.controller.api;
 
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-10T10:25:19.794-04:00")
@@ -26,4 +25,25 @@ public interface TrialsApi {
         consumes = { "application/json" },
         method = RequestMethod.POST)
     public ResponseEntity<Void> create(@ApiParam(value = "a trial json object " ,required=true )  @Valid @RequestBody Object trial);
+
+    @ApiOperation(value = "", notes = "Get trial json data by nct_id.", response = Void.class, tags={  })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Return trials successfully.", response = Void.class),
+        @ApiResponse(code = 500, message = "Exception occured at the backend.", response = Void.class) })
+
+    @RequestMapping(value = "/trials/{id}",
+        produces = { "application/json" },
+        method = RequestMethod.GET)
+    public ResponseEntity<String> getTrialById(@ApiParam(value = "Search by NCT ID.",required=true ) @PathVariable("id") String id);
+
+
+    @ApiOperation(value = "", notes = "Get trial json data.", response = Void.class, tags={  })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Return trials successfully.", response = Void.class),
+        @ApiResponse(code = 500, message = "Exception occured at the backend.", response = Void.class) })
+
+    @RequestMapping(value = "/trials",
+        produces = { "application/json" },
+        method = RequestMethod.GET)
+    public ResponseEntity<String> getTrialsData(@ApiParam(value = "Size of results.") @RequestParam(value = "size", required = false) String size, @ApiParam(value = "Search by NCT ID.") @RequestParam(value = "nctId", required = false) String nctId, @ApiParam(value = "Search by trial status.") @RequestParam(value = "trialStatus", required = false) String trialStatus);
 }

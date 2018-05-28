@@ -27,4 +27,48 @@ paths:
         '200':
           description: Load to Mongo DB successfully.
         '500':
-          description: Load the trial failed!
+          description: Exception occured at the backend.
+  '/trials':
+    get:
+      description: Get trial json data.
+      operationId: "getTrialsData"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "size"
+        in: "query"
+        type: "string"
+        description: "Size of results."
+        required: false
+      - name: "nctId"
+        in: "query"
+        type: "string"
+        description: "Search by NCT ID."
+        required: false
+      - in: "query"
+        name: "trialStatus"
+        type: "string"
+        description: "Search by trial status."
+        required: false
+      responses:
+        '200':
+          description: Return trials successfully.
+        '500':
+          description: Exception occured at the backend.
+  '/trials/{id}':
+    get:
+      description: Get trial json data by nct_id.
+      operationId: "getTrialById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        type: "string"
+        description: "Search by NCT ID."
+        required: true
+      responses:
+        '200':
+          description: Return trials successfully.
+        '500':
+          description: Exception occured at the backend.
