@@ -1,0 +1,55 @@
+<div class="container" style="min-height:550px">
+    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+        <thead>
+        <tr>
+            <th>NCT ID</th>
+            <th>Status</th>
+            <th>Title</th>
+            <th>Download</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let trial of trialList">
+            <td><a routerLink="{{'/trials/' + trial.nct_id}}">{{ trial.nct_id }}</a></td>
+            <!--<td><a (click)="viewTrialDetails(trial.nct_id)">{{ trial.nct_id }}</a></td>-->
+            <td>{{ trial.status }}</td>
+            <td>{{ trial.short_title }}</td>
+            <td style="display: inline-flex">
+                <button class="btn btn-primary download-button" (click)="downloadSingleTrial(trial.nct_id, 'json')">JSON</button>
+                <button class="btn btn-primary download-button" (click)="downloadSingleTrial(trial.nct_id, 'yaml')">YAML</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="margin-top: 30px;margin-bottom: 30px;">
+        <div style="float:right">
+            <label for="fileType">File Type for download/upload:</label>
+            <span id="fileType">
+            <label for="jsonOption" style="margin-left:10px">JSON</label>
+            <input id="jsonOption" type="radio" value="JSON" name="fileType" [(ngModel)]="fileType">
+            <label for="yamlOption" style="margin-left:10px">YAML</label>
+            <input id="yamlOption" type="radio" value="YAML" name="fileType" [(ngModel)]="fileType">
+        </span>
+        </div>
+        <br>
+        <br>
+        <div>
+            <p>Choose trials nct_id that you want to download:
+                <button class="btn btn-primary button-margin" (click)="downloadMultipleTrials()">Download Selected</button>
+                <button class="btn btn-primary button-margin" (click)="downloadAllTrials()">Download All</button>
+            </p>
+            <ng-select [items]="nctIdList" [multiple]="true" [closeOnSelect]="false" [hideSelected]="true"></ng-select>
+        </div>
+        <br>
+        <br>
+        <div>
+            <p>Upload trial files(Try selecting more than one file when browsing for files):
+                <button class="btn btn-primary button-margin" (click)="uploadFiles()">Upload Files</button>
+            </p>
+            <div>
+                <input type="file" name="filesToUpload[]" multiple>
+
+            </div>
+        </div>
+    </div>
+</div>

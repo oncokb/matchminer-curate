@@ -28,6 +28,7 @@
     "firebase": "^4.9.0",
     "font-awesome": "4.7.0",
     "jquery": "^3.3.1",
+    "js-yaml": "^3.11.0",
     "ng-jhipster": "0.3.6",
     "ng2-webstorage": "^2.0.0",
     "ngx-cookie": "2.0.1",

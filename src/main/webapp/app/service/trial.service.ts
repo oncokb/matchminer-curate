@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AngularFireDatabase, AngularFireObject, AngularFireList } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
 import { Trial } from '../trial/trial.model';
 import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
@@ -9,7 +8,6 @@ import { MovingPath } from '../panel/movingPath.model';
 import { Arm } from '../arm/arm.model';
 import { Http, Response } from '@angular/http';
 import * as _ from 'underscore';
-import { currentId } from 'async_hooks';
 import { SERVER_API_URL } from '../app.constants';
 import { environment } from '../environments/environment';
 import { EmailService } from "./email.service";
@@ -70,8 +68,8 @@ export class TrialService {
     allSubTypesOptions = [];
     subToMainMapping = {};
     mainTypesOptions = ['All Solid Tumors', 'All Liquid Tumors', 'All Tumors', 'All Pediatric Tumors'];
-    statusOptions = ['Active', 'Administratively Complete', 'Approved', 'Closed to Accrual', 'Closed to Accrual and Intervention', 
-    'Complete', 'Enrolling by Invitation', 'In Review', 'Temporarily Closed to Accrual', 'Temporarily Closed to Accrual and Intervention', 
+    statusOptions = ['Active', 'Administratively Complete', 'Approved', 'Closed to Accrual', 'Closed to Accrual and Intervention',
+    'Complete', 'Enrolling by Invitation', 'In Review', 'Temporarily Closed to Accrual', 'Temporarily Closed to Accrual and Intervention',
     'Withdrawn'];
     annotated_variants = {};
     trialList: Array<Trial> = [];
@@ -82,7 +80,7 @@ export class TrialService {
     constructor(public http: Http, public db: AngularFireDatabase, private emailService: EmailService) {
         this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
-        
+
         // prepare main types list
         this.http.get(this.getAPIUrl('MainType'))
         .subscribe((res: Response) => {
@@ -204,12 +202,22 @@ export class TrialService {
             this.authorizedSource.next(true);
             this.trialList = [];
             for (const nctId of _.keys(action.payload.val())) {
-                this.trialList.push(action.payload.val()[nctId]);                
+                this.trialList.push(action.payload.val()[nctId]);
             }
             this.trialListSource.next(this.trialList);
             this.setTrialChosen(this.nctIdChosen);
         }, error => {
             this.authorizedSource.next(false);
+        });
+    }
+    fetchTrialById(id: string) {
+        return new Promise((resolve, reject) => {
+            this.db.object('Trials/' + id).valueChanges().subscribe((trial: any) => {
+                resolve(trial);
+            }, error => {
+                console.log("Fetch trial by id failed!", error);
+                reject({});
+            });
         });
     }
     setTrialChosen(nctId: string) {
@@ -301,7 +309,7 @@ export class TrialService {
             switch(type) {
                 case 'MainType':
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
-                case 'SubType': 
+                case 'SubType':
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
@@ -316,7 +324,7 @@ export class TrialService {
             switch(type) {
                 case 'MainType':
                     return 'http://oncotree.mskcc.org/api/mainTypes';
-                case 'SubType': 
+                case 'SubType':
                     return 'http://oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return 'http://oncokb.org/api/v1/variants';
@@ -325,7 +333,7 @@ export class TrialService {
                 case 'ClinicalTrials':
                     return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
                 case 'ExampleValidation':
-                    return 'http://oncokb.org/api/v1/utils/match/variant?';    
+                    return 'http://oncokb.org/api/v1/utils/match/variant?';
             }
         }
     }

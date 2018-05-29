@@ -39,6 +39,7 @@ import {
     ErrorComponent
 } from './layouts';
 import { EmailService } from "./service/email.service";
+import { ConverterComponent } from "./converter/converter.component";
 
 @NgModule({
     imports: [
@@ -69,7 +70,8 @@ import { EmailService } from "./service/email.service";
         ArmComponent,
         PanelComponent,
         MatchComponent,
-        LoginComponent
+        LoginComponent,
+        ConverterComponent
     ],
     providers: [
         ProfileService,
