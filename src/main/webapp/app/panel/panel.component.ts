@@ -176,7 +176,8 @@ export class PanelComponent implements OnInit {
         return true;
     }
     hasEmptyArmFields(obj: any) {
-        if (!_.isUndefined(obj['arm_name']) && obj['arm_name'].length > 0) {
+        if ((!_.isUndefined(obj['arm_name']) && obj['arm_name'].length > 0) ||
+            (!_.isUndefined(obj['arm_code']) && obj['arm_code'].length > 0)) {
             return false;
         }
         return true;
@@ -486,7 +487,7 @@ export class PanelComponent implements OnInit {
             this.trialService.setClinicalInput(_.clone(this.unit['clinical']));
             this.setNotLogic('clinical');
             this.setOncotree();
-        } else if (this.unit.hasOwnProperty('arm_name')) {
+        } else if (this.unit.hasOwnProperty('arm_name') || this.unit.hasOwnProperty('arm_code')) {
             let armToAdd: Arm = {
                 arm_name: this.unit['arm_name'],
                 arm_status: this.unit['arm_status'],
@@ -494,6 +495,12 @@ export class PanelComponent implements OnInit {
                 arm_eligibility: this.unit['arm_eligibility'],
                 match: this.unit['match']
             };
+            // Display DFCI arm data
+            if (!this.trialService.oncokb) {
+                armToAdd.arm_code = this.unit['arm_code'];
+                armToAdd.arm_internal_id = this.unit['arm_internal_id'];
+                armToAdd.arm_suspended = this.unit['arm_suspended'];
+            }
             this.trialService.setArmInput(armToAdd);
         }
     }
@@ -537,7 +544,12 @@ export class PanelComponent implements OnInit {
     preAddNode() {
         this.addNode = true;
         if (this.arm === true) {
-            this.clearInputForm(['arm_name', 'arm_status', 'arm_description', 'arm_eligibility'], 'arm');
+            if (this.trialService.oncokb) {
+                this.clearInputForm(['arm_name', 'arm_status', 'arm_description', 'arm_eligibility'], 'arm');
+            } else {
+                this.clearInputForm(['arm_name', 'arm_code', 'arm_internal_id', 'arm_suspended', 'arm_status',
+                    'arm_description', 'arm_eligibility'], 'arm');
+            }
         }
     }
     moveNode() {
@@ -651,22 +663,34 @@ export class PanelComponent implements OnInit {
     modifyArmGroup(type) {
         if (type === 'add') {
             let armToAdd: Arm = {
-                arm_name: this.armInput.arm_name,
-                arm_status: this.armInput.arm_status,
-                arm_description: this.armInput.arm_description,
-                arm_eligibility: this.armInput.arm_eligibility,
+                arm_name: '',
+                arm_status: '',
+                arm_description: '',
+                arm_eligibility: '',
+                arm_code: '',
+                arm_internal_id: '',
+                arm_suspended: '',
                 match: []
             };
+            this.prepareArmData(this.armInput, armToAdd);
             this.originalArms.push(armToAdd);
         } else if (type === 'delete') {
             const tempIndex = Number(this.path.split(',')[1].trim());
             this.originalArms.splice(tempIndex, 1);
         } else if (type === 'update') {
             const tempIndex = this.path.split(',')[1].trim();
-            this.originalArms[tempIndex].arm_name = this.armInput['arm_name'];
-            this.originalArms[tempIndex].arm_status = this.armInput['arm_status'];
-            this.originalArms[tempIndex].arm_description = this.armInput['arm_description'];
-            this.originalArms[tempIndex].arm_eligibility = this.armInput['arm_eligibility'];
+            this.prepareArmData(this.armInput, this.originalArms[tempIndex]);
         }
+    }
+    prepareArmData(armInput: Arm, armToSave: Arm){
+        let keys = _.keys(armInput);
+        _.each(keys, function(key) {
+            if(!_.isUndefined(armInput[key])) {
+                armToSave[key] = armInput[key];
+            }
+            if(_.isEmpty(armInput[key])) {
+                delete armToSave[key];
+            }
+        });
     }
 }

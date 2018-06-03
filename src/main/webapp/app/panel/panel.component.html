@@ -45,27 +45,63 @@
         </ng-template>
     </div>
     <ng-template #armSection>
-        <div>
-            <label style="width: 150px; margin-right: -30px">arm name: </label>
-            <input [(ngModel)]="armInput.arm_name" size="100"/>
-        </div>
-         <div>
-            <label style="width: 150px; margin-right: -30px">arm status: </label>
-            <div style="min-width: 300px; display: inline-block; margin-top: 10px;">
-                <ng-select class="selectStyle" [items]="statusOptions" [(ngModel)]="armInput.arm_status" [clearable]="true"></ng-select>
+        <div class="row arm-row">
+            <div class="col-md-2">
+                <label>arm name: </label>
+            </div>
+            <div class="col-md-10">
+                <input [(ngModel)]="armInput.arm_name" size="100"/>
             </div>
         </div>
-        <div>
-            <label style="width:150px" for="description">arm description: </label>
+        <div *ngIf="!oncokb">
+            <div class="row arm-row">
+                <div class="col-md-2">
+                    <span class="indent1">arm code: </span>
+                </div>
+                <div class="col-md-10">
+                    <input [(ngModel)]="armInput.arm_code" size="100"/>
+                </div>
+            </div>
+            <div class="row arm-row">
+                <div class="col-md-2">
+                    <span class="indent1">arm internal id: </span>
+                </div>
+                <div class="col-md-10">
+                    <input [(ngModel)]="armInput.arm_internal_id" size="100"/>
+                </div>
+            </div>
+            <div class="row arm-row">
+                <div class="col-md-2">
+                    <span class="indent1">arm suspended: </span>
+                </div>
+                <div class="col-md-10">
+                    <input [(ngModel)]="armInput.arm_suspended" size="100"/>
+                </div>
+            </div>
         </div>
-        <div style="margin-top: -20px; margin-left:150px">
-            <textarea id="description" rows="3" cols="100" [(ngModel)]="armInput.arm_description"></textarea>
+        <div class="row arm-row">
+            <div class="col-md-2">
+                <label>arm status: </label>
+            </div>
+            <div class="col-md-10">
+                <ng-select class="selectStyle select-width" [items]="statusOptions" [(ngModel)]="armInput.arm_status" [clearable]="true"></ng-select>
+            </div>
         </div>
-        <div>
-            <label style="width:150px" for="eligibility">arm eligibility: </label>
+        <div class="row arm-row">
+            <div class="col-md-2">
+                <label for="description">arm description: </label>
+            </div>
+            <div class="col-md-10">
+                <textarea id="description" rows="3" cols="100" [(ngModel)]="armInput.arm_description"></textarea>
+            </div>
         </div>
-        <div style="margin-top: -20px; margin-left:150px">
-            <textarea id="eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
+        <div class="row arm-row">
+            <div class="col-md-2">
+                <label for="eligibility">arm eligibility: </label>
+            </div>
+            <div class="col-md-10">
+                <textarea id="eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
+            </div>
         </div>
         <button class="btn btn-success addButon" (click)="modifyNode('add')">Add</button>
         <button class="btn btn-warning cancelButton" (click)="clearInput()">Cancel</button>

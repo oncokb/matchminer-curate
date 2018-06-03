@@ -67,19 +67,24 @@ export class TrialComponent implements OnInit, AfterViewInit{
     this.messages = [];
     const newTrials: Array<string>  = this.trialsToImport.split(',');
     let setChosenTrial = false;
+    let result = true;
     for (const newTrial of newTrials) {
         const tempTrial = newTrial.trim();
         if (tempTrial.length === 0) {
-            continue;
-        }
-        if (this.nctIdList.indexOf(tempTrial) !== -1) {
-            this.messages.push(tempTrial + ' already imported');
             continue;
         }
         if (!tempTrial.match(/NCT[0-9]+/g)) {
             this.messages.push(tempTrial + ' is invalid trial format');
             continue;
         }
+        if (this.nctIdList.indexOf(tempTrial) !== -1) {
+            result = confirm('Trial ' + tempTrial + ' has been loaded in database. ' +
+                'Are you sure you want to overwrite this trial by loading file ' + tempTrial + '?');
+        }
+        if(!result) {
+            continue;
+        }
+
         this.http.get(this.trialService.getAPIUrl('ClinicalTrials') + tempTrial)
         .subscribe((res: Response) => {
            const trialInfo = res.json();

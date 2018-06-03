@@ -59,6 +59,9 @@ export class TrialService {
         arm_status: '',
         arm_description: '',
         arm_eligibility: '',
+        arm_code: '',
+        arm_internal_id: '',
+        arm_suspended: '',
         match: []
     };
     private armInputSource = new BehaviorSubject<Arm>(this.armInput);
@@ -289,6 +292,17 @@ export class TrialService {
         }
         return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
     }
+    saveTrialById(id: string, data: object) {
+        return new Promise((resolve, reject) => {
+            this.db.object('Trials/' + id).set(data).then(result => {
+                console.log('Save trial ' + id + ' successfully!');
+                resolve(true);
+            }).catch(error => {
+                console.log('Failed to save trial' + id + ' to DB ', error);
+                reject(false);
+            });
+        });
+    }
     saveErrors(info: string, content: object, error: object) {
         if (info.includes('failed') && info.includes('database')) {
             this.emailService.sendEmail({
@@ -303,6 +317,16 @@ export class TrialService {
                 error: error
             });
         }
+    }
+    getNodeDisplayContent(key: string, node: object) {
+        let result = '';
+        if (node['no_' + key]) {
+            result += '!';
+        }
+        if (node[key]) {
+            result += node[key];
+        }
+        return result;
     }
     getAPIUrl(type: string) {
         if (this.production === true) {
