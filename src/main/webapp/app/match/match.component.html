@@ -9,7 +9,7 @@
         <div *ngIf="unit.or">
             <div [ngStyle]="getStyle(0)">
                 <span>-or:</span>
-                <jhi-panel [type]="'add,delete,relocate,exchange,destination'" [path]="path+','+i"></jhi-panel>
+                <jhi-panel [type]="'add,delete,relocate,copy,exchange,destination'" [path]="path+','+i"></jhi-panel>
             </div>
             <div *ngFor="let unit1 of unit.or; let i1 = index">
                 <div [ngStyle]="getStyle(1)" class="levelIndicator">
@@ -22,14 +22,14 @@
                     <div *ngIf="unit1.and">
                         <div>
                             -and:
-                            <jhi-panel [type]="'add,delete,relocate,exchange,destination'" [path]="path+','+i+','+i1"></jhi-panel>
+                            <jhi-panel [type]="'add,delete,relocate,copy,exchange,destination'" [path]="path+','+i+','+i1"></jhi-panel>
                         </div>
                         <jhi-match [match]="unit1.and" [base]="base+1" [path]="path+','+i+','+i1"></jhi-match>
                     </div>
                     <div *ngIf="unit1.or">
                         <div>
                             -or:
-                            <jhi-panel [type]="'add,delete,relocate,exchange,destination'" [path]="path+','+i+','+i1"></jhi-panel>
+                            <jhi-panel [type]="'add,delete,relocate,copy,exchange,destination'" [path]="path+','+i+','+i1"></jhi-panel>
                         </div>
                         <jhi-match [match]="unit1.or" [base]="base+1" [path]="path+','+i+','+i1"></jhi-match>
                     </div>
@@ -39,7 +39,7 @@
         <div *ngIf="unit.and">
             <div [ngStyle]="getStyle(0)">
                 -and:
-                <jhi-panel [type]="'add,delete,relocate,exchange,destination'" [path]="path+','+i"></jhi-panel>
+                <jhi-panel [type]="'add,delete,relocate,copy,exchange,destination'" [path]="path+','+i"></jhi-panel>
             </div>
             <div *ngFor="let unit2 of unit.and; let i2 = index">
                 <div [ngStyle]="getStyle(1)" class="levelIndicator">
@@ -52,14 +52,14 @@
                     <div *ngIf="unit2.or">
                         <div>
                             -or:
-                            <jhi-panel [type]="'add,delete,relocate,exchange,destination'" [path]="path+','+i+','+i2"></jhi-panel>
+                            <jhi-panel [type]="'add,delete,relocate,copy,exchange,destination'" [path]="path+','+i+','+i2"></jhi-panel>
                         </div>
                         <jhi-match [match]="unit2.or" [base]="base+1" [path]="path+','+i+','+i2"></jhi-match>
                     </div>
                     <div *ngIf="unit2.and">
                         <div>
                             -and:
-                            <jhi-panel [type]="'add,delete,relocate,exchange,destination'" [path]="path+','+i+','+i2"></jhi-panel>
+                            <jhi-panel [type]="'add,delete,relocate,copy,exchange,destination'" [path]="path+','+i+','+i2"></jhi-panel>
                         </div>
                         <jhi-match [match]="unit2.and" [base]="base+1" [path]="path+','+i+','+i2"></jhi-match>
                     </div>

@@ -91,7 +91,7 @@
             <br/>
             <label for="treatmentList">Treatment List:</label>
             <div id="treatmentList">
-                <span>-arm: <jhi-panel [type]="'add'" [arm]="true" [path]="'arms'"></jhi-panel></span>
+                <span>-arm: <jhi-panel [type]="'add,destination'" [arm]="true" [path]="'arms'"></jhi-panel></span>
                 <br/>
                 <div *ngFor="let arm of trialChosen.treatment_list.step[0].arm; let i = index">
                     <jhi-arm [type]="'delete,edit'" [unit]="arm" [path]="'arm_name,'+i"></jhi-arm>
@@ -115,8 +115,9 @@
                         <i class="fa fa-pencil noteEdit" aria-hidden="true"></i>: Edit
                     </p>
                     <p>Click (<i class="fa fa-exchange noteExchange"></i>) to switch logic between "and" and "or"</p>
-                    <p>Click (<i class="fa fa-arrows noteMove" aria-hidden="true"></i>) to move this section; click again to cancel. 
-                        Click (<i class="fa fa-arrows noteDestination" aria-hidden="true"></i>) to use as your destination.</p>
+                    <p>Click (<i class="fa fa-scissors noteMove" aria-hidden="true"></i>) to move this section; click again to cancel.</p>
+                    <p>Click (<i class="fa fa-clone noteCopy" aria-hidden="true"></i>) to copy this section; click again to cancel.</p>
+                    <p>Click (<i class="fa fa-arrows noteDestination" aria-hidden="true"></i>) to use as your destination for move or copy.</p>
                     <p>Use comma(,) to separate a list of annotated_variants(i.e. "V600E, V600K") and age_numerical range(i.e. ">=12, &lt;=18").</p>
                 </div>
             </div>

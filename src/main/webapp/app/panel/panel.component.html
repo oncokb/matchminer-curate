@@ -2,9 +2,10 @@
 <i class="fa fa-trash-o deleteIcon" aria-hidden="true" *ngIf="displayTrash()" (click)="modifyNode('delete')"></i>
 <i class="fa fa-pencil editIcon" aria-hidden="true" *ngIf="displayPencil()" (click)="editNode()"></i>
 <i class="fa fa-exchange exchangeIcon" *ngIf="displayExchange()" (click)="modifyNode('exchange')"></i>
-<i class="fa fa-arrows moveIcon" aria-hidden="true" *ngIf="displayMove()" (click)="moveNode()" title="Click to choose this section as to be moved"></i>
+<i class="fa fa-scissors moveIcon" aria-hidden="true" *ngIf="displayMove()" (click)="moveNode()" title="Click to choose this section as to be moved"></i>
 <i class="fa fa-arrows destinationIcon" aria-hidden="true" *ngIf="displayDestination()" (click)="dropDownNode()"  title="Click to choose as destination"></i>
-<span *ngIf="operationPool['relocate'] !== true && operationPool['currentPath'] === path">
+<i class="fa fa-clone copyIcon" aria-hidden="true" *ngIf="displayCopy()" (click)="copyNode()" title="Click to choose this section as to be copied"></i>
+<span *ngIf="operationPool['relocate'] !== true && operationPool['copy'] !== true && operationPool['currentPath'] === path">
     <button class="btn btn-success editButtonStyle" (click)="saveModification()" [disabled]="hasErrorInputField">Save</button>
     <button class="btn btn-warning editButtonStyle" (click)="cancelModification()">Cancel</button>
 </span>
