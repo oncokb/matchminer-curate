@@ -41,6 +41,7 @@ import {
 import { EmailService } from './service/email.service';
 import { ConverterComponent } from './converter/converter.component';
 import { ConnectionService } from "./service/connection.service";
+import { EmailService } from "./service/email.service";
 
 @NgModule({
     imports: [
@@ -80,7 +81,8 @@ import { ConnectionService } from "./service/connection.service";
         PaginationConfig,
         UserRouteAccessService,
         TrialService,
-        ConnectionService
+        ConnectionService,
+        EmailService
     ],
     bootstrap: [ JhiMainComponent ]
 })

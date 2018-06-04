@@ -6,10 +6,11 @@ import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from '../panel/movingPath.model';
 import { Arm } from '../arm/arm.model';
-import { Http, Response } from '@angular/http';
 import * as _ from 'underscore';
 import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
+import { ConnectionService } from "./connection.service";
+
 @Injectable()
 export class TrialService {
     oncokb = environment.oncokb ? environment.oncokb : false;
@@ -81,15 +82,14 @@ export class TrialService {
     nctIdChosen = '';
     errorList: Array<object> = [];
 
-    constructor(public http: Http, public db: AngularFireDatabase, private emailService: EmailService) {
-        this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
+    constructor(public connectionService: ConnectionService, public db: AngularFireDatabase, private emailService: EmailService) {
+        this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
 
         // prepare main types list
-        this.http.get(this.getAPIUrl('MainType'))
-        .subscribe((res: Response) => {
+        this.connectionService.getMainType().subscribe((res: Array<string>) => {
             const mainTypeQueries = [];
-            for (const item of res.json()) {
+            for (const item of res) {
                 mainTypeQueries.push({
                     'exactMatch': true,
                     'query': item,
@@ -101,9 +101,8 @@ export class TrialService {
             const queries =  {
                 'queries': mainTypeQueries
               };
-            this.http.post(this.getAPIUrl('SubType'), queries)
-            .subscribe((response: Response) => {
-                const tempSubTypes = response.json();
+            this.connectionService.getSubType(queries).subscribe((res: Array<any>) => {
+                const tempSubTypes = res;
                 let currentSubtype = '';
                 let currentMaintype = '';
                 for (const items of tempSubTypes) {
@@ -126,10 +125,9 @@ export class TrialService {
             });
         });
         // prepare oncokb variant list
-        this.http.get(this.getAPIUrl('OncoKBVariant'))
-        .subscribe((res: Response) => {
-           const allAnnotatedVariants = res.json();
-           for (const item of  allAnnotatedVariants) {
+        this.connectionService.getOncoKBVariant().subscribe((res) => {
+           const allAnnotatedVariants = res;
+           for(const item of  allAnnotatedVariants) {
                 if (item['gene']['hugoSymbol']) {
                     if (this.annotated_variants[item['gene']['hugoSymbol']]) {
                         this.annotated_variants[item['gene']['hugoSymbol']].push(item['alteration']);

@@ -1,5 +1,4 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
@@ -97,53 +96,49 @@ export class TrialComponent implements OnInit, AfterViewInit {
         if (!result) {
             continue;
         }
-
-        this.http.get(this.trialService.getAPIUrl('ClinicalTrials') + tempTrial)
-        .subscribe((res: Response) => {
-           const trialInfo = res.json();
-           const armsInfo: any = [];
-           _.each(trialInfo.arms, function(arm) {
-               if (arm.arm_description !== null) {
+        this.connectionService.importTrials(tempTrial).subscribe((res) => {
+            const trialInfo = res;
+            const armsInfo: any = [];
+            _.each(trialInfo['arms'], function(arm) {
+                if (arm.arm_description !== null) {
                     armsInfo.push({
                         arm_description: arm.arm_name,
                         arm_info: arm.arm_description,
                         match: []
                     });
-               }
-           });
-           const trial: Trial = {
-                   curation_status: 'In progress',
-                   archived: 'No',
-                   nct_id: trialInfo.nct_id,
-                   long_title: trialInfo.official_title,
-                   short_title: trialInfo.brief_title,
-                   phase: trialInfo.phase.phase,
-                   status: trialInfo.current_trial_status,
-                   treatment_list: {
-                       step: [{
+                }
+            });
+            const trial: Trial = {
+                curation_status: 'In progress',
+                archived: 'No',
+                nct_id: trialInfo['nct_id'],
+                long_title: trialInfo['official_title'],
+                short_title: trialInfo['brief_title'],
+                phase: trialInfo['phase']['phase'],
+                status: trialInfo['current_trial_status'],
+                treatment_list: {
+                    step: [{
                         arm:  armsInfo,
                         match: []
                     }]
-                   }
-               };
-           this.db.object('Trials/' + trialInfo.nct_id).set(trial).then((response) => {
-            this.messages.push('Successfully imported ' + trialInfo.nct_id);
-            if (setChosenTrial === false) {
-                 this.nctIdChosen = trialInfo.nct_id;
-                 this.trialService.setTrialChosen(this.nctIdChosen);
-                 this.originalTrialStatus = this.trialChosen['status'];
-                 setChosenTrial = true;
-            }
-           }).catch((error) => {
-            this.messages.push('Fail to save to database ' + tempTrial);
-           });
-        },
-            (error) => {
+                }
+            };
+            this.db.object('Trials/' + trialInfo['nct_id']).set(trial).then((response) => {
+                this.messages.push('Successfully imported ' + trialInfo['nct_id']);
+                if (setChosenTrial === false) {
+                    this.nctIdChosen = trialInfo['nct_id'];
+                    this.trialService.setTrialChosen(this.nctIdChosen);
+                    this.originalTrialStatus = this.trialChosen['status'];
+                    setChosenTrial = true;
+                }
+            }).catch((error) => {
+                this.messages.push('Fail to save to database ' + tempTrial);
+            });
+        }, (error) => {
             this.messages.push(tempTrial + ' not found');
-        }
-        );
+        });
     }
-    this.trialsToImport = '';
+      this.trialsToImport = '';
   }
     updateStatus(type: string) {
         if (type === 'curation') {
@@ -224,7 +219,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
         if (res.status === 200) {
             if (this.trialChosen['archived'] === 'Yes') {
                 // Remove archived trials from database
-                alert("This archived trial has been removed from database");
+                alert("This archived trial has been removed from database.");
                 return;
             }
             this.mongoMessage.content = 'Send trial ' + this.nctIdChosen + ' successfully!';

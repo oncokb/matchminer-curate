@@ -7,6 +7,7 @@ import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import { Genomic } from './genomic.model';
 import * as _ from 'underscore';
+import { ConnectionService } from "../service/connection.service";
 
 @Component({
     selector: 'jhi-genomic',
@@ -54,7 +55,8 @@ export class GenomicComponent implements OnInit {
             this.genomicInput.annotated_variant = variantArray.join(',');
         }
     }
-    constructor(private trialService: TrialService, public http: Http) {
+
+    constructor(private trialService: TrialService, public connectionService: ConnectionService) {
     }
     ngOnInit() {
         this.trialService.genomicInputObs.subscribe((message) => {
@@ -76,10 +78,8 @@ export class GenomicComponent implements OnInit {
             this.trialService.setHasErrorInputField(false);
             return;
         }
-        this.http.get(this.trialService.getAPIUrl('GeneValidation') + this.genomicInput.hugo_symbol)
-        .subscribe((res: Response) => {
-           const result = res.json();
-           if (result.hits.length > 0) {
+        this.connectionService.validateGenomicGene(this.genomicInput.hugo_symbol).subscribe((result) => {
+           if (result['hits'].length > 0) {
                 this.validationMessage['gene'] = 'Valid gene';
                 this.geneValidation = true;
                this.trialService.setHasErrorInputField(false);
@@ -93,11 +93,8 @@ export class GenomicComponent implements OnInit {
     }
     validateGenomicExample() {
         if (this.genomicInput.hugo_symbol && this.genomicInput.annotated_variant && this.genomicInput.matching_examples) {
-            const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol + '&variant=' +
-                this.genomicInput.annotated_variant + '&examples=' + this.genomicInput.matching_examples;
-            this.http.get(this.trialService.getAPIUrl('ExampleValidation') + variantsTobeValidated)
-            .subscribe((res: Response) => {
-                const result = res.json();
+            const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol +'&variant=' + this.genomicInput.annotated_variant +'&examples=' + this.genomicInput.matching_examples;
+            this.connectionService.validateGenomicExample(variantsTobeValidated).subscribe((result) => {
                 if (result[this.genomicInput.matching_examples] === true) {
                     this.validationMessage['example'] = 'Valid';
                     this.exampleValidation = true;
