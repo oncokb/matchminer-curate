@@ -300,9 +300,9 @@ export class TrialService {
         if (this.production === true) {
             switch(type) {
                 case 'MainType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/mainTypes';
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
                 case 'SubType': 
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/tumorTypes/search';  
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
                 case 'GeneValidation':
@@ -315,9 +315,9 @@ export class TrialService {
         } else {
             switch(type) {
                 case 'MainType':
-                    return 'http://oncotree.mskcc.org/oncotree/api/mainTypes';
+                    return 'http://oncotree.mskcc.org/api/mainTypes';
                 case 'SubType': 
-                    return 'http://oncotree.mskcc.org/oncotree/api/tumorTypes/search';  
+                    return 'http://oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return 'http://oncokb.org/api/v1/variants';
                 case 'GeneValidation':
