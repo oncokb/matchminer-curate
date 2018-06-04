@@ -87,13 +87,13 @@ export class TrialService {
         this.http.get(this.getAPIUrl('MainType'))
         .subscribe((res: Response) => {
             let mainTypeQueries = [];
-            for (const item of res.json().data) {
+            for (const item of res.json()) {
                 mainTypeQueries.push({
                     "exactMatch": true,
-                    "query": item.name,
+                    "query": item,
                     "type": "mainType"
                 });
-                this.mainTypesOptions.push(item.name);
+                this.mainTypesOptions.push(item);
             }
             // prepare subtypes by maintype
             let queries =  {
@@ -101,12 +101,12 @@ export class TrialService {
               };
             this.http.post(this.getAPIUrl('SubType'), queries)
             .subscribe((res: Response) => {
-                let tempSubTypes = res.json().data;
+                let tempSubTypes = res.json();
                 let currentSubtype = '';
                 let currentMaintype = '';
                 for (const items of tempSubTypes) {
                     for (const item of items) {
-                        currentMaintype = item.mainType.name;
+                        currentMaintype = item.mainType;
                         currentSubtype = item.name;
                         this.allSubTypesOptions.push(currentSubtype);
                         this.subToMainMapping[currentSubtype] = currentMaintype;
@@ -300,9 +300,9 @@ export class TrialService {
         if (this.production === true) {
             switch(type) {
                 case 'MainType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/mainTypes';
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
                 case 'SubType': 
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/oncotree/api/tumorTypes/search';  
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
                 case 'GeneValidation':
@@ -315,9 +315,9 @@ export class TrialService {
         } else {
             switch(type) {
                 case 'MainType':
-                    return 'http://oncotree.mskcc.org/oncotree/api/mainTypes';
+                    return 'http://oncotree.mskcc.org/api/mainTypes';
                 case 'SubType': 
-                    return 'http://oncotree.mskcc.org/oncotree/api/tumorTypes/search';  
+                    return 'http://oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return 'http://oncokb.org/api/v1/variants';
                 case 'GeneValidation':
