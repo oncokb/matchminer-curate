@@ -597,34 +597,40 @@ export class PanelComponent implements OnInit {
         this.modifyNode('update');
     }
     dropDownNode() {
+        this.operationPool['relocate'] = false;
         this.operationPool['currentPath'] = '';
         this.movingPath.to = this.path;
         // find the data to be moved and mark it as to be removed.
         // We can't remove it at this step because it will upset the path for the destination node
         this.preparePath(this.movingPath.from);
-        if (this.operationPool['relocate']) {
-            this.operationPool['relocate'] = false;
-            this.modifyData(this.dataToModify, this.finalPath, 'remove');
+        this.modifyData(this.dataToModify, this.finalPath, 'remove');
+        //add the data to destination node
+        this.preparePath(this.movingPath.to);
+        this.modifyData(this.dataToModify, this.finalPath, 'add');
+        //remove the original data that has been moved to the destination
+        this.removeOriginalNode(this.originalMatch);
+        for (let arm of this.originalArms) {
+            this.removeOriginalNode(arm.match);
+        }
+        this.dataBlockToMove = {};
+        this.saveBacktoDB();
+    }
+    addCopiedNode() {
+        this.operationPool['currentPath'] = '';
+        this.movingPath.to = this.path;
+        // find the data to be moved and mark it as to be removed.
+        // We can't remove it at this step because it will upset the path for the destination node
+        this.preparePath(this.movingPath.from);
+        this.operationPool['copy'] = false;
+        if (this.arm) {
+            let copiedArmPathArr = this.movingPath.from.split(',');
+            let armToAdd: Arm = this.originalArms[copiedArmPathArr[copiedArmPathArr.length - 1]];
+            this.modifyArmGroup('add', armToAdd);
+        } else {
+            this.modifyData(this.dataToModify, this.finalPath, 'copy');
             //add the data to destination node
             this.preparePath(this.movingPath.to);
             this.modifyData(this.dataToModify, this.finalPath, 'add');
-            //remove the original data that has been moved to the destination
-            this.removeOriginalNode(this.originalMatch);
-            for (let arm of this.originalArms) {
-                this.removeOriginalNode(arm.match);
-            }
-        } else if (this.operationPool['copy']) {
-            this.operationPool['copy'] = false;
-            if (this.arm) {
-                let copiedArmPathArr = this.movingPath.from.split(',');
-                let armToAdd: Arm = this.originalArms[copiedArmPathArr[copiedArmPathArr.length - 1]];
-                this.modifyArmGroup('add', armToAdd);
-            } else {
-                this.modifyData(this.dataToModify, this.finalPath, 'copy');
-                //add the data to destination node
-                this.preparePath(this.movingPath.to);
-                this.modifyData(this.dataToModify, this.finalPath, 'add');
-            }
         }
         this.dataBlockToMove = {};
         this.saveBacktoDB();
@@ -663,15 +669,21 @@ export class PanelComponent implements OnInit {
         }
         return isInside;
     }
-    // when user try to move or copy a section, we hide all icons except the relocate icon to avoid distraction. Among which, there are 3 cases the destination icons are hidden
+    // when user try to move a section, we hide all icons except the relocate icon to avoid distraction. Among which, there are 2 cases the destination icons are hidden
     // 1) The section is the current chosen one to move around.
     // 2) The section is inside the current chosen section.
-    // 3) Hide other destination buttons(match, and, or) except root "arm" when copy an arm.
-    displayDestination() {
+    displayMoveDestination() {
+        if (this.isPermitted === false) return false;
+        return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true
+            && this.operationPool['copy'] !== true && this.operationPool['currentPath'] !== this.path &&
+            !this.isNestedInside(this.operationPool['currentPath'], this.path);
+    }
+    // Hide other destination buttons(match, and, or) except root "arm" when copy an arm.
+    displayCopyDestination() {
         if (this.isPermitted === false) return false;
         // Show root "arm" destination button when copy an arm
         if (this.arm && this.path === 'arms') {
-            return this.type.indexOf('destination') !== -1 && this.operationPool['copy'] &&
+            return this.type.indexOf('copyDestination') !== -1 && this.operationPool['copy'] &&
                 this.operationPool['currentPath'].includes('arm_name');
         }
         // Hide other destination button except root "arm" when copy an arm
@@ -682,10 +694,9 @@ export class PanelComponent implements OnInit {
             }
         }
         return this.type.indexOf('destination') !== -1 && this.path !== 'arms' &&
-            ((this.operationPool['relocate'] === true && this.operationPool['currentPath'] !== this.path &&
-            !this.isNestedInside(this.operationPool['currentPath'], this.path)) ||
+            this.operationPool['relocate'] !== true &&
             (this.operationPool['copy'] === true && this.operationPool['currentPath'] !== this.path &&
-                !this.isNestedInside(this.operationPool['currentPath'], this.path)));
+                    !this.isNestedInside(this.operationPool['currentPath'], this.path));
     }
     displayPencil() {
         if (this.isPermitted === false) return false;
@@ -712,8 +723,7 @@ export class PanelComponent implements OnInit {
     // 3) when the item is the one we chose to move around
     displayMove() {
         if (this.isPermitted === false) return false;
-        if (this.operationPool['copy']) return false;
-        return this.type.indexOf('relocate') !== -1 &&
+        return this.type.indexOf('relocate') !== -1 && this.operationPool['copy'] !== true &&
             (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
         || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
         || this.operationPool['relocate'] === true && this.operationPool['currentPath'] === this.path);
@@ -725,8 +735,8 @@ export class PanelComponent implements OnInit {
     }
     displayCopy() {
         if (this.isPermitted === false) return false;
-        if (this.operationPool['relocate']) return false;
-        return this.type.indexOf('copy') !== -1 && (this.operationPool['copy'] !== true && this.operationPool['editing'] !== true
+        return this.type.indexOf('copy') !== -1 && !this.type.includes('copyDestination') && this.operationPool['relocate'] !== true &&
+            (this.operationPool['copy'] !== true && this.operationPool['editing'] !== true
             || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
             || this.operationPool['copy'] === true && this.operationPool['currentPath'] === this.path);
     }
