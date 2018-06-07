@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { errorRoute } from './layouts';
-import { navbarRoute } from './layouts/navbar/navbar.route';
 import { ConverterComponent } from './converter/converter.component';
+import { errorRoute, navbarRoute } from './layouts';
 import { TrialComponent } from './trial/trial.component';
 
 const LAYOUT_ROUTES: Routes = [

@@ -1,5 +1,5 @@
 <jhi-page-ribbon></jhi-page-ribbon>
-<div>
+<div *ngIf="showHeader">
     <router-outlet name="navbar"></router-outlet>
 </div>
 <div class="container-fluid">
@@ -18,5 +18,5 @@
     </div>
 </div>
 <div style="margin-top: 20px;">
-    <jhi-footer *ngIf="authorized;"></jhi-footer>
+    <jhi-footer *ngIf="showFooter && authorized"></jhi-footer>
 </div>
