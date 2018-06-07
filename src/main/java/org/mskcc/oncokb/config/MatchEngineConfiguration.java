@@ -24,23 +24,27 @@ public class MatchEngineConfiguration {
 
     @PostConstruct
     public void cloneMatchEngineFromGit() {
-        try {
-            if (Files.exists(Paths.get(this.matchenginePath))) {
-                FileUtils.cleanDirectory(new File(this.matchenginePath));
-            }
-            ProcessBuilder pbClone = new ProcessBuilder("git", "clone", this.gitUrl, "-b", this.branch,
-                this.matchenginePath);
-            Boolean isClone = PythonUtil.runPythonScript(pbClone);
+        if (this.matchenginePath.length() > 0 && this.gitUrl.length() > 0) {
+            try {
+                if (Files.exists(Paths.get(this.matchenginePath))) {
+                    FileUtils.cleanDirectory(new File(this.matchenginePath));
+                }
+                if (this.branch.length() == 0) {
+                    this.branch = "master";
+                }
+                ProcessBuilder pbClone = new ProcessBuilder("git", "clone", this.gitUrl, "-b", this.branch,
+                    this.matchenginePath);
+                Boolean isClone = PythonUtil.runPythonScript(pbClone);
 
-            if(isClone){
-                log.info("Clone matchminer-engine successfully!");
-            } else {
-                log.error("Clone matchminer-engine failed");
-            }
+                if(isClone){
+                    log.info("Clone matchminer-engine successfully!");
+                } else {
+                    log.error("Clone matchminer-engine failed");
+                }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
     }
 }
