@@ -91,19 +91,19 @@
             <br/>
             <label for="treatmentList">Treatment List:</label>
             <div id="treatmentList">
-                <span>-arm: <jhi-panel [type]="'add,copyDestination'" [arm]="true" [path]="'arms'"></jhi-panel></span>
+                <span>-arm: <jhi-panel [type]="'add,copyArm'" [arm]="true" [path]="'arms'"></jhi-panel></span>
                 <br/>
                 <div *ngFor="let arm of trialChosen.treatment_list.step[0].arm; let i = index">
                     <jhi-arm [type]="'delete,edit'" [unit]="arm" [path]="'arm_name,'+i"></jhi-arm>
                     <span class="matchTitle2">-match </span>
-                    <jhi-panel [type]="'add,destination'" [path]="'arm,'+i"></jhi-panel>
+                    <jhi-panel [type]="'add,destination,copyMatch'" [path]="'arm,'+i"></jhi-panel>
                     <div class="indent2 levelIndicator">
                         <jhi-match [match]="arm.match" [path]="'arm,'+i"></jhi-match>
                     </div>
                     <br/>
                 </div>
                 <span class="matchTitle1">-match </span>
-                <jhi-panel [type]="'add,destination'" [path]="'match'"></jhi-panel>
+                <jhi-panel [type]="'add,destination,copyMatch'" [path]="'match'"></jhi-panel>
                 <div class="indent1 levelIndicator">
                     <jhi-match [match]="trialChosen.treatment_list.step[0].match" [path]="'match'"></jhi-match>
                 </div>

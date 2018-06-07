@@ -683,8 +683,12 @@ export class PanelComponent implements OnInit {
         if (this.isPermitted === false) return false;
         // Show root "arm" destination button when copy an arm
         if (this.arm && this.path === 'arms') {
-            return this.type.indexOf('copyDestination') !== -1 && this.operationPool['copy'] &&
+            return this.type.indexOf('copyArm') !== -1 && this.operationPool['copy'] && 
                 this.operationPool['currentPath'].includes('arm_name');
+        }
+        if (this.type.indexOf('copyMatch') !== -1) {
+            return this.operationPool['copy'] && this.operationPool['currentPath'] !== this.path && !this.operationPool['currentPath'].includes('arm_name') &&
+                !this.isNestedInside(this.operationPool['currentPath'], this.path);
         }
         // Hide other destination button except root "arm" when copy an arm
         if(!_.isUndefined(this.operationPool['currentPath']) && this.operationPool['currentPath'].includes(',')){
@@ -735,7 +739,7 @@ export class PanelComponent implements OnInit {
     }
     displayCopy() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('copy') !== -1 && !this.type.includes('copyDestination') && this.operationPool['relocate'] !== true &&
+        return this.type.indexOf('copy') !== -1 && !this.type.includes('copyArm') && this.operationPool['relocate'] !== true &&
             (this.operationPool['copy'] !== true && this.operationPool['editing'] !== true
             || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
             || this.operationPool['copy'] === true && this.operationPool['currentPath'] === this.path);
