@@ -4,11 +4,8 @@
 </div>
 <div class="container-fluid">
     <div class="card jh-card">
-        <!--<router-outlet></router-outlet>
-        <router-outlet name="popup"></router-outlet>-->
         <div *ngIf="authorized; else permission">
             <router-outlet></router-outlet>
-            <!--<jhi-trial></jhi-trial>-->
         </div>
         <ng-template #permission>
             <div class="container" style="min-height:550px">
