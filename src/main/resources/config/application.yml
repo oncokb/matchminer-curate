@@ -76,7 +76,7 @@ jhipster:
     mail:
         from: matchminerCurate@localhost
     swagger:
-        default-include-pattern: /trials/.*
+        default-include-pattern: /trials/*.*
         title: matchminerCurate API
         description: matchminerCurate API documentation
         version: 0.0.1

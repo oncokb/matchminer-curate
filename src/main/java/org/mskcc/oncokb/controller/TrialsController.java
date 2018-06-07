@@ -1,12 +1,11 @@
 package org.mskcc.oncokb.controller;
 
-import com.google.firebase.database.*;
-import com.google.gson.Gson;
 import com.mongodb.client.MongoDatabase;
 import io.swagger.annotations.ApiParam;
 import org.json.JSONObject;
 import org.mskcc.oncokb.controller.api.TrialsApi;
 import org.mskcc.oncokb.service.util.FileUtil;
+import org.mskcc.oncokb.service.util.HttpUtil;
 import org.mskcc.oncokb.service.util.MongoUtil;
 import org.mskcc.oncokb.service.util.PythonUtil;
 import org.slf4j.Logger;
@@ -39,14 +38,11 @@ public class TrialsController implements TrialsApi {
     @Autowired
     private MongoDatabase mongoDatabase;
     @Autowired
-    private FirebaseDatabase firebaseDatabase;
-    String trialJson = "";
-    String trialsJson = "";
+    private String firebaseToken;
+    @Autowired
+    private String firebaseProjectId;
 
     @Override
-    @RequestMapping(value = "/trials/create",
-        consumes = { "application/json" },
-        method = RequestMethod.POST)
     public ResponseEntity<Void> create(@ApiParam(value = "a trial json object " ,required=true )  @Valid @RequestBody Object trial) {
         // check if MatchEngine is accessible.
         if (this.matchenginePath == null || this.matchenginePath.length() == 0 ) {
@@ -105,30 +101,44 @@ public class TrialsController implements TrialsApi {
     @Override
     public ResponseEntity<String> getTrialById(@ApiParam(value = "Search by NCT ID.",required=true )
                                                  @PathVariable("id") String id) {
-        DatabaseReference ref = firebaseDatabase.getReference("Trials");
-        // Attach a listener to read the data at our posts reference
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Object obj = dataSnapshot.getValue(Object.class);
-                Gson gson = new Gson();
-                trialJson = gson.toJson(obj);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                log.error("The read failed: " + databaseError.getCode());
-            }
-        });
-        return new ResponseEntity<>(trialJson, HttpStatus.OK);
+        String response = HttpUtil.getRequest("https://" + firebaseProjectId +
+            ".firebaseio.com/Trials/" + id + ".json?access_token=" + firebaseToken, true);
+        if (response == null) {
+            return new ResponseEntity<>("Sorry, some issues happened in backend.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<String> getTrialsData(@ApiParam(value = "Size of results.") @RequestParam(value = "size", required = false) String size,
-                                              @ApiParam(value = "Search by NCT ID.") @RequestParam(value = "nctId", required = false) String nctId,
-                                              @ApiParam(value = "Search by trial status.") @RequestParam(value = "trialStatus", required = false) String trialStatus) {
+                                              @ApiParam(value = "Search by trial status.") @RequestParam(value = "trialStatus", required = false) String trialStatus) throws InterruptedException  {
+        int sizeInt = 0;
+        if (size != null && size.length() > 0) {
+            sizeInt = Integer.parseInt(size);
+        }
+        String response;
+        if (trialStatus != null && trialStatus.length() > 0) {
+            if (sizeInt > 0) {
+                response = HttpUtil.getRequest("https://" + firebaseProjectId +
+                    ".firebaseio.com/Trials.json?access_token=" + firebaseToken +
+                    "&orderBy=\"status\"&equalTo=\"" + trialStatus.replaceAll(" ", "+") + "\"&limitToFirst=" + sizeInt, true);
+            } else {
+                response = HttpUtil.getRequest("https://" + firebaseProjectId +
+                    ".firebaseio.com/Trials.json?access_token=" + firebaseToken +
+                    "&orderBy=\"status\"&equalTo=\"" + trialStatus.replaceAll(" ", "+") + "\"", true);
+            }
+        } else if (sizeInt > 0) {
+            response = HttpUtil.getRequest("https://" + firebaseProjectId +
+                ".firebaseio.com/Trials.json?access_token=" + firebaseToken + "&orderBy=\"$key\"&limitToFirst=" + sizeInt, true);
+        } else {
+            response = HttpUtil.getRequest("https://" + firebaseProjectId +
+                ".firebaseio.com/Trials.json?access_token=" + firebaseToken, true);
+        }
 
-        return new ResponseEntity<>(trialsJson, HttpStatus.OK);
+        if (response == null) {
+            return new ResponseEntity<>("Sorry, some issues happened in backend.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 }

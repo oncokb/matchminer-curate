@@ -45,5 +45,5 @@ public interface TrialsApi {
     @RequestMapping(value = "/trials",
         produces = { "application/json" },
         method = RequestMethod.GET)
-    public ResponseEntity<String> getTrialsData(@ApiParam(value = "Size of results.") @RequestParam(value = "size", required = false) String size, @ApiParam(value = "Search by NCT ID.") @RequestParam(value = "nctId", required = false) String nctId, @ApiParam(value = "Search by trial status.") @RequestParam(value = "trialStatus", required = false) String trialStatus);
+    public ResponseEntity<String> getTrialsData(@ApiParam(value = "Size of results.") @RequestParam(value = "size", required = false) String size, @ApiParam(value = "Search by trial status.") @RequestParam(value = "trialStatus", required = false) String trialStatus) throws InterruptedException;
 }

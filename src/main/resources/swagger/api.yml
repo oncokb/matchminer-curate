@@ -40,11 +40,6 @@ paths:
         type: "string"
         description: "Size of results."
         required: false
-      - name: "nctId"
-        in: "query"
-        type: "string"
-        description: "Search by NCT ID."
-        required: false
       - in: "query"
         name: "trialStatus"
         type: "string"

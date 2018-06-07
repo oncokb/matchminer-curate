@@ -1,28 +1,38 @@
 package org.mskcc.oncokb.config;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
 @Configuration
 public class FirebaseConfiguration {
-    private static final String FIREDB = "https://herokucurationdevelopment.firebaseio.com";
+    private static final String fireConfigPath = "src/main/resources/config/firebase.json";
 
     @Bean
-    public FirebaseDatabase firebaseDatabase() throws Exception {
-        FileInputStream serviceAccount = new FileInputStream("src/main/resources/config/firebase.json");
-
-        FirebaseOptions options = new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .setDatabaseUrl(FIREDB)
-            .build();
-        FirebaseApp defaultApp = FirebaseApp.initializeApp(options);
-
-        return FirebaseDatabase.getInstance(defaultApp);
+    public String firebaseToken() throws IOException {
+        FileInputStream serviceAccount = new FileInputStream(fireConfigPath);
+        // Authenticate a Google credential with the service account
+        GoogleCredential googleCred = GoogleCredential.fromStream(serviceAccount);
+        // Add the required scopes to the Google credential
+        GoogleCredential scoped = googleCred.createScoped(
+            Arrays.asList(
+                "https://www.googleapis.com/auth/firebase.database",
+                "https://www.googleapis.com/auth/userinfo.email"
+            )
+        );
+        // Use the Google credential to generate an access token
+        scoped.refreshToken();
+        return scoped.getAccessToken();
     }
 
+    @Bean
+    public String firebaseProjectId() throws IOException {
+        FileInputStream serviceAccount = new FileInputStream(fireConfigPath);
+        // Authenticate a Google credential with the service account
+        GoogleCredential googleCred = GoogleCredential.fromStream(serviceAccount);
+        return googleCred.getServiceAccountProjectId();
+    }
 }
