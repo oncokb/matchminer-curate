@@ -34,6 +34,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         content: '',
         color: ''
     };
+    tableDestroied: boolean = false;
     @ViewChild('selectModel') private selectModel: NgModel;
 
     constructor(private trialService: TrialService) {
@@ -56,12 +57,16 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         this.dtTrigger.next();
     }
     rerender(): void {
+        this.tableDestroied = false;
         if (!_.isUndefined(this.dtElement)) {
             this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
                 // Destroy the table first
-                dtInstance.destroy();
-                // Call the dtTrigger to rerender again
-                this.dtTrigger.next();
+                 if (!this.tableDestroied) {
+                     dtInstance.destroy();
+                     // Call the dtTrigger to rerender again
+                     this.dtTrigger.next();
+                     this.tableDestroied = true;
+                 }
             });
         }
     }
@@ -153,19 +158,20 @@ export class ConverterComponent implements OnInit, AfterViewInit {
                         if (!res) {
                             this.uploadFailedFileList.push(file.name);
                         }
+                        if (file.name === this.filesToUpload[this.filesToUpload.length -1].name) {
+                            if(_.isEmpty(this.uploadFailedFileList)) {
+                                this.uploadMessage['content'] = 'Upload files successfully!';
+                                this.uploadMessage['color'] = 'green';
+                            } else {
+                                this.uploadMessage['content'] = 'Sorry, files ' + this.uploadFailedFileList.join(', ') +
+                                    ' are failed to upload. Please check file format or try it later!';
+                                this.uploadMessage['color'] = 'red';
+                            }
+                        }
                     });
                 }
             };
         }, this);
-        if(_.isEmpty(this.uploadFailedFileList)) {
-            this.uploadMessage['content'] = 'Upload files successfully!';
-            this.uploadMessage['color'] = 'green';
-        } else {
-            this.uploadMessage['content'] = 'Sorry, files ' + this.uploadFailedFileList.join(', ') +
-                ' are failed to upload. Please check file format or try it later!';
-            this.uploadMessage['color'] = 'red';
-        }
-
     }
     fileChanged($event) {
         this.uploadMessage['content'] = '';
