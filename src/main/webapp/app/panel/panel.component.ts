@@ -428,6 +428,7 @@ export class PanelComponent implements OnInit {
         }
     }
     addNewNode(obj: Array<any>) {
+        let emptyObj = false;
         if (_.isEmpty(this.dataBlockToMove)) {
             switch (this.nodeType) {
                 case 'Genomic':
@@ -449,6 +450,9 @@ export class PanelComponent implements OnInit {
                                 break;
                         }
                     }
+                    if (_.isEmpty(tempObj1)) {
+                        emptyObj = true;
+                    }
                     let tempObj2: any = {};
                     if (this.nodeType === 'And') {
                         tempObj2.and = tempObj1;
@@ -461,7 +465,12 @@ export class PanelComponent implements OnInit {
         } else {
             obj.push(this.dataBlockToMove);
         }
-        obj.sort(this.sortModifiedArray);
+        if(!emptyObj) {
+            // Do not sort object when add a empty object.
+            // If the empty object is put on the index 0 position, Firebase will delete it automatically and
+            // index order will be messed up.
+            obj.sort(this.sortModifiedArray);
+        }
     }
     exchangeLogic(obj: any) {
         if (obj.hasOwnProperty('or')) {
