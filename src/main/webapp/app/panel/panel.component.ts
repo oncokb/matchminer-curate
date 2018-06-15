@@ -47,6 +47,7 @@ export class PanelComponent implements OnInit {
     oncokbGenomicFields = ['hugo_symbol', 'annotated_variant'];
     oncokb: boolean;
     hasErrorInputField: boolean;
+    copyMatch:boolean = false;
 
     constructor(private trialService: TrialService) {
     }
@@ -265,7 +266,11 @@ export class PanelComponent implements OnInit {
                 }
                 break;
             case 'copy':
-                if (path.length === 2 && (path[1] === 'and' || path[1] === 'or') || path.length === 1) {
+                if (_.isEmpty(path)) {
+                    // The who match node is copied.
+                    this.copyMatch = true;
+                    this.dataBlockToMove = _.clone(obj);
+                } else if (path.length === 2 && (path[1] === 'and' || path[1] === 'or') || path.length === 1) {
                     this.dataBlockToMove = _.clone(obj[path[0]]);
                 } else {
                     const index = path.shift();
@@ -471,7 +476,13 @@ export class PanelComponent implements OnInit {
                     break;
             }
         } else {
-            obj.push(this.dataBlockToMove);
+            if(this.copyMatch) {
+                _.each(this.dataBlockToMove, function(item){
+                    obj.push(item);
+                });
+            } else {
+                obj.push(this.dataBlockToMove);
+            }
         }
         if(!emptyObj) {
             // Do not sort object when add a empty object.
@@ -683,7 +694,7 @@ export class PanelComponent implements OnInit {
         if (this.isPermitted === false) return false;
         // Show root "arm" destination button when copy an arm
         if (this.arm && this.path === 'arms') {
-            return this.type.indexOf('copyArm') !== -1 && this.operationPool['copy'] && 
+            return this.type.indexOf('copyArm') !== -1 && this.operationPool['copy'] &&
                 this.operationPool['currentPath'].includes('arm_name');
         }
         if (this.type.indexOf('copyMatch') !== -1) {
