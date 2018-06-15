@@ -9,7 +9,7 @@ import { TrialComponent } from "./trial/trial.component";
 const LAYOUT_ROUTES: Routes = [
     navbarRoute,
     { path: 'trials', component: TrialComponent },
-    { path: 'converter', component: ConverterComponent },
+    { path: 'data', component: ConverterComponent },
     { path: 'trials/:id', component: TrialComponent },
     ...errorRoute
 ];
