@@ -68,19 +68,19 @@
     <ng-template #panel>
         <div [ngStyle]="getStyle()">
             <div class="row">
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     <label>age_numerical:</label>
                 </div>
-                <div class="col-sm-9">
+                <div class="col-sm-8">
                     <span>{{unit.clinical.age_numerical}}</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     <label>oncotree_primary_diagnosis:</label>
                 </div>
-                <div class="col-sm-9">
-                    <span>{{unit.clinical.oncotree_primary_diagnosis}}</span>
+                <div class="col-sm-8">
+                    <span>{{getDisplayContent('oncotree_primary_diagnosis')}}</span>
                 </div>
             </div>
         </div>

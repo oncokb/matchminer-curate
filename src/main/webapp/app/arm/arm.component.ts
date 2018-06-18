@@ -13,7 +13,11 @@ export class ArmComponent implements OnInit {
     operationPool: {};
     armInput: Arm;
     statusOptions = this.trialService.getStatusOptions();
-    constructor(private trialService: TrialService) { }
+    oncokb: boolean;
+
+    constructor(private trialService: TrialService) {
+        this.oncokb = this.trialService.oncokb;
+    }
 
     ngOnInit() {
         this.trialService.operationPoolObs.subscribe(message => {

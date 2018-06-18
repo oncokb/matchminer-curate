@@ -1,0 +1,35 @@
+@import '../../../../../node_modules/datatables.net-dt/css/jquery.dataTables.css';
+
+.data-container{
+    min-height:550px
+}
+.download-button {
+    margin: 3px;
+}
+.button-margin {
+    margin: 5px;
+}
+.radio-group{
+    float:right;
+    margin-top: 10px;
+}
+.download-upload-container{
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+.file-type-span{
+    float: left;
+    margin-right: 20px;
+}
+.label-margin{
+    margin-left:10px;
+}
+.center{
+    text-align:center;
+}
+.upload-container{
+    min-height: 50px;
+}
+.upload-p{
+    padding: 10px 20px 10px 0px;
+}

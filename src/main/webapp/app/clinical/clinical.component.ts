@@ -114,4 +114,7 @@ export class ClinicalComponent implements OnInit {
         this.clinicalInput.sub_type = '';
         this.clinicalInput.main_type = '';
     }
+    getDisplayContent(key: string) {
+        return this.trialService.getNodeDisplayContent(key, this.unit['clinical']);
+    }
 }

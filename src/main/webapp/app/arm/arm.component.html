@@ -3,29 +3,56 @@
     <div class="indent2">
         <input [(ngModel)]="armInput.arm_name" size="100"/>
     </div>
-    <span class="indent1">-arm status: </span><br/>
+    <div *ngIf="!oncokb">
+        <span class="indent1">-arm code: </span>
+        <div class="armContent">
+            <input [(ngModel)]="armInput.arm_code" size="100"/>
+        </div>
+        <span class="indent1">-arm internal id: </span>
+        <div class="armContent">
+            <input [(ngModel)]="armInput.arm_internal_id" size="100"/>
+        </div>
+        <span class="indent1">-arm suspended: </span>
+        <div class="armContent">
+            <input [(ngModel)]="armInput.arm_suspended" size="100"/>
+        </div>
+    </div>
+    <span class="indent1">-arm status: </span>
     <div class="indent2">
         <div style="min-width: 300px; display: inline-block">
             <ng-select class="selectStyle" [items]="statusOptions" [(ngModel)]="armInput.arm_status" [clearable]="true"></ng-select>
         </div>
     </div>
-    <span class="indent1">-arm description: </span><br/>
+    <span class="indent1">-arm description: </span>
     <div class="armContent">
         <textarea id="description" rows="3" cols="100" [(ngModel)]="armInput.arm_description"></textarea>
     </div>
-    <span class="indent1">-arm eligibility: </span><br/>
+    <span class="indent1">-arm eligibility: </span>
     <div class="armContent">
         <textarea id="arm-eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
     </div>
 </div>
 <ng-template #dispalyArm>
-    <br/>
-    <span class="armContent">{{unit.arm_name}}</span><br/>
-    <span class="indent1">-arm status: </span><br/>
+    <div class="armContent">{{unit.arm_name}}</div>
+    <div *ngIf="!oncokb">
+        <div *ngIf="unit.arm_code">
+            <span class="indent1">-arm code: </span>
+            <div class="armContent">{{unit.arm_code}}</div>
+        </div>
+        <div *ngIf="unit.arm_internal_id">
+            <span class="indent1">-arm internal id: </span>
+            <div class="armContent">{{unit.arm_internal_id}}</div>
+        </div>
+        <div *ngIf="unit.arm_suspended">
+            <span class="indent1">-arm suspended: </span>
+            <div class="armContent">{{unit.arm_suspended}}</div>
+        </div>
+    </div>
+    <span class="indent1">-arm status: </span>
     <div class="armContent">{{unit.arm_status}}</div>
-    <span class="indent1">-arm description: </span><br/>
+    <span class="indent1">-arm description: </span>
     <div class="armContent">{{unit.arm_description}}</div>
-    <span class="indent1">-arm eligibility: </span><br/>
+    <span class="indent1">-arm eligibility: </span>
     <div class="armContent">{{unit.arm_eligibility}}</div>
 </ng-template>
 

@@ -216,56 +216,171 @@
                     </select>
                 </div>
             </div>
+            <div class="row borderMargin" *ngIf="unit.genomic.display_name">
+                <div class="col-sm-4">display_name:</div>
+                <div class="col-sm-8">
+                    <input [(ngModel)]="genomicInput.display_name" size="36" />
+                </div>
+            </div>
+            <div class="row borderMargin" *ngIf="unit.genomic.fusion_partner_hugo_symbol">
+                <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
+                <div class="col-sm-8">
+                    <input [(ngModel)]="genomicInput.fusion_partner_hugo_symbol" size="36" />
+                </div>
+            </div>
+            <div class="row borderMargin" *ngIf="unit.genomic.ms_status">
+                <div class="col-sm-4">ms_status:</div>
+                <div class="col-sm-8">
+                    <input [(ngModel)]="genomicInput.ms_status" size="36" />
+                </div>
+            </div>
+            <div class="row borderMargin" *ngIf="unit.genomic.mmr_status">
+                <div class="col-sm-4">mmr_status:</div>
+                <div class="col-sm-8">
+                    <input [(ngModel)]="genomicInput.mmr_status" size="36" />
+                </div>
+            </div>
         </div>
     </div>
     <ng-template #panel>
         <div [ngStyle]="getStyle()">
-            <label>hugo_symbol: </label>
-            <span>{{getDisplayContent('hugo_symbol')}}</span>
-            <br/>
-            <label>annotated_variant: </label>
-            <span>{{getDisplayContent('annotated_variant')}}</span>
-            <br/>
-            <span *ngIf="unit.genomic.matching_examples">
-                <label>matching_examples: </label>
-                <span>{{unit.genomic.matching_examples}}</span>
-                <br/>
-            </span>
+            <div class="row">
+                <div class="col-sm-4">
+                    <label>hugo_symbol: </label>
+                </div>
+                <div class="col-sm-8">
+                    <span>{{getDisplayContent('hugo_symbol')}}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <label>annotated_variant: </label>
+                </div>
+                <div class="col-sm-8">
+                    <span>{{getDisplayContent('annotated_variant')}}</span>
+                </div>
+            </div>
+            <div *ngIf="unit.genomic.matching_examples">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label>matching_examples: </label>
+                    </div>
+                    <div class="col-sm-8">
+                        <span>{{unit.genomic.matching_examples}}</span>
+                    </div>
+                </div>
+            </div>
             <div *ngIf="!oncokb">
-                <span *ngIf="unit.genomic.variant_category">
-                    <label>variant_category: </label>
-                    <span>{{getDisplayContent('variant_category')}}</span>
-                    <br/>
-                </span>
-                <span *ngIf="unit.genomic.protein_change">
-                    <label>protein_change: </label>
-                    <span>{{getDisplayContent('protein_change')}}</span>
-                    <br/>
-                </span>
-                <span *ngIf="unit.genomic.wildcard_protein_change">
-                    <label>wildcard_protein_change: </label>
-                    <span>{{getDisplayContent('wildcard_protein_change')}}</span>
-                    <br/>
-                </span>
-                <span *ngIf="unit.genomic.variant_classification">
-                    <label>variant_classification: </label>
-                    <span>{{getDisplayContent('variant_classification')}}</span>
-                    <br/>
-                </span>
-                <span *ngIf="unit.genomic.exon">
-                    <label>exon: </label>
-                    <span>{{getDisplayContent('exon')}}</span>
-                    <br/>
-                </span>
-                <span *ngIf="unit.genomic.cnv_call">
-                    <label>cnv_call: </label>
-                    <span>{{getDisplayContent('cnv_call')}}</span>
-                    <br/>
-                </span>
-                <span *ngIf="unit.genomic.wildtype">
-                    <label>wildtype: </label>
-                    <span>{{unit.genomic.wildtype}}</span>
-                </span>
+                <div *ngIf="unit.genomic.variant_category">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>variant_category: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('variant_category')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.protein_change">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>protein_change: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('protein_change')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.wildcard_protein_change">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>wildcard_protein_change: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('wildcard_protein_change')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.variant_classification">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>variant_classification: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('variant_classification')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.exon">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>exon: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('exon')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.cnv_call">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>cnv_call: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('cnv_call')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.wildtype">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>wildtype: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{unit.genomic.wildtype}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.display_name">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>display_name: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('display_name')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.fusion_partner_hugo_symbol">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>fusion_partner_hugo_symbol: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('fusion_partner_hugo_symbol')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.ms_status">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>ms_status: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('ms_status')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="unit.genomic.mmr_status">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>mmr_status: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('mmr_status')}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </ng-template>
