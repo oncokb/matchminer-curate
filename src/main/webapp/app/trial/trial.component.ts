@@ -48,6 +48,8 @@ export class TrialComponent implements OnInit, AfterViewInit{
     $.fn['dataTable'].ext.search.push((settings, data, dataIndex) => {
         if (this.hideArchived === 'Yes' && data[4] === 'Yes') {
             return false;
+        } else if (this.hideArchived === 'No' && data[4] === 'No') {
+            return false;
         } else {
             return true;
         }
