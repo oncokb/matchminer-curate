@@ -21,28 +21,36 @@
     </table>
     <br>
     <div class="download-upload-container">
-        <p>
-            <span id="fileType" class="radio-group file-type-span">
-                <span>File Type: </span>
-                <label for="jsonOption" class="label-margin">JSON</label>
-                <input id="jsonOption" type="radio" value="json" name="fileType" [(ngModel)]="fileType">
-                <label for="yamlOption" class="label-margin">YAML</label>
-                <input id="yamlOption" type="radio" value="yml" name="fileType" [(ngModel)]="fileType">
-            </span>
-            <button class="btn btn-primary button-margin" (click)="downloadTrials(true)">Download All</button>
-            <button class="btn btn-primary button-margin" (click)="downloadTrials(false)" *ngIf="downloadIdList.length > 0">Download Selected</button>
-        </p>
-        <br>
-        <div>
-            <div class="upload-container">
-                <p class="upload-p">Choose one or multiple files to upload:</p>
-                <div>
-                    <button class="btn btn-primary button-margin" (click)="uploadFiles()" *ngIf="filesToUpload.length > 0">Upload File(s)</button>
-                    <span *ngIf="uploadMessage.content.length > 0" [style.color]="uploadMessage.color"> {{uploadMessage.content}} </span>
-                </div>
+        <div class="row">
+            <div class="col-md-5">
+                <span id="fileType" class="radio-group file-type-span">
+                    <span>File Type: </span>
+                    <label for="jsonOption" class="label-margin">JSON</label>
+                    <input id="jsonOption" type="radio" value="json" name="fileType" [(ngModel)]="fileType">
+                    <label for="yamlOption" class="label-margin">YAML</label>
+                    <input id="yamlOption" type="radio" value="yml" name="fileType" [(ngModel)]="fileType">
+                </span>
             </div>
-            <div>
+            <div class="col-md-7">
+                <button class="btn btn-primary button-margin" (click)="downloadTrials(true)">Download All</button>
+                <button class="btn btn-primary button-margin" (click)="downloadTrials(false)" *ngIf="downloadIdList.length > 0">Download Selected</button>
+            </div>
+        </div>
+        <br>
+        <div class="row upload-container">
+            <div class="col-md-5">
+                <p class="upload-p">Choose one or multiple files to upload:</p>
+            </div>
+            <div class="col-md-7">
+                <button class="btn btn-primary button-margin" (click)="uploadFiles()" *ngIf="filesToUpload.length > 0">Upload File(s)</button>
+                <span *ngIf="uploadMessage.content.length > 0" [style.color]="uploadMessage.color"> {{uploadMessage.content}} </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
                 <input type="file" accept=".json, .yml" (change)="fileChanged($event)" multiple>
+            </div>
+            <div class="col-md-7">
                 <span *ngIf="uploadFileNames.length > 0"> {{uploadFileNames}} </span>
             </div>
         </div>
