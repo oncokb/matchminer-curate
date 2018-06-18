@@ -1,4 +1,4 @@
-<div class="container" style="min-height:550px">
+<div class="container data-container">
     <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
         <thead>
         <tr>
@@ -11,45 +11,39 @@
         <tbody>
         <tr *ngFor="let trial of trialList">
             <td><a routerLink="{{'/trials/' + trial.nct_id}}">{{ trial.nct_id }}</a></td>
-            <!--<td><a (click)="viewTrialDetails(trial.nct_id)">{{ trial.nct_id }}</a></td>-->
             <td>{{ trial.status }}</td>
             <td>{{ trial.short_title }}</td>
-            <td style="display: inline-flex">
-                <button class="btn btn-primary download-button" (click)="downloadSingleTrial(trial.nct_id, 'json')">JSON</button>
-                <button class="btn btn-primary download-button" (click)="downloadSingleTrial(trial.nct_id, 'yml')">YAML</button>
+            <td class="center">
+                <input type="checkbox" (change)="getDownloadCheckbox(trial.nct_id, $event.target.checked)"name="{{trial.nct_id}}">
             </td>
         </tr>
         </tbody>
     </table>
-    <div style="margin-top: 30px;margin-bottom: 30px;">
+    <br>
+    <div class="download-upload-container">
+        <p>
+            <span id="fileType" class="radio-group file-type-span">
+                <span>File Type: </span>
+                <label for="jsonOption" class="label-margin">JSON</label>
+                <input id="jsonOption" type="radio" value="json" name="fileType" [(ngModel)]="fileType">
+                <label for="yamlOption" class="label-margin">YAML</label>
+                <input id="yamlOption" type="radio" value="yml" name="fileType" [(ngModel)]="fileType">
+            </span>
+            <button class="btn btn-primary button-margin" (click)="downloadTrials(true)">Download All</button>
+            <button class="btn btn-primary button-margin" (click)="downloadTrials(false)" *ngIf="downloadIdList.length > 0">Download Selected</button>
+        </p>
+        <br>
         <div>
-            <div class="row">
-                <div class="col-md-10">
-                    <p>Choose trials nct_id that you want to download:
-                        <button class="btn btn-primary button-margin" (click)="downloadTrials(false)" [disabled]="selectedDownloadIdList.length < 1">Download Selected</button>
-                        <button class="btn btn-primary button-margin" (click)="downloadTrials(true)">Download All</button>
-                    </p>
-                </div>
-                <div class="col-md-2 radio-group">
-                    <span id="fileType">
-                        <label for="jsonOption" style="margin-left:10px">JSON</label>
-                        <input id="jsonOption" type="radio" value="json" name="fileType" [(ngModel)]="fileType">
-                        <label for="yamlOption" style="margin-left:10px">YAML</label>
-                        <input id="yamlOption" type="radio" value="yml" name="fileType" [(ngModel)]="fileType">
-                    </span>
+            <div class="upload-container">
+                <p class="upload-p">Choose one or multiple files to upload:</p>
+                <div>
+                    <button class="btn btn-primary button-margin" (click)="uploadFiles()" *ngIf="filesToUpload.length > 0">Upload File(s)</button>
+                    <span *ngIf="uploadMessage.content.length > 0" [style.color]="uploadMessage.color"> {{uploadMessage.content}} </span>
                 </div>
             </div>
-            <ng-select [items]="nctIdList" [multiple]="true" [closeOnSelect]="false" [hideSelected]="true" [(ngModel)]="selectedDownloadIdList"></ng-select>
-        </div>
-        <br>
-        <br>
-        <div>
-            <p>Upload trial files(Try selecting more than one file when browsing for files):
-                <button class="btn btn-primary button-margin" (click)="uploadFiles()" [disabled]="filesToUpload.length < 1">Upload File(s)</button>
-                <span [hidden]="uploadMessage.content.length === 0" [style.color]="uploadMessage.color"> {{uploadMessage.content}} </span>
-            </p>
             <div>
                 <input type="file" accept=".json, .yml" (change)="fileChanged($event)" multiple>
+                <span *ngIf="uploadFileNames.length > 0"> {{uploadFileNames}} </span>
             </div>
         </div>
     </div>

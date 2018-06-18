@@ -24,11 +24,12 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     dtElement: DataTableDirective;
     trialList: Array<Trial> = [];
     nctIdList = [];
-    selectedDownloadIdList: Array<string> = [];
+    downloadIdList: Array<string> = [];
     dtOptions: DataTables.Settings = {};
     dtTrigger: Subject<any> = new Subject();
     fileType: string = 'json';
     filesToUpload: Array<any> = [];
+    uploadFileNames: string = '';
     uploadFailedFileList: Array<string> = [];
     uploadMessage: object = {
         content: '',
@@ -92,10 +93,14 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         let zip = new JSZip();
         let folderName = 'Trials';
         let zipFolder = zip.folder(folderName);
+        if (this.downloadIdList.length === 1 && !isAll) {
+            this.downloadSingleTrial(this.downloadIdList[0], this.fileType);
+            return;
+        }
         if (isAll) {
             this.createTrialZipFile(this.nctIdList, zipFolder, true);
-        } else if (this.selectedDownloadIdList.length > 0) {
-            this.createTrialZipFile(this.selectedDownloadIdList, zipFolder, false);
+        } else if (this.downloadIdList.length > 1) {
+            this.createTrialZipFile(this.downloadIdList, zipFolder, false);
         }
         zip.generateAsync({type:"blob"}).then(function (content) {
             FileSaver.saveAs(content, folderName + '.zip');
@@ -174,7 +179,24 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         }, this);
     }
     fileChanged($event) {
+        let fileArray = [];
         this.uploadMessage['content'] = '';
+        this.uploadFileNames = '';
         this.filesToUpload = $event.target.files;
+        if (this.filesToUpload.length > 1) {
+            _.each(this.filesToUpload, function(file) {
+                fileArray.push(file.name);
+            });
+            this.uploadFileNames = fileArray.join(', ');
+        }
     }
+    getDownloadCheckbox(id:string, isChecked: boolean) {
+        if(isChecked) {
+            this.downloadIdList.push(id);
+        } else {
+            let index = this.downloadIdList.indexOf(id);
+            this.downloadIdList.splice(index,1);
+        }
+    }
+
 }
