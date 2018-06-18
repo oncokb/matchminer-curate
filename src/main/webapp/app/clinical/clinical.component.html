@@ -32,9 +32,9 @@
 </div>
 <ng-template #editPanel>
     <span>-clinical:</span>
-    <jhi-panel [type]="'delete,edit,relocate'" [unit]="unit" [path]="path"></jhi-panel>
+    <jhi-panel [type]="'delete,edit,relocate,copy'" [unit]="unit" [path]="path"></jhi-panel>
     <br/>
-    <div [ngStyle]="getStyle()" *ngIf="operationPool['relocate'] !== true && operationPool['currentPath'] === path; else panel">
+    <div [ngStyle]="getStyle()" *ngIf="operationPool['relocate'] !== true && operationPool['copy'] !== true && operationPool['currentPath'] === path; else panel">
         <div class="row ageNumericalMargin">
             <div class="col-sm-4">
                 <label>age_numerical:

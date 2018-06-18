@@ -1,5 +1,5 @@
-<span class="indent1">-arm name: <jhi-panel [type]="'delete,edit'" [path]="path" [arm]="true" [unit]="unit"></jhi-panel></span>
-<div *ngIf="operationPool['currentPath'] === path; else dispalyArm">
+<span class="indent1">-arm name: <jhi-panel [type]="'delete,edit,copy'" [path]="path" [arm]="true" [unit]="unit"></jhi-panel></span>
+<div *ngIf="operationPool['currentPath'] === path && operationPool['copy'] !== true; else dispalyArm">
     <div class="indent2">
         <input [(ngModel)]="armInput.arm_name" size="100"/>
     </div>

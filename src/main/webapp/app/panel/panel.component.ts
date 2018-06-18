@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
-import { AngularFireDatabase, AngularFireObject, AngularFireList } from 'angularfire2/database';
 import * as _ from 'underscore';
 import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
@@ -36,8 +35,8 @@ export class PanelComponent implements OnInit {
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
-    statusOptions = this.trialService.getStatusOptions(); 
-    isPermitted = true; 
+    statusOptions = this.trialService.getStatusOptions();
+    isPermitted = true;
     nctIdChosen:string;
     trialChosen: {};
     genomicInput: Genomic;
@@ -48,8 +47,9 @@ export class PanelComponent implements OnInit {
     oncokbGenomicFields = ['hugo_symbol', 'annotated_variant'];
     oncokb: boolean;
     hasErrorInputField: boolean;
-            
-    constructor(private trialService: TrialService) { 
+    copyMatch:boolean = false;
+
+    constructor(private trialService: TrialService) {
     }
 
     ngOnInit() {
@@ -143,7 +143,7 @@ export class PanelComponent implements OnInit {
                 this.modifyArmGroup(type);
             } else {
                 this.preparePath();
-                this.modifyData(this.dataToModify, this.finalPath, type);  
+                this.modifyData(this.dataToModify, this.finalPath, type);
             }
             this.saveBacktoDB().then((isSaved) => {
                 if (isSaved && type === 'update') {
@@ -156,7 +156,7 @@ export class PanelComponent implements OnInit {
         let genomicFieldsToCheck = this.oncokbGenomicFields;
         if (!this.oncokb) {
             genomicFieldsToCheck = _.without(this.genomicFields, 'matching_examples');
-        } 
+        }
         for (const key of genomicFieldsToCheck) {
             if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
                 return false;
@@ -265,6 +265,18 @@ export class PanelComponent implements OnInit {
                     this.modifyData(obj[index], path, type);
                 }
                 break;
+            case 'copy':
+                if (_.isEmpty(path)) {
+                    // The who match node is copied.
+                    this.copyMatch = true;
+                    this.dataBlockToMove = _.clone(obj);
+                } else if (path.length === 2 && (path[1] === 'and' || path[1] === 'or') || path.length === 1) {
+                    this.dataBlockToMove = _.clone(obj[path[0]]);
+                } else {
+                    const index = path.shift();
+                    this.modifyData(obj[index], path, type);
+                }
+                break;
             case 'update':
                 if (path.length === 1) {
                     if (obj[path[0]].hasOwnProperty('genomic')) {
@@ -298,7 +310,7 @@ export class PanelComponent implements OnInit {
                     const index = path.shift();
                     this.modifyData(obj[index], path, type);
                 }
-                break;    
+                break;
             default:
                 break;
         }
@@ -318,16 +330,16 @@ export class PanelComponent implements OnInit {
             for (let key of keys) {
                 this.genomicInput[key] = '';
                 this.genomicInput['no_'+key] = false;
-            }    
+            }
         } else if (type === 'Clinical') {
             for (let key of keys) {
                 this.clinicalInput[key] = '';
                 this.clinicalInput['no_'+key] = false;
-            }    
+            }
         } else if (type === 'arm') {
             for (let key of keys) {
                 this.armInput[key] = '';
-            } 
+            }
         }
     }
     getOncotree() {
@@ -464,7 +476,13 @@ export class PanelComponent implements OnInit {
                     break;
             }
         } else {
-            obj.push(this.dataBlockToMove);
+            if(this.copyMatch) {
+                _.each(this.dataBlockToMove, function(item){
+                    obj.push(item);
+                });
+            } else {
+                obj.push(this.dataBlockToMove);
+            }
         }
         if(!emptyObj) {
             // Do not sort object when add a empty object.
@@ -486,7 +504,7 @@ export class PanelComponent implements OnInit {
         const keys = ['genomic', 'clinical', 'and', 'or'];
         return keys.indexOf(Object.keys(a)[0]) - keys.indexOf(Object.keys(b)[0]);
     }
-    editNode() { 
+    editNode() {
         this.operationPool['currentPath'] = this.path;
         this.operationPool['editing'] = true;
         if (this.unit.hasOwnProperty('genomic')) {
@@ -571,6 +589,17 @@ export class PanelComponent implements OnInit {
             this.movingPath.from = this.path;
         }
     }
+    copyNode() {
+        if (this.operationPool['copy'] === true) {
+            // click twice for canceling copy operation
+            this.operationPool['currentPath'] = '';
+            this.operationPool['copy'] = false;
+        } else {
+            this.operationPool['currentPath'] = this.path;
+            this.operationPool['copy'] = true;
+            this.movingPath.from = this.path;
+        }
+    }
     cancelModification() {
         this.operationPool['currentPath'] = '';
         this.operationPool['editing'] = false;
@@ -593,6 +622,26 @@ export class PanelComponent implements OnInit {
         this.removeOriginalNode(this.originalMatch);
         for (let arm of this.originalArms) {
             this.removeOriginalNode(arm.match);
+        }
+        this.dataBlockToMove = {};
+        this.saveBacktoDB();
+    }
+    addCopiedNode() {
+        this.operationPool['currentPath'] = '';
+        this.movingPath.to = this.path;
+        // find the data to be moved and mark it as to be removed.
+        // We can't remove it at this step because it will upset the path for the destination node
+        this.preparePath(this.movingPath.from);
+        this.operationPool['copy'] = false;
+        if (this.arm) {
+            let copiedArmPathArr = this.movingPath.from.split(',');
+            let armToAdd: Arm = this.originalArms[copiedArmPathArr[copiedArmPathArr.length - 1]];
+            this.modifyArmGroup('add', armToAdd);
+        } else {
+            this.modifyData(this.dataToModify, this.finalPath, 'copy');
+            //add the data to destination node
+            this.preparePath(this.movingPath.to);
+            this.modifyData(this.dataToModify, this.finalPath, 'add');
         }
         this.dataBlockToMove = {};
         this.saveBacktoDB();
@@ -631,28 +680,56 @@ export class PanelComponent implements OnInit {
         }
         return isInside;
     }
-    // when user try to move a section, we hide all icons except the relocate icon to avoid distraction. Among which, there are two cases the destination icons are hidden
+    // when user try to move a section, we hide all icons except the relocate icon to avoid distraction. Among which, there are 2 cases the destination icons are hidden
     // 1) The section is the current chosen one to move around.
     // 2) The section is inside the current chosen section.
-    displayDestination() {
+    displayMoveDestination() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true 
-        && this.operationPool['currentPath'] !== this.path && !this.isNestedInside(this.operationPool['currentPath'], this.path);
+        return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true
+            && this.operationPool['copy'] !== true && this.operationPool['currentPath'] !== this.path &&
+            !this.isNestedInside(this.operationPool['currentPath'], this.path);
+    }
+    // Hide other destination buttons(match, and, or) except root "arm" when copy an arm.
+    displayCopyDestination() {
+        if (this.isPermitted === false) return false;
+        // Show root "arm" destination button when copy an arm
+        if (this.arm && this.path === 'arms') {
+            return this.type.indexOf('copyArm') !== -1 && this.operationPool['copy'] &&
+                this.operationPool['currentPath'].includes('arm_name');
+        }
+        if (this.type.indexOf('copyMatch') !== -1) {
+            return this.operationPool['copy'] && this.operationPool['currentPath'] !== this.path && !this.operationPool['currentPath'].includes('arm_name') &&
+                !this.isNestedInside(this.operationPool['currentPath'], this.path);
+        }
+        // Hide other destination button except root "arm" when copy an arm
+        if(!_.isUndefined(this.operationPool['currentPath']) && this.operationPool['currentPath'].includes(',')){
+            let currentPathArr = this.operationPool['currentPath'].split(',');
+            if(currentPathArr.length === 2 && currentPathArr[0] === 'arm_name' && Number(currentPathArr[1]) >= 0) {
+                return false;
+            }
+        }
+        return this.type.indexOf('destination') !== -1 && this.path !== 'arms' &&
+            this.operationPool['relocate'] !== true &&
+            (this.operationPool['copy'] === true && this.operationPool['currentPath'] !== this.path &&
+                    !this.isNestedInside(this.operationPool['currentPath'], this.path));
     }
     displayPencil() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('edit') !== -1 && this.operationPool['relocate'] !== true && this.operationPool['currentPath'] !== this.path;
+        return this.type.indexOf('edit') !== -1 && this.operationPool['relocate'] !== true &&
+            this.operationPool['copy'] !== true && this.operationPool['currentPath'] !== this.path;
     }
     displayAdd() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('add') !== -1 && this.operationPool['relocate'] !== true;
+        return this.type.indexOf('add') !== -1 && this.operationPool['relocate'] !== true &&
+            this.operationPool['copy'] !== true;
     }
     // There are three cases we display the trash icon
     // 1) when the page is first loaded
     // 2) when the item is not the current editing one
     displayTrash() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('delete') !== -1 && (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
+        return this.type.indexOf('delete') !== -1 && (this.operationPool['relocate'] !== true &&
+            this.operationPool['copy'] !== true && this.operationPool['editing'] !== true
         || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path);
     }
     // There are three cases we display the move icon
@@ -661,15 +738,24 @@ export class PanelComponent implements OnInit {
     // 3) when the item is the one we chose to move around
     displayMove() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('relocate') !== -1 && (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
+        return this.type.indexOf('relocate') !== -1 && this.operationPool['copy'] !== true &&
+            (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
         || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
         || this.operationPool['relocate'] === true && this.operationPool['currentPath'] === this.path);
     }
     displayExchange() {
         if (this.isPermitted === false) return false;
-        return this.type.indexOf('exchange') !== -1 && this.operationPool['relocate'] !== true;
+        return this.type.indexOf('exchange') !== -1 && this.operationPool['relocate'] !== true &&
+            this.operationPool['copy'] !== true;
     }
-    modifyArmGroup(type) {
+    displayCopy() {
+        if (this.isPermitted === false) return false;
+        return this.type.indexOf('copy') !== -1 && !this.type.includes('copyArm') && this.operationPool['relocate'] !== true &&
+            (this.operationPool['copy'] !== true && this.operationPool['editing'] !== true
+            || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
+            || this.operationPool['copy'] === true && this.operationPool['currentPath'] === this.path);
+    }
+    modifyArmGroup(type, arm?: Arm) {
         if (type === 'add') {
             let armToAdd: Arm = {
                 arm_name: '',
