@@ -5,13 +5,13 @@ import { TrialService } from '../service/trial.service';
 import * as _ from 'underscore';
 import '../../../../../node_modules/jquery/dist/jquery.js';
 import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
-import  * as YAML from '../../../../../node_modules/js-yaml/index.js';
+import  * as YAML from 'js-yaml';
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
 import { NgModel } from '@angular/forms';
 import { Trial } from '../trial/trial.model';
-import * as JSZip from '../../../../../node_modules/jszip/dist/jszip.js';
-import * as FileSaver from '../../../../../node_modules/file-saver/FileSaver.js';
+import * as JSZip from 'jszip';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'jhi-converter',
@@ -144,7 +144,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
             let fileReader = new FileReader();
             fileReader.readAsText(file);
             fileReader.onload = (e) => {
-                let trialJson = '';
+                let trialJson = {};
                 if (file.name.includes('json')) {
                     trialJson = JSON.parse(fileReader.result);
                 } else {

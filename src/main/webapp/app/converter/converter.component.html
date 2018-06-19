@@ -43,7 +43,7 @@
             </div>
             <div class="col-md-7">
                 <button class="btn btn-primary button-margin" (click)="uploadFiles()" *ngIf="filesToUpload.length > 0">Upload File(s)</button>
-                <span *ngIf="uploadMessage.content.length > 0" [style.color]="uploadMessage.color"> {{uploadMessage.content}} </span>
+                <span *ngIf="uploadMessage['content'].length > 0" [style.color]="uploadMessage.color"> {{uploadMessage.content}} </span>
             </div>
         </div>
         <div class="row">
