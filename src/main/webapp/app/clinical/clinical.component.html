@@ -1,11 +1,10 @@
 <div *ngIf="type === 'add'; else editPanel">
     <div>
         <div class="row ageNumericalMargin">
-            <div class="col-sm-3">
+            <div class="col-sm-4">
                 age_numerical:
                 <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
             </div>
-            <div class="col-sm-1"></div>
             <div class="col-sm-8">
                 <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
             </div>
@@ -25,6 +24,23 @@
                     <ng-select class="selectStyle" [items]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
                         [clearable]="true" placeholder="Select Subtype" (change)="onSingleSelected($event)">
                     </ng-select>
+                    <i class="collapse-margin" aria-hidden="true" title="Display optional attributes"
+                       ngClass="{{ displayOptionalFields ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down'}}" (click)="collapse()"></i>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="displayOptionalFields">
+            <div class="row">
+                <div class="col-sm-4">gender:</div>
+                <div class="col-sm-8">
+                    <span id="gender1">
+                        <label for="gender-male1">
+                            <input id="gender-male1" type="radio" value="Male" name="gender" [(ngModel)]="clinicalInput.gender" (click)="unCheckRadio($event)">Male
+                        </label>
+                        <label for="gender-female1">
+                            <input id="gender-female1" type="radio" value="Female" name="gender" [(ngModel)]="clinicalInput.gender" (click)="unCheckRadio($event)">Female
+                        </label>
+                    </span>
                 </div>
             </div>
         </div>
@@ -61,7 +77,22 @@
                     <ng-select class="selectStyle" [items]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
                         [clearable]="true" placeholder="Select Subtype" (change)="onSingleSelected($event)">
                     </ng-select>
+                    <i class="collapse-margin" aria-hidden="true" title="Display optional attributes"
+                       ngClass="{{ displayOptionalFields ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down'}}" (click)="collapse()"></i>
                 </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="displayOptionalFields">
+            <div class="col-sm-4">gender:</div>
+            <div class="col-sm-8">
+                <span id="gender2">
+                    <label for="gender-male2">
+                        <input id="gender-male2" type="radio" value="Male" name="gender" [(ngModel)]="clinicalInput.gender" (click)="unCheckRadio($event)">Male
+                    </label>
+                    <label for="gender-female2">
+                        <input id="gender-female2" type="radio" value="Female" name="gender" [(ngModel)]="clinicalInput.gender" (click)="unCheckRadio($event)">Female
+                    </label>
+                </span>
             </div>
         </div>
     </div>
@@ -81,6 +112,14 @@
                 </div>
                 <div class="col-sm-8">
                     <span>{{getDisplayContent('oncotree_primary_diagnosis')}}</span>
+                </div>
+            </div>
+            <div *ngIf="unit.clinical.gender" class="row">
+                <div class="col-sm-4">
+                    <label>gender:</label>
+                </div>
+                <div class="col-sm-8">
+                    <span>{{unit.clinical.gender}}</span>
                 </div>
             </div>
         </div>
