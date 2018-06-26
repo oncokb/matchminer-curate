@@ -25,15 +25,15 @@ export class ClinicalComponent implements OnInit {
     constructor(private trialService: TrialService) { }
 
     ngOnInit() {
-        this.trialService.clinicalInputObs.subscribe(message => {
+        this.trialService.clinicalInputObs.subscribe((message) => {
             this.clinicalInput = message;
         });
-        this.trialService.operationPoolObs.subscribe(message => {
+        this.trialService.operationPoolObs.subscribe((message) => {
             this.operationPool = message;
         });
-        let optionalFields = ['gender'];
+        const optionalFields = ['gender'];
         _.some(optionalFields, function(key) {
-            if(!_.isEmpty(this.unit) && this.unit.clinical[key]) {
+            if (!_.isEmpty(this.unit) && this.unit.clinical[key]) {
                 this.displayOptionalFields = true;
                 return true;
             }
@@ -51,12 +51,12 @@ export class ClinicalComponent implements OnInit {
     }
     validateAgeInput() {
         let isValidated = false;
-        if(this.clinicalInput.age_numerical.includes(',')) {
-            let ageGroups = this.clinicalInput.age_numerical.split(',');
+        if (this.clinicalInput.age_numerical.includes(',')) {
+            const ageGroups = this.clinicalInput.age_numerical.split(',');
             // Age input cannot only accepts age range groups greater than 2.
             if (ageGroups.length === 2) {
-                let ageNumber0 = Number(ageGroups[0].match(/\d\d?$/));
-                let ageNumber1 = Number(ageGroups[1].match(/\d\d?$/));
+                const ageNumber0 = Number(ageGroups[0].match(/\d\d?$/));
+                const ageNumber1 = Number(ageGroups[1].match(/\d\d?$/));
                 // Do no allow age range like '>15, >=30' or '<=60, <40' or '<10, >60' or '>50, <20'
                 if ((ageGroups[0].includes('>') && ageGroups[1].includes('>')) ||
                     (ageGroups[0].includes('<') && ageGroups[1].includes('<')) ||
@@ -65,7 +65,7 @@ export class ClinicalComponent implements OnInit {
                     this.setValidationMessage(false, 'Invalid Age Entry');
                     return;
                 }
-                ageGroups.forEach(age => {
+                ageGroups.forEach((age) => {
                     isValidated = this.validateSingleAgeStr(age.trim());
                     if (!isValidated) {
                         this.setValidationMessage(false, 'Invalid Age Entry');
@@ -89,7 +89,7 @@ export class ClinicalComponent implements OnInit {
                 return;
             }
         }
-        if(isValidated) {
+        if (isValidated) {
             this.setValidationMessage(true, 'Valid Age Entry');
         }
     }
@@ -110,7 +110,7 @@ export class ClinicalComponent implements OnInit {
             this.trialService.setHasErrorInputField(true);
         }
     }
-    onSingleSelected(option){
+    onSingleSelected(option) {
         if (_.isUndefined(option)) {
             this.clinicalInput.sub_type = '';
         } else if (option && this.clinicalInput.main_type !== this.subToMainMapping[option]) {
@@ -124,7 +124,7 @@ export class ClinicalComponent implements OnInit {
     getDisplayContent(key: string) {
         return this.trialService.getNodeDisplayContent(key, this.unit['clinical']);
     }
-    collapse(){
+    collapse() {
         if (this.displayOptionalFields) {
             this.displayOptionalFields = false;
         } else {

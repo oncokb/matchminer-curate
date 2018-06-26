@@ -1,25 +1,26 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
 import * as _ from 'underscore';
 import { Trial } from './trial.model';
 import * as $ from 'jquery';
-import "../../../../../node_modules/jquery/dist/jquery.js";
-import "../../../../../node_modules/datatables.net/js/jquery.dataTables.js";
+import '../../../../../node_modules/jquery/dist/jquery.js';
+import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
-import { NgModel } from "@angular/forms";
-import { Router } from "@angular/router";
+import { NgModel } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'jhi-trial',
   templateUrl: './trial.component.html',
   styleUrls: ['trial.scss']
 })
-export class TrialComponent implements OnInit, AfterViewInit{
+
+export class TrialComponent implements OnInit, AfterViewInit {
   @ViewChild(DataTableDirective)
   dtElement: DataTableDirective;
   trialsToImport = '';
@@ -36,18 +37,18 @@ export class TrialComponent implements OnInit, AfterViewInit{
   @ViewChild('selectModel') private selectModel: NgModel;
 
   constructor(public http: Http, private trialService: TrialService, public db: AngularFireDatabase, private router: Router ) {
-    this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
-    this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);
-    this.trialService.trialListObs.subscribe(message => {
+    this.trialService.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
+    this.trialService.trialChosenObs.subscribe((message) => this.trialChosen = message);
+    this.trialService.trialListObs.subscribe((message) => {
         this.trialList = message;
-        this.nctIdList = _.map(this.trialList, function(trial){
+        this.nctIdList = _.map(this.trialList, function(trial) {
             return trial.nct_id;
         });
         this.rerender();
     });
   }
   ngOnInit(): void {
-    $.fn['dataTable'].ext.search.push((settings, data, dataIndex) => {
+    $.fn['dataTable'].ext.search.push((settings, data) => {
         if (this.hideArchived === 'Yes' && data[4] === 'Yes') {
             return false;
         } else if (this.hideArchived === 'No' && data[4] === 'No') {
@@ -60,8 +61,8 @@ export class TrialComponent implements OnInit, AfterViewInit{
         paging: false,
         scrollY: '300'
     };
-      if (this.router.url.includes("NCT")) {
-          let nctId = this.router.url.split("/").slice(-1)[0];
+      if (this.router.url.includes('NCT')) {
+          const nctId = this.router.url.split('/').slice(-1)[0];
           this.curateTrial(nctId);
       }
   }
@@ -83,14 +84,14 @@ export class TrialComponent implements OnInit, AfterViewInit{
             result = confirm('Trial ' + tempTrial + ' has been loaded in database. ' +
                 'Are you sure you want to overwrite this trial by loading file ' + tempTrial + '?');
         }
-        if(!result) {
+        if (!result) {
             continue;
         }
 
         this.http.get(this.trialService.getAPIUrl('ClinicalTrials') + tempTrial)
         .subscribe((res: Response) => {
            const trialInfo = res.json();
-           let armsInfo:any = [];
+           const armsInfo: any = [];
            _.each(trialInfo.arms, function(arm) {
                if (arm.arm_type !== null && arm.arm_description !== null) {
                     armsInfo.push({
@@ -118,7 +119,7 @@ export class TrialComponent implements OnInit, AfterViewInit{
                     }]
                    }
                };
-           this.db.object('Trials/' + trialInfo.nct_id).set(trial).then(result => {
+           this.db.object('Trials/' + trialInfo.nct_id).set(trial).then((response) => {
             this.messages.push('Successfully imported ' + trialInfo.nct_id);
             if (setChosenTrial === false) {
                  this.nctIdChosen = trialInfo.nct_id;
@@ -126,11 +127,11 @@ export class TrialComponent implements OnInit, AfterViewInit{
                  this.originalTrialStatus = this.trialChosen['status'];
                  setChosenTrial = true;
             }
-           }).catch(error => {
+           }).catch((error) => {
             this.messages.push('Fail to save to database ' + tempTrial);
            });
         },
-        error => {
+            (error) => {
             this.messages.push(tempTrial + ' not found');
         }
         );
@@ -141,20 +142,20 @@ export class TrialComponent implements OnInit, AfterViewInit{
       if (type === 'curation') {
         this.db.object('Trials/' + this.nctIdChosen).update({
             curation_status: this.trialChosen['curation_status']
-        }).then(result => {
+        }).then((result) => {
             console.log('success saving curation status');
-        }).catch(error => {
+        }).catch((error) => {
             console.log('error', error);
         });
       } else if (type === 'archive') {
         this.db.object('Trials/' + this.nctIdChosen).update({
             archived: this.trialChosen['archived']
-        }).then(result => {
+        }).then((result) => {
             console.log('success saving archive status');
             if (this.trialChosen['archived'] === 'Yes') {
                 this.curateTrial('');
             }
-        }).catch(error => {
+        }).catch((error) => {
             console.log('error', error);
         });
       } else if (type === 'hideArchived') {
@@ -186,11 +187,11 @@ export class TrialComponent implements OnInit, AfterViewInit{
   }
   updateTrialStatusInDB() {
     if (this.originalTrialStatus !== this.trialChosen['status']) {
-        this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then(result => {
+        this.trialService.getTrialRef(this.nctIdChosen, 'status').set(this.trialChosen['status']).then((result) => {
             console.log('Save to DB Successfully!');
-        }).catch(error => {
+        }).catch((error) => {
             console.log('Failed to save to DB ', error);
-            let errorMessage = 'Sorry, the trial status is failed to save to database.';
+            const errorMessage = 'Sorry, the trial status is failed to save to database.';
             this.trialService.saveErrors(
                 errorMessage,
                 {

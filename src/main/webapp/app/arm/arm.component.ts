@@ -20,10 +20,10 @@ export class ArmComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.trialService.operationPoolObs.subscribe(message => {
+        this.trialService.operationPoolObs.subscribe((message) => {
             this.operationPool = message;
         });
-        this.trialService.armInputObs.subscribe(message => {
+        this.trialService.armInputObs.subscribe((message) => {
             this.armInput = message;
         });
     }

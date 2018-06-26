@@ -38,8 +38,8 @@ import {
     PageRibbonComponent,
     ErrorComponent
 } from './layouts';
-import { EmailService } from "./service/email.service";
-import { ConverterComponent } from "./converter/converter.component";
+import { EmailService } from './service/email.service';
+import { ConverterComponent } from './converter/converter.component';
 
 @NgModule({
     imports: [

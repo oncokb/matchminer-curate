@@ -37,7 +37,7 @@ export class PanelComponent implements OnInit {
     mainTypesOptions = this.trialService.getMainTypesOptions();
     statusOptions = this.trialService.getStatusOptions();
     isPermitted = true;
-    nctIdChosen:string;
+    nctIdChosen: string;
     trialChosen: {};
     genomicInput: Genomic;
     clinicalInput: Clinical;
@@ -47,37 +47,37 @@ export class PanelComponent implements OnInit {
     oncokbGenomicFields = ['hugo_symbol', 'annotated_variant'];
     oncokb: boolean;
     hasErrorInputField: boolean;
-    copyMatch:boolean = false;
+    copyMatch = false;
 
     constructor(private trialService: TrialService) {
     }
 
     ngOnInit() {
-        this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
-        this.trialService.trialChosenObs.subscribe(message => {
+        this.trialService.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
+        this.trialService.trialChosenObs.subscribe((message) => {
             this.trialChosen = message;
             this.originalMatch = this.trialChosen['treatment_list'].step[0].match;
             this.originalArms = this.trialChosen['treatment_list'].step[0].arm;
         });
-        this.trialService.genomicInputObs.subscribe(message => {
+        this.trialService.genomicInputObs.subscribe((message) => {
             this.genomicInput = message;
         });
-        this.trialService.clinicalInputObs.subscribe(message => {
+        this.trialService.clinicalInputObs.subscribe((message) => {
             this.clinicalInput = message;
         });
-        this.trialService.operationPoolObs.subscribe(message => {
+        this.trialService.operationPoolObs.subscribe((message) => {
             this.operationPool = message;
         });
-        this.trialService.currentPathObs.subscribe(message => {
+        this.trialService.currentPathObs.subscribe((message) => {
             this.currentPath = message;
         });
-        this.trialService.movingPathObs.subscribe(message => {
+        this.trialService.movingPathObs.subscribe((message) => {
             this.movingPath = message;
         });
-        this.trialService.armInputObs.subscribe(message => {
+        this.trialService.armInputObs.subscribe((message) => {
             this.armInput = message;
         });
-        this.trialService.hasErrorInputFieldObs.subscribe(message => {
+        this.trialService.hasErrorInputFieldObs.subscribe((message) => {
             this.hasErrorInputField = message;
         });
         this.oncokb = this.trialService.oncokb;
@@ -111,7 +111,7 @@ export class PanelComponent implements OnInit {
                     this.finalPath.push('or');
                 } else {
                     // case: the first time add nodes to match under each arm
-                    //this.dataToModify = this.dataToModify[point].match;
+                    // this.dataToModify = this.dataToModify[point].match;
                 }
             }
         }
@@ -120,9 +120,9 @@ export class PanelComponent implements OnInit {
         if (this.arm) {
             return 'Arm';
         } else if (_.isUndefined(type) || type.length === 0) {
-            let keys = _.keys(this.unit);
+            const keys = _.keys(this.unit);
             if (keys.length === 1) {
-                return keys[0].replace(/\b\w/g, l => l.toUpperCase());
+                return keys[0].replace(/\b\w/g, (l) => l.toUpperCase());
             }
         }
         return type;
@@ -134,7 +134,7 @@ export class PanelComponent implements OnInit {
         if (type === 'delete') {
             result = confirm('This will delete the entire section. Are you sure you want to proceed?');
         } else {
-            let nodeType = this.getNodeType(this.nodeType);
+            const nodeType = this.getNodeType(this.nodeType);
             hasEmptySections = this.hasEmptySections(nodeType);
         }
 
@@ -167,7 +167,7 @@ export class PanelComponent implements OnInit {
     hasEmptyClinicalFields(obj: any) {
         // Check clinical input fields
         // TODO: Use clinicalFields to replace the array after we remove main_type input field
-        let clinicalFieldsToCheck = ['age_numerical', 'sub_type', 'main_type'];
+        const clinicalFieldsToCheck = ['age_numerical', 'sub_type', 'main_type'];
         for (const key of clinicalFieldsToCheck) {
             if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
                 return false;
@@ -201,7 +201,7 @@ export class PanelComponent implements OnInit {
             break;
         case 'And':
         case 'Or':
-            for (let item of this.selectedItems) {
+            for (const item of this.selectedItems) {
                 this.getEmptySectionNames(item, emptySections);
             }
             break;
@@ -213,7 +213,7 @@ export class PanelComponent implements OnInit {
         let emptySections = this.getEmptySectionNames(type, []);
         if (emptySections.length > 0) {
             emptySections = _.uniq(emptySections);
-            let warnMessage = "Please enter information in " + emptySections.join(' and ');
+            let warnMessage = 'Please enter information in ' + emptySections.join(' and ');
             if (emptySections.length > 1) {
                 warnMessage += ' sections!';
             } else {
@@ -229,13 +229,13 @@ export class PanelComponent implements OnInit {
             this.trialService.getTrialRef(this.nctIdChosen).set({
                 arm: this.originalArms,
                 match: this.originalMatch
-            }).then(result => {
-                console.log("save successfully!");
+            }).then((result) => {
+                console.log('save successfully!');
                 this.clearInput();
                 resolve(true);
-            }).catch(error => {
+            }).catch((error) => {
                 console.log('Failed to save to DB ', error);
-                const errorMessage = "Sorry, this node is failed to save to database. Please make a copy of your data. Thanks!";
+                const errorMessage = 'Sorry, this node is failed to save to database. Please make a copy of your data. Thanks!';
                 this.trialService.saveErrors(
                     errorMessage,
                     {
@@ -327,17 +327,17 @@ export class PanelComponent implements OnInit {
     }
     clearInputForm(keys: Array<string>, type: string) {
         if (type === 'Genomic') {
-            for (let key of keys) {
+            for (const key of keys) {
                 this.genomicInput[key] = '';
-                this.genomicInput['no_'+key] = false;
+                this.genomicInput['no_' + key] = false;
             }
         } else if (type === 'Clinical') {
-            for (let key of keys) {
+            for (const key of keys) {
                 this.clinicalInput[key] = '';
-                this.clinicalInput['no_'+key] = false;
+                this.clinicalInput['no_' + key] = false;
             }
         } else if (type === 'arm') {
-            for (let key of keys) {
+            for (const key of keys) {
                 this.armInput[key] = '';
             }
         }
@@ -353,14 +353,14 @@ export class PanelComponent implements OnInit {
     }
     prepareClinicalData() {
         this.clinicalInput['oncotree_primary_diagnosis'] = this.getOncotree();
-        let clinicalToSave = _.clone(this.clinicalInput);
+        const clinicalToSave = _.clone(this.clinicalInput);
         delete clinicalToSave['main_type'];
         delete clinicalToSave['sub_type'];
         this.prepareSectionByField('clinical', clinicalToSave);
         return clinicalToSave;
     }
     prepareGenomicData() {
-        let genomicToSave = _.clone(this.genomicInput);
+        const genomicToSave = _.clone(this.genomicInput);
         this.prepareSectionByField('genomic', genomicToSave);
         return genomicToSave;
     }
@@ -378,8 +378,8 @@ export class PanelComponent implements OnInit {
             }
             // apply not logic
             if (nodeData['no_' + key]) {
-                if (key === 'annotated_variant'){
-                    let annotatedVariants = nodeData[key].split(',');
+                if (key === 'annotated_variant') {
+                    const annotatedVariants = nodeData[key].split(',');
                     nodeData[key] = '!' + nodeData[key];
                     if (annotatedVariants.length > 1) {
                         nodeData[key] = '';
@@ -398,11 +398,11 @@ export class PanelComponent implements OnInit {
     // Generate multiple genomic nodes if annotated_variant is an array.
     prepareGenomicNodes(genomicNode: object) {
         if (!_.isUndefined(genomicNode['annotated_variant']) && genomicNode['annotated_variant'].includes(',')) {
-            let annotatedVariants = genomicNode['annotated_variant'].split(',');
-            let genomicNodeToSave = { and: [] };
+            const annotatedVariants = genomicNode['annotated_variant'].split(',');
+            const genomicNodeToSave = { and: [] };
             _.each(annotatedVariants, function(variant) {
                 if (!_.isEmpty(variant)) {
-                    let genomicNodeCopy = _.clone(genomicNode);
+                    const genomicNodeCopy = _.clone(genomicNode);
                     genomicNodeCopy['annotated_variant'] = variant.trim();
                     genomicNodeToSave['and'].push({
                         genomic: genomicNodeCopy
@@ -414,24 +414,24 @@ export class PanelComponent implements OnInit {
             return { genomic: genomicNode };
         }
     }
-    // Generate "And" node for age range
+    // Generate 'And' node for age range
     prepareClinicalNodes(clinicalNode: Clinical) {
         if (!_.isUndefined(clinicalNode['age_numerical']) && clinicalNode['age_numerical'].includes(',')) {
-            let ageGroups = clinicalNode['age_numerical'].split(',');
+            const ageGroups = clinicalNode['age_numerical'].split(',');
             ageGroups[0] = ageGroups[0].trim();
             ageGroups[1] = ageGroups[1].trim();
-            let ageNumber0 = Number(ageGroups[0].match(/\d\d?$/));
-            let ageNumber1 = Number(ageGroups[1].match(/\d\d?$/));
+            const ageNumber0 = Number(ageGroups[0].match(/\d\d?$/));
+            const ageNumber1 = Number(ageGroups[1].match(/\d\d?$/));
             let clinicalNodeToSave = {};
             if ((ageGroups[0].includes('>') && ageGroups[1].includes('<') && ageNumber0 <= ageNumber1) ||
                 (ageGroups[0].includes('<') && ageGroups[1].includes('>') && ageNumber0 > ageNumber1)) {
                 clinicalNodeToSave = {
                     and: []
                 };
-                let tempClinicalNode0 = _.clone( clinicalNode );
+                const tempClinicalNode0 = _.clone( clinicalNode );
                 tempClinicalNode0[ 'age_numerical' ] = ageGroups[0];
                 clinicalNodeToSave[ 'and' ].push( { clinical: tempClinicalNode0 } );
-                let tempClinicalNode1 = _.clone( clinicalNode );
+                const tempClinicalNode1 = _.clone( clinicalNode );
                 tempClinicalNode1[ 'age_numerical' ] = ageGroups[1];
                 clinicalNodeToSave[ 'and' ].push( { clinical: tempClinicalNode1 } );
             }
@@ -452,8 +452,8 @@ export class PanelComponent implements OnInit {
                     break;
                 case 'And':
                 case 'Or':
-                    let tempObj1: any = [];
-                    for (let item of this.selectedItems) {
+                    const tempObj1: any = [];
+                    for (const item of this.selectedItems) {
                         switch (item) {
                             case 'Genomic':
                                 tempObj1.push(this.prepareGenomicNodes(this.prepareGenomicData()));
@@ -466,7 +466,7 @@ export class PanelComponent implements OnInit {
                     if (_.isEmpty(tempObj1)) {
                         emptyObj = true;
                     }
-                    let tempObj2: any = {};
+                    const tempObj2: any = {};
                     if (this.nodeType === 'And') {
                         tempObj2.and = tempObj1;
                     } else if (this.nodeType === 'Or') {
@@ -476,7 +476,7 @@ export class PanelComponent implements OnInit {
                     break;
             }
         } else {
-            if(this.copyMatch) {
+            if (this.copyMatch) {
                 _.each(this.dataBlockToMove, function(item){
                     obj.push(item);
                 });
@@ -484,7 +484,7 @@ export class PanelComponent implements OnInit {
                 obj.push(this.dataBlockToMove);
             }
         }
-        if(!emptyObj) {
+        if (!emptyObj) {
             // Do not sort object when add a empty object.
             // If the empty object is put on the index 0 position, Firebase will delete it automatically and
             // index order will be messed up.
@@ -515,7 +515,7 @@ export class PanelComponent implements OnInit {
             this.setNotLogic('clinical');
             this.setOncotree();
         } else if (this.unit.hasOwnProperty('arm_name') || this.unit.hasOwnProperty('arm_code')) {
-            let armToAdd: Arm = {
+            const armToAdd: Arm = {
                 arm_name: this.unit['arm_name'],
                 arm_status: this.unit['arm_status'],
                 arm_description: this.unit['arm_description'],
@@ -532,11 +532,11 @@ export class PanelComponent implements OnInit {
         }
     }
     setOncotree() {
-        let oncotree_primary_diagnosis = this.clinicalInput['oncotree_primary_diagnosis'];
+        const oncotree_primary_diagnosis = this.clinicalInput['oncotree_primary_diagnosis'];
         this.clinicalInput['sub_type'] = '';
         this.clinicalInput['main_type'] = '';
         let isSubtype = false;
-        for (let item of this.allSubTypesOptions) {
+        for (const item of this.allSubTypesOptions) {
             if (item === oncotree_primary_diagnosis) {
                 this.clinicalInput['sub_type'] = oncotree_primary_diagnosis;
                 this.clinicalInput['main_type'] = this.subToMainMapping[oncotree_primary_diagnosis];
@@ -544,7 +544,7 @@ export class PanelComponent implements OnInit {
             }
         }
         if (isSubtype === false) {
-            for (let item of this.mainTypesOptions) {
+            for (const item of this.mainTypesOptions) {
                 if (item === oncotree_primary_diagnosis) {
                     this.clinicalInput['main_type'] = oncotree_primary_diagnosis;
                 }
@@ -553,14 +553,14 @@ export class PanelComponent implements OnInit {
     }
     setNotLogic(type: string) {
         if (type === 'clinical') {
-            for(const key of this.clinicalFields) {
+            for (const key of this.clinicalFields) {
                 if (!_.isUndefined(this.clinicalInput[key]) && this.clinicalInput[key].startsWith('!')) {
                     this.clinicalInput['no_' + key] = true;
                     this.clinicalInput[key] = this.clinicalInput[key].substr(1);
                 }
             }
         } else if (type === 'genomic') {
-            for(const key of this.genomicFields) {
+            for (const key of this.genomicFields) {
                 if (!_.isUndefined(this.genomicInput[key]) && this.genomicInput[key].startsWith('!')) {
                     this.genomicInput['no_' + key] = true;
                     this.genomicInput[key] = this.genomicInput[key].substr(1);
@@ -615,12 +615,12 @@ export class PanelComponent implements OnInit {
         // We can't remove it at this step because it will upset the path for the destination node
         this.preparePath(this.movingPath.from);
         this.modifyData(this.dataToModify, this.finalPath, 'remove');
-        //add the data to destination node
+        // add the data to destination node
         this.preparePath(this.movingPath.to);
         this.modifyData(this.dataToModify, this.finalPath, 'add');
-        //remove the original data that has been moved to the destination
+        // remove the original data that has been moved to the destination
         this.removeOriginalNode(this.originalMatch);
-        for (let arm of this.originalArms) {
+        for (const arm of this.originalArms) {
             this.removeOriginalNode(arm.match);
         }
         this.dataBlockToMove = {};
@@ -634,12 +634,12 @@ export class PanelComponent implements OnInit {
         this.preparePath(this.movingPath.from);
         this.operationPool['copy'] = false;
         if (this.arm) {
-            let copiedArmPathArr = this.movingPath.from.split(',');
-            let armToAdd: Arm = this.originalArms[copiedArmPathArr[copiedArmPathArr.length - 1]];
+            const copiedArmPathArr = this.movingPath.from.split(',');
+            const armToAdd: Arm = this.originalArms[copiedArmPathArr[copiedArmPathArr.length - 1]];
             this.modifyArmGroup('add', armToAdd);
         } else {
             this.modifyData(this.dataToModify, this.finalPath, 'copy');
-            //add the data to destination node
+            // add the data to destination node
             this.preparePath(this.movingPath.to);
             this.modifyData(this.dataToModify, this.finalPath, 'add');
         }
@@ -647,16 +647,16 @@ export class PanelComponent implements OnInit {
         this.saveBacktoDB();
     }
     removeOriginalNode(match: Array<any>) {
-        let itemsToRemove = [];
-        for (let item of match) {
+        const itemsToRemove = [];
+        for (const item of match) {
             if (item.toBeRemoved === true) {
                 itemsToRemove.push(item);
             }
         }
-        for (let item of itemsToRemove) {
+        for (const item of itemsToRemove) {
             match.splice(match.indexOf(item), 1);
         }
-        for (let item of match) {
+        for (const item of match) {
             if (_.keys(item).indexOf('and') !== -1) {
                 this.removeOriginalNode(item['and']);
             } else if (_.keys(item).indexOf('or') !== -1) {
@@ -665,8 +665,8 @@ export class PanelComponent implements OnInit {
         }
     }
     isNestedInside(currentPath: string, destinationPath: string) {
-        let currentPathArr = currentPath.split(',');
-        let destinationPathArr = destinationPath.split(',');
+        const currentPathArr = currentPath.split(',');
+        const destinationPathArr = destinationPath.split(',');
         let isInside = true;
         if (currentPathArr.length < destinationPathArr.length) {
             _.some(currentPathArr, function(item, index) {
@@ -684,15 +684,15 @@ export class PanelComponent implements OnInit {
     // 1) The section is the current chosen one to move around.
     // 2) The section is inside the current chosen section.
     displayMoveDestination() {
-        if (this.isPermitted === false) return false;
+        if (this.isPermitted === false) { return false; }
         return this.type.indexOf('destination') !== -1 && this.operationPool['relocate'] === true
             && this.operationPool['copy'] !== true && this.operationPool['currentPath'] !== this.path &&
             !this.isNestedInside(this.operationPool['currentPath'], this.path);
     }
-    // Hide other destination buttons(match, and, or) except root "arm" when copy an arm.
+    // Hide other destination buttons(match, and, or) except root 'arm' when copy an arm.
     displayCopyDestination() {
-        if (this.isPermitted === false) return false;
-        // Show root "arm" destination button when copy an arm
+        if (this.isPermitted === false) { return false; }
+        // Show root 'arm' destination button when copy an arm
         if (this.arm && this.path === 'arms') {
             return this.type.indexOf('copyArm') !== -1 && this.operationPool['copy'] &&
                 this.operationPool['currentPath'].includes('arm_name');
@@ -701,10 +701,10 @@ export class PanelComponent implements OnInit {
             return this.operationPool['copy'] && this.operationPool['currentPath'] !== this.path && !this.operationPool['currentPath'].includes('arm_name') &&
                 !this.isNestedInside(this.operationPool['currentPath'], this.path);
         }
-        // Hide other destination button except root "arm" when copy an arm
-        if(!_.isUndefined(this.operationPool['currentPath']) && this.operationPool['currentPath'].includes(',')){
-            let currentPathArr = this.operationPool['currentPath'].split(',');
-            if(currentPathArr.length === 2 && currentPathArr[0] === 'arm_name' && Number(currentPathArr[1]) >= 0) {
+        // Hide other destination button except root 'arm' when copy an arm
+        if (!_.isUndefined(this.operationPool['currentPath']) && this.operationPool['currentPath'].includes(',')) {
+            const currentPathArr = this.operationPool['currentPath'].split(',');
+            if (currentPathArr.length === 2 && currentPathArr[0] === 'arm_name' && Number(currentPathArr[1]) >= 0) {
                 return false;
             }
         }
@@ -714,12 +714,12 @@ export class PanelComponent implements OnInit {
                     !this.isNestedInside(this.operationPool['currentPath'], this.path));
     }
     displayPencil() {
-        if (this.isPermitted === false) return false;
+        if (this.isPermitted === false) { return false; }
         return this.type.indexOf('edit') !== -1 && this.operationPool['relocate'] !== true &&
             this.operationPool['copy'] !== true && this.operationPool['currentPath'] !== this.path;
     }
     displayAdd() {
-        if (this.isPermitted === false) return false;
+        if (this.isPermitted === false) { return false; }
         return this.type.indexOf('add') !== -1 && this.operationPool['relocate'] !== true &&
             this.operationPool['copy'] !== true;
     }
@@ -727,7 +727,7 @@ export class PanelComponent implements OnInit {
     // 1) when the page is first loaded
     // 2) when the item is not the current editing one
     displayTrash() {
-        if (this.isPermitted === false) return false;
+        if (this.isPermitted === false) { return false; }
         return this.type.indexOf('delete') !== -1 && (this.operationPool['relocate'] !== true &&
             this.operationPool['copy'] !== true && this.operationPool['editing'] !== true
         || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path);
@@ -737,19 +737,19 @@ export class PanelComponent implements OnInit {
     // 2) when the item is not the current editing one
     // 3) when the item is the one we chose to move around
     displayMove() {
-        if (this.isPermitted === false) return false;
+        if (this.isPermitted === false) { return false; }
         return this.type.indexOf('relocate') !== -1 && this.operationPool['copy'] !== true &&
             (this.operationPool['relocate'] !== true && this.operationPool['editing'] !== true
         || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
         || this.operationPool['relocate'] === true && this.operationPool['currentPath'] === this.path);
     }
     displayExchange() {
-        if (this.isPermitted === false) return false;
+        if (this.isPermitted === false) { return false; }
         return this.type.indexOf('exchange') !== -1 && this.operationPool['relocate'] !== true &&
             this.operationPool['copy'] !== true;
     }
     displayCopy() {
-        if (this.isPermitted === false) return false;
+        if (this.isPermitted === false) { return false; }
         return this.type.indexOf('copy') !== -1 && !this.type.includes('copyArm') && this.operationPool['relocate'] !== true &&
             (this.operationPool['copy'] !== true && this.operationPool['editing'] !== true
             || this.operationPool['editing'] === true && this.operationPool['currentPath'] !== this.path
@@ -757,7 +757,7 @@ export class PanelComponent implements OnInit {
     }
     modifyArmGroup(type, arm?: Arm) {
         if (type === 'add') {
-            let armToAdd: Arm = {
+            const armToAdd: Arm = {
                 arm_name: '',
                 arm_status: '',
                 arm_description: '',
@@ -777,13 +777,13 @@ export class PanelComponent implements OnInit {
             this.prepareArmData(this.armInput, this.originalArms[tempIndex]);
         }
     }
-    prepareArmData(armInput: Arm, armToSave: Arm){
-        let keys = _.keys(armInput);
+    prepareArmData(armInput: Arm, armToSave: Arm) {
+        const keys = _.keys(armInput);
         _.each(keys, function(key) {
-            if(!_.isUndefined(armInput[key])) {
+            if (!_.isUndefined(armInput[key])) {
                 armToSave[key] = armInput[key];
             }
-            if(_.isEmpty(armInput[key])) {
+            if (_.isEmpty(armInput[key])) {
                 delete armToSave[key];
             }
         });

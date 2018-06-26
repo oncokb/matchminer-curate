@@ -14,7 +14,7 @@ export class JhiMainComponent implements OnInit {
         private router: Router,
         private trialService: TrialService
     ) {
-        this.trialService.authorizedObs.subscribe(message => this.authorized = message);
+        this.trialService.authorizedObs.subscribe((message) => this.authorized = message);
     }
 
     private getPageTitle(routeSnapshot: ActivatedRouteSnapshot) {
