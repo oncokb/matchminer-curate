@@ -10,7 +10,7 @@ import { Http, Response } from '@angular/http';
 import * as _ from 'underscore';
 import { SERVER_API_URL } from '../app.constants';
 import { environment } from '../environments/environment';
-import { EmailService } from "./email.service";
+import { EmailService } from './email.service';
 @Injectable()
 export class TrialService {
     production = environment.production ? environment.production : false;
@@ -81,28 +81,28 @@ export class TrialService {
     errorList: Array<object> = [];
 
     constructor(public http: Http, public db: AngularFireDatabase, private emailService: EmailService) {
-        this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
+        this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
 
         // prepare main types list
         this.http.get(this.getAPIUrl('MainType'))
         .subscribe((res: Response) => {
-            let mainTypeQueries = [];
+            const mainTypeQueries = [];
             for (const item of res.json()) {
                 mainTypeQueries.push({
-                    "exactMatch": true,
-                    "query": item,
-                    "type": "mainType"
+                    'exactMatch': true,
+                    'query': item,
+                    'type': 'mainType'
                 });
                 this.mainTypesOptions.push(item);
             }
             // prepare subtypes by maintype
-            let queries =  {
-                "queries": mainTypeQueries
+            const queries =  {
+                'queries': mainTypeQueries
               };
             this.http.post(this.getAPIUrl('SubType'), queries)
-            .subscribe((res: Response) => {
-                let tempSubTypes = res.json();
+            .subscribe((response: Response) => {
+                const tempSubTypes = response.json();
                 let currentSubtype = '';
                 let currentMaintype = '';
                 for (const items of tempSubTypes) {
@@ -111,7 +111,7 @@ export class TrialService {
                         currentSubtype = item.name;
                         this.allSubTypesOptions.push(currentSubtype);
                         this.subToMainMapping[currentSubtype] = currentMaintype;
-                        if (this.subTypesOptions[currentMaintype] == undefined) {
+                        if (this.subTypesOptions[currentMaintype] === undefined) {
                             this.subTypesOptions[currentMaintype] = [currentSubtype];
                         } else {
                             this.subTypesOptions[currentMaintype].push(currentSubtype);
@@ -128,7 +128,7 @@ export class TrialService {
         this.http.get(this.getAPIUrl('OncoKBVariant'))
         .subscribe((res: Response) => {
            const allAnnotatedVariants = res.json();
-           for(const item of  allAnnotatedVariants) {
+           for (const item of  allAnnotatedVariants) {
                 if (item['gene']['hugoSymbol']) {
                     if (this.annotated_variants[item['gene']['hugoSymbol']]) {
                         this.annotated_variants[item['gene']['hugoSymbol']].push(item['alteration']);
@@ -137,7 +137,7 @@ export class TrialService {
                     }
                 }
            }
-           for(const key of _.keys(this.annotated_variants)) {
+           for (const key of _.keys(this.annotated_variants)) {
                 this.annotated_variants[key].sort();
            }
         });
@@ -178,7 +178,7 @@ export class TrialService {
         return genomicInput;
     }
     createClinical() {
-        let clinicalInput: Clinical= {
+        const clinicalInput: Clinical = {
             age_numerical: '',
             oncotree_primary_diagnosis: '',
             main_type: '',
@@ -188,7 +188,7 @@ export class TrialService {
         return clinicalInput;
     }
     createTrial() {
-        let trial: Trial= {
+        const trial: Trial = {
             curation_status: '',
             archived: '',
             nct_id: '',
@@ -201,7 +201,7 @@ export class TrialService {
         return trial;
     }
     fetchTrials() {
-        this.trialsRef.snapshotChanges().subscribe(action => {
+        this.trialsRef.snapshotChanges().subscribe((action) => {
             this.authorizedSource.next(true);
             this.trialList = [];
             for (const nctId of _.keys(action.payload.val())) {
@@ -209,7 +209,7 @@ export class TrialService {
             }
             this.trialListSource.next(this.trialList);
             this.setTrialChosen(this.nctIdChosen);
-        }, error => {
+        }, (error) => {
             this.authorizedSource.next(false);
         });
     }
@@ -217,8 +217,8 @@ export class TrialService {
         return new Promise((resolve, reject) => {
             this.db.object('Trials/' + id).valueChanges().subscribe((trial: any) => {
                 resolve(trial);
-            }, error => {
-                console.log("Fetch trial by id failed!", error);
+            }, (error) => {
+                console.log('Fetch trial by id failed!', error);
                 reject({});
             });
         });
@@ -294,10 +294,10 @@ export class TrialService {
     }
     saveTrialById(id: string, data: object) {
         return new Promise((resolve, reject) => {
-            this.db.object('Trials/' + id).set(data).then(result => {
+            this.db.object('Trials/' + id).set(data).then((result) => {
                 console.log('Save trial ' + id + ' successfully!');
                 resolve(true);
-            }).catch(error => {
+            }).catch((error) => {
                 console.log('Failed to save trial' + id + ' to DB ', error);
                 reject(false);
             });
@@ -312,9 +312,9 @@ export class TrialService {
             });
         } else {
             this.errorList.push({
-                info: info,
-                content: content,
-                error: error
+                'info': info,
+                'content': content,
+                'error': error
             });
         }
     }
@@ -330,7 +330,7 @@ export class TrialService {
     }
     getAPIUrl(type: string) {
         if (this.production === true) {
-            switch(type) {
+            switch (type) {
                 case 'MainType':
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
                 case 'SubType':
@@ -345,7 +345,7 @@ export class TrialService {
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
             }
         } else {
-            switch(type) {
+            switch (type) {
                 case 'MainType':
                     return 'http://oncotree.mskcc.org/api/mainTypes';
                 case 'SubType':

@@ -5,7 +5,7 @@ import { TrialService } from '../service/trial.service';
 import * as _ from 'underscore';
 import '../../../../../node_modules/jquery/dist/jquery.js';
 import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
-import  * as YAML from 'js-yaml';
+import * as YAML from 'js-yaml';
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
 import { NgModel } from '@angular/forms';
@@ -27,19 +27,19 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     downloadIdList: Array<string> = [];
     dtOptions: DataTables.Settings = {};
     dtTrigger: Subject<any> = new Subject();
-    fileType: string = 'json';
+    fileType = 'json';
     filesToUpload: Array<any> = [];
-    uploadFileNames: string = '';
+    uploadFileNames= '';
     uploadFailedFileList: Array<string> = [];
     uploadMessage: object = {
         content: '',
         color: ''
     };
-    tableDestroied: boolean = false;
+    tableDestroied = false;
     @ViewChild('selectModel') private selectModel: NgModel;
 
     constructor(private trialService: TrialService) {
-        this.trialService.trialListObs.subscribe(message => {
+        this.trialService.trialListObs.subscribe((message) => {
             this.trialList = message;
             this.nctIdList = _.map(this.trialList, function(trial){
                 return trial.nct_id;
@@ -76,23 +76,23 @@ export class ConverterComponent implements OnInit, AfterViewInit {
             if (!_.isEmpty(trialJson)) {
                 let data = '';
                 if (type === 'json') {
-                    data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(trialJson, null, 2));
+                    data = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(trialJson, null, 2));
                 } else if (type === 'yml') {
-                    data = "text/x-yaml;charset=utf-8," + encodeURIComponent(YAML.safeDump(trialJson));
+                    data = 'text/x-yaml;charset=utf-8,' + encodeURIComponent(YAML.safeDump(trialJson));
                 }
-                let a = document.createElement('a');
+                const a = document.createElement('a');
                 a.href = 'data:' + data;
                 a.download = nctId + '.' + type;
                 a.click();
             } else {
-                alert("Download trial " + nctId + " failed!");
+                alert('Download trial ' + nctId + ' failed!');
             }
         });
     }
     downloadTrials(isAll: boolean) {
-        let zip = new JSZip();
-        let folderName = 'Trials';
-        let zipFolder = zip.folder(folderName);
+        const zip = new JSZip();
+        const folderName = 'Trials';
+        const zipFolder = zip.folder(folderName);
         if (this.downloadIdList.length === 1 && !isAll) {
             this.downloadSingleTrial(this.downloadIdList[0], this.fileType);
             return;
@@ -102,17 +102,17 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         } else if (this.downloadIdList.length > 1) {
             this.createTrialZipFile(this.downloadIdList, zipFolder, false);
         }
-        zip.generateAsync({type:"blob"}).then(function (content) {
+        zip.generateAsync({type: 'blob'}).then(function(content) {
             FileSaver.saveAs(content, folderName + '.zip');
-        }, function (err) {
+        }, function(err) {
             console.log(err);
         });
     }
-    createTrialZipFile(idList:Array<string>, zipFolder:any, isAll?: boolean) {
+    createTrialZipFile(idList: Array<string>, zipFolder: any, isAll?: boolean) {
         let content = '';
         if (isAll) {
             _.each(this.trialList, function(trialJson){
-                let nctId = trialJson['nct_id'];
+                const nctId = trialJson['nct_id'];
                 if ( this.fileType === 'json' ) {
                     content = JSON.stringify( trialJson, null, 2 );
                 } else {
@@ -141,7 +141,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         let result = true;
         this.uploadFailedFileList = [];
         _.each(this.filesToUpload, function(file) {
-            let fileReader = new FileReader();
+            const fileReader = new FileReader();
             fileReader.readAsText(file);
             fileReader.onload = (e) => {
                 let trialJson = {};
@@ -150,7 +150,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
                 } else {
                     trialJson = YAML.safeLoad(fileReader.result);
                 }
-                let nctId = trialJson['nct_id'];
+                const nctId = trialJson['nct_id'];
                 trialJson['curation_status'] = 'In progress';
                 trialJson['archived'] = 'No';
                 // Check if this trial has been loaded. If yes, ask user if overwrite current trial.
@@ -163,8 +163,8 @@ export class ConverterComponent implements OnInit, AfterViewInit {
                         if (!res) {
                             this.uploadFailedFileList.push(file.name);
                         }
-                        if (file.name === this.filesToUpload[this.filesToUpload.length -1].name) {
-                            if(_.isEmpty(this.uploadFailedFileList)) {
+                        if (file.name === this.filesToUpload[this.filesToUpload.length - 1].name) {
+                            if (_.isEmpty(this.uploadFailedFileList)) {
                                 this.uploadMessage['content'] = 'Upload files successfully!';
                                 this.uploadMessage['color'] = 'green';
                             } else {
@@ -179,7 +179,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         }, this);
     }
     fileChanged($event) {
-        let fileArray = [];
+        const fileArray = [];
         this.uploadMessage['content'] = '';
         this.uploadFileNames = '';
         this.filesToUpload = $event.target.files;
@@ -190,12 +190,12 @@ export class ConverterComponent implements OnInit, AfterViewInit {
             this.uploadFileNames = fileArray.join(', ');
         }
     }
-    getDownloadCheckbox(id:string, isChecked: boolean) {
-        if(isChecked) {
+    getDownloadCheckbox(id: string, isChecked: boolean) {
+        if (isChecked) {
             this.downloadIdList.push(id);
         } else {
-            let index = this.downloadIdList.indexOf(id);
-            this.downloadIdList.splice(index,1);
+            const index = this.downloadIdList.indexOf(id);
+            this.downloadIdList.splice(index, 1);
         }
     }
 
