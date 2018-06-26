@@ -65,7 +65,7 @@
                 <input id="archive" type="radio" value="Yes" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
                 <label for="retrieve" style="color:green;margin-left:10px">No </label>
                 <input id="retrieve" type="radio" value="No" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
-            </span>            
+            </span>
             <br/><br/>
             <label for="nctId">NCT ID: </label>
             <span id="nctId" style="margin-left:10px">
@@ -77,7 +77,7 @@
             <br/>
             <label for="status">Status: </label>
             <span id="status" style="margin-left:10px">
-                <div style="min-width: 300px; display: inline-block">
+                <div style="min-width: 400px; display: inline-block">
                     <ng-select class="selectStyle" #selectModel="ngModel" [items]="statusOptions" [(ngModel)]="trialChosen.status"
                                [clearable]="false" (change)="updateTrialStatusInDB()"></ng-select>
                 </div>
