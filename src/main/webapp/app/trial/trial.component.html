@@ -1,4 +1,4 @@
-<div class="container" style="min-height:550px">
+<div class="container curation-container-height">
     <div class="input-group">
         <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Enter trial in the format: NCT02057133, NCT03006172"
             size="100">
@@ -9,20 +9,20 @@
     <div *ngIf="messages.length > 0">
         <br/>
         <div *ngFor="let message of messages">
-            <span style="color: green;" *ngIf="message.indexOf('Successfully') !== -1; else failedMessage"> {{message}} </span>
+            <span class="noteExchange" *ngIf="message.indexOf('Successfully') !== -1; else failedMessage"> {{message}} </span>
             <ng-template #failedMessage>
-                    <span style="color: red;"> {{message}} </span>
+                    <span class="red"> {{message}} </span>
             </ng-template>
         </div>
     </div>
     <br/>
     <br/>
-    <div style="float:right">
+    <div class="float-right">
         <label for="hideArchived">Hide archived trials:</label>
         <span id="hideArchived">
-            <label for="hideArchivedOption" style="margin-left:10px">Yes</label>
+            <label for="hideArchivedOption" class="noteEdit">Yes</label>
             <input id="hideArchivedOption" type="radio" value="Yes" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
-            <label for="displayArchivedOption" style="margin-left:10px">No</label>
+            <label for="displayArchivedOption" class="noteEdit">No</label>
             <input id="displayArchivedOption" type="radio" value="No" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
         </span>
     </div>
@@ -48,46 +48,46 @@
       </table>
       <br/>
     <div id="trialDetail"><br/></div>
-    <div *ngIf="nctIdChosen" style="margin-bottom: 100px">
+    <div *ngIf="nctIdChosen" class="trial-bottom">
         <hr>
         <div>
             <label for="curation_status">Curation Status:</label>
             <span id="curation_status">
-                <label for="progress" style="color:red;margin-left:10px">In progress </label>
+                <label for="progress" class="noteDelete">In progress </label>
                 <input id="progress" type="radio" value="In progress" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
-                <label for="complete" style="color:green;margin-left:10px">Completed </label>
+                <label for="complete" class="noteAdd">Completed </label>
                 <input id="complete" type="radio" value="Completed" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
             </span>
             <br/>
             <label for="archive_status">Archive:</label>
             <span id="archive_status">
-                <label for="archive" style="color:red;margin-left:10px">Yes </label>
+                <label for="archive" class="noteDelete">Yes </label>
                 <input id="archive" type="radio" value="Yes" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
-                <label for="retrieve" style="color:green;margin-left:10px">No </label>
+                <label for="retrieve" class="noteAdd">No </label>
                 <input id="retrieve" type="radio" value="No" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
             </span>
             <br/><br/>
             <label for="nctId">NCT ID: </label>
-            <span id="nctId" style="margin-left:10px">
+            <span id="nctId" class="noteEdit">
                 <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{trialChosen.nct_id}}">{{ trialChosen.nct_id }}</a>
             </span>
             <br/>
             <label for="phase">Phase: </label>
-            <span id="phase" style="margin-left:10px">{{ trialChosen.phase }}</span>
+            <span id="phase" class="noteEdit">{{ trialChosen.phase }}</span>
             <br/>
             <label for="status">Status: </label>
-            <span id="status" style="margin-left:10px">
-                <div style="min-width: 400px; display: inline-block">
+            <span id="status" class="noteEdit">
+                <div class="status-select">
                     <ng-select class="selectStyle" #selectModel="ngModel" [items]="statusOptions" [(ngModel)]="trialChosen.status"
                                [clearable]="false" (change)="updateTrialStatusInDB()"></ng-select>
                 </div>
             </span>
             <br/>
             <label for="shortTitle">Short Title: </label>
-            <span id="shortTitle" style="margin-left:10px">{{ trialChosen.short_title }}</span>
+            <span id="shortTitle" class="noteEdit">{{ trialChosen.short_title }}</span>
             <br/>
             <label for="longTitle">Long Title: </label>
-            <span id="longTitle" style="margin-left:10px">{{ trialChosen.long_title }}</span>
+            <span id="longTitle" class="noteEdit">{{ trialChosen.long_title }}</span>
             <br/>
             <label for="treatmentList">Treatment List:</label>
             <div id="treatmentList">
@@ -107,7 +107,7 @@
                 <div class="indent1 levelIndicator">
                     <jhi-match [match]="trialChosen.treatment_list.step[0].match" [path]="'match'"></jhi-match>
                 </div>
-                <div style="margin-top:150px;">
+                <div class="note-margin">
                     <p>
                         Note*
                         <i class="fa fa-plus noteAdd" aria-hidden="true"></i>: Add
