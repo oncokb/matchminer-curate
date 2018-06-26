@@ -35,6 +35,7 @@ export class ClinicalComponent implements OnInit {
         _.some(optionalFields, function(key) {
             if(!_.isEmpty(this.unit) && this.unit.clinical[key]) {
                 this.displayOptionalFields = true;
+                return true;
             }
         }, this);
     }
