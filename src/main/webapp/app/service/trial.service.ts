@@ -13,8 +13,8 @@ import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
 @Injectable()
 export class TrialService {
-    production = environment.production ? environment.production : false;
-    oncokb = environment.oncokb ? environment.oncokb : false;
+    oncokb = false;
+    frontEndOnly = environment.frontEndOnly ? environment.frontEndOnly : false;
 
     private nctIdChosenSource = new BehaviorSubject<string>('');
     nctIdChosenObs = this.nctIdChosenSource.asObservable();
@@ -329,7 +329,7 @@ export class TrialService {
         return result;
     }
     getAPIUrl(type: string) {
-        if (this.production === true) {
+        if (this.frontEndOnly === true) {
             switch (type) {
                 case 'MainType':
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
