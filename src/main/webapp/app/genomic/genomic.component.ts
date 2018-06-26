@@ -28,7 +28,6 @@ export class GenomicComponent implements OnInit {
     'Splice_Site', 'Splice_Lost', 'Translation_Start_Site', 'coding_sequence', 'intergenic_variant',
     'protein_altering', 'splice site_mutation', 'stop_retained', 'synonymous', "3'UTR", "3_prime_UTR",
     "5'Flank", "5'UTR", "5'UTR_mutation", "5_prime_UTR"];
-    wiltypes = [true, false];
     annotated_variants = this.trialService.getOncokbVariants();
     oncokb = environment.oncokb ? environment.oncokb : false;
     validationMessage = {
@@ -37,6 +36,7 @@ export class GenomicComponent implements OnInit {
     };
     geneValidation = false;
     exampleValidation = false;
+    displayOptionalFields = false;
     search = (text$: Observable<string>) =>
         text$
         .debounceTime(200)
@@ -64,6 +64,15 @@ export class GenomicComponent implements OnInit {
         this.trialService.operationPoolObs.subscribe(message => {
             this.operationPool = message;
         });
+        let optionalFields = ['ms_status', 'mmr_status'];
+        if(!this.oncokb) {
+            optionalFields = optionalFields.concat(['display_name', 'fusion_partner_hugo_symbol']);
+        }
+        _.some(optionalFields, function(key) {
+            if(!_.isEmpty(this.unit) && this.unit.genomic[key]) {
+                this.displayOptionalFields = true;
+            }
+        }, this);
     }
     getStyle() {
         return this.trialService.getStyle(this.indent);
@@ -115,4 +124,17 @@ export class GenomicComponent implements OnInit {
     getDisplayContent(key: string) {
         return this.trialService.getNodeDisplayContent(key, this.unit['genomic']);
     }
+    collapse(){
+        if (this.displayOptionalFields) {
+            this.displayOptionalFields = false;
+        } else {
+            this.displayOptionalFields = true;
+        }
+    }
+    unCheckRadio(event) {
+        if (event.target.value === this.genomicInput.wildtype) {
+            this.genomicInput.wildtype = '';
+        }
+    }
+
 }

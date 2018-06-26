@@ -21,5 +21,7 @@ export interface Genomic {
     no_variant_classification?: boolean,
     no_variant_category?: boolean,
     no_exon?: boolean,
-    no_cnv_call?: boolean
+    no_cnv_call?: boolean,
+    no_ms_statys?: boolean,
+    no_mmr_status?: boolean
 }
