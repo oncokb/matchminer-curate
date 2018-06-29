@@ -55,13 +55,12 @@ export class TrialService {
     hasErrorInputFieldObs = this.hasErrorInputFieldSource.asObservable();
 
     armInput: Arm = {
-        arm_name: '',
-        arm_status: '',
-        arm_description: '',
-        arm_eligibility: '',
         arm_code: '',
+        arm_description: '',
         arm_internal_id: '',
         arm_suspended: '',
+        arm_eligibility: '',
+        arm_info: '',
         match: []
     };
     private armInputSource = new BehaviorSubject<Arm>(this.armInput);

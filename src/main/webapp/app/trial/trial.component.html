@@ -94,7 +94,7 @@
                 <span>-arm: <jhi-panel [type]="'add,copyArm'" [arm]="true" [path]="'arms'"></jhi-panel></span>
                 <br/>
                 <div *ngFor="let arm of trialChosen.treatment_list.step[0].arm; let i = index">
-                    <jhi-arm [type]="'delete,edit'" [unit]="arm" [path]="'arm_name,'+i"></jhi-arm>
+                    <jhi-arm [type]="'delete,edit'" [unit]="arm" [path]="'arm_description,'+i"></jhi-arm>
                     <span class="matchTitle2">-match </span>
                     <jhi-panel [type]="'add,destination,copyMatch'" [path]="'arm,'+i"></jhi-panel>
                     <div class="indent2 levelIndicator">

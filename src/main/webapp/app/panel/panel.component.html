@@ -50,44 +50,10 @@
     <ng-template #armSection>
         <div class="row arm-row">
             <div class="col-md-2">
-                <label>arm name: </label>
+                <label>arm code: </label>
             </div>
             <div class="col-md-10">
-                <input [(ngModel)]="armInput.arm_name" size="100"/>
-            </div>
-        </div>
-        <div *ngIf="!oncokb">
-            <div class="row arm-row">
-                <div class="col-md-2">
-                    <span class="indent1">arm code: </span>
-                </div>
-                <div class="col-md-10">
-                    <input [(ngModel)]="armInput.arm_code" size="100"/>
-                </div>
-            </div>
-            <div class="row arm-row">
-                <div class="col-md-2">
-                    <span class="indent1">arm internal id: </span>
-                </div>
-                <div class="col-md-10">
-                    <input [(ngModel)]="armInput.arm_internal_id" size="100"/>
-                </div>
-            </div>
-            <div class="row arm-row">
-                <div class="col-md-2">
-                    <span class="indent1">arm suspended: </span>
-                </div>
-                <div class="col-md-10">
-                    <input [(ngModel)]="armInput.arm_suspended" size="100"/>
-                </div>
-            </div>
-        </div>
-        <div class="row arm-row">
-            <div class="col-md-2">
-                <label>arm status: </label>
-            </div>
-            <div class="col-md-10">
-                <ng-select class="selectStyle select-width" [items]="statusOptions" [(ngModel)]="armInput.arm_status" [clearable]="true"></ng-select>
+                <input [(ngModel)]="armInput.arm_code" size="100"/>
             </div>
         </div>
         <div class="row arm-row">
@@ -100,10 +66,43 @@
         </div>
         <div class="row arm-row">
             <div class="col-md-2">
-                <label for="eligibility">arm eligibility: </label>
+                <span class="indent1">arm internal id: </span>
             </div>
             <div class="col-md-10">
-                <textarea id="eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
+                <input [(ngModel)]="armInput.arm_internal_id" size="100"/>
+            </div>
+        </div>
+        <div class="row arm-row">
+            <div class="col-md-2">
+                <span class="indent1">arm suspended: </span>
+            </div>
+            <div class="col-md-10">
+                <span id="suspended">
+                    <label for="suspended-y" class="suspended-label">
+                        <input id="suspended-y" type="radio" value="Y" name="suspended" [(ngModel)]="armInput.arm_suspended" (click)="unCheckRadio($event)">Y
+                    </label>
+                    <label for="suspended-n" class=" suspended-label">
+                        <input id="suspended-n" type="radio" value="N" name="suspended" [(ngModel)]="armInput.arm_suspended" (click)="unCheckRadio($event)">N
+                    </label>
+                </span>
+            </div>
+        </div>
+        <div *ngIf="oncokb">
+            <div class="row arm-row">
+                <div class="col-md-2">
+                    <label for="info">arm info: </label>
+                </div>
+                <div class="col-md-10">
+                    <textarea id="info" rows="3" cols="100" [(ngModel)]="armInput.arm_info"></textarea>
+                </div>
+            </div>
+            <div class="row arm-row">
+                <div class="col-md-2">
+                    <label for="eligibility">arm eligibility: </label>
+                </div>
+                <div class="col-md-10">
+                    <textarea id="eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
+                </div>
             </div>
         </div>
         <button class="btn btn-success addButon" (click)="modifyNode('add')">Add</button>
