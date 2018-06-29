@@ -74,6 +74,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     downloadSingleTrial(nctId: string, type: string) {
         this.trialService.fetchTrialById(nctId).then((trialJson) => {
             if (!_.isEmpty(trialJson)) {
+                this.removeAttributes(trialJson);
                 let data = '';
                 if (type === 'json') {
                     data = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(trialJson, null, 2));
@@ -112,6 +113,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         let content = '';
         if (isAll) {
             _.each(this.trialList, function(trialJson){
+                this.removeAttributes(trialJson);
                 const nctId = trialJson['nct_id'];
                 if ( this.fileType === 'json' ) {
                     content = JSON.stringify( trialJson, null, 2 );
@@ -125,6 +127,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
             _.each(idList, function(nctId) {
                 _.each(this.trialList, function(trialJson){
                     if (nctId === trialJson['nct_id']) {
+                        this.removeAttributes(trialJson);
                         if ( this.fileType === 'json' ) {
                             content = JSON.stringify( trialJson, null, 2 );
                         } else {
@@ -198,5 +201,19 @@ export class ConverterComponent implements OnInit, AfterViewInit {
             this.downloadIdList.splice(index, 1);
         }
     }
-
+    removeAttributes(data: object) {
+        // Remove attributes not in CTML.
+        const removedFields = ['archived', 'curation_status'];
+        _.each(removedFields, function(item) {
+            delete data[item];
+        });
+        if (data['treatment_list']['step'][0]['arm'].length > 0) {
+            const removedArmFields = ['arm_info', 'arm_eligibility'];
+            _.each(data['treatment_list']['step'][0]['arm'], function(arm) {
+                _.each(removedArmFields, function(item) {
+                    delete arm[item];
+                });
+            });
+        }
+    }
 }

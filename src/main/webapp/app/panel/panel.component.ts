@@ -176,8 +176,7 @@ export class PanelComponent implements OnInit {
         return true;
     }
     hasEmptyArmFields(obj: any) {
-        if ((!_.isUndefined(obj['arm_name']) && obj['arm_name'].length > 0) ||
-            (!_.isUndefined(obj['arm_code']) && obj['arm_code'].length > 0)) {
+        if (!_.isUndefined(obj['arm_description']) && obj['arm_description'].length > 0) {
             return false;
         }
         return true;
@@ -514,20 +513,16 @@ export class PanelComponent implements OnInit {
             this.trialService.setClinicalInput(_.clone(this.unit['clinical']));
             this.setNotLogic('clinical');
             this.setOncotree();
-        } else if (this.unit.hasOwnProperty('arm_name') || this.unit.hasOwnProperty('arm_code')) {
+        } else if (this.unit.hasOwnProperty('arm_description')) {
             const armToAdd: Arm = {
-                arm_name: this.unit['arm_name'],
-                arm_status: this.unit['arm_status'],
+                arm_code: this.unit['arm_code'],
+                arm_suspended: this.unit['arm_suspended'],
                 arm_description: this.unit['arm_description'],
+                arm_internal_id: this.unit['arm_internal_id'],
+                arm_info: this.unit['arm_info'],
                 arm_eligibility: this.unit['arm_eligibility'],
                 match: this.unit['match']
             };
-            // Display DFCI arm data
-            if (!this.trialService.oncokb) {
-                armToAdd.arm_code = this.unit['arm_code'];
-                armToAdd.arm_internal_id = this.unit['arm_internal_id'];
-                armToAdd.arm_suspended = this.unit['arm_suspended'];
-            }
             this.trialService.setArmInput(armToAdd);
         }
     }
@@ -572,10 +567,10 @@ export class PanelComponent implements OnInit {
         this.addNode = true;
         if (this.arm === true) {
             if (this.trialService.oncokb) {
-                this.clearInputForm(['arm_name', 'arm_status', 'arm_description', 'arm_eligibility'], 'arm');
+                this.clearInputForm(['arm_code', 'arm_description', 'arm_internal_id', 'arm_suspended',
+                    'arm_info', 'arm_eligibility'], 'arm');
             } else {
-                this.clearInputForm(['arm_name', 'arm_code', 'arm_internal_id', 'arm_suspended', 'arm_status',
-                    'arm_description', 'arm_eligibility'], 'arm');
+                this.clearInputForm(['arm_code', 'arm_description', 'arm_internal_id', 'arm_suspended'], 'arm');
             }
         }
     }
@@ -695,16 +690,16 @@ export class PanelComponent implements OnInit {
         // Show root 'arm' destination button when copy an arm
         if (this.arm && this.path === 'arms') {
             return this.type.indexOf('copyArm') !== -1 && this.operationPool['copy'] &&
-                this.operationPool['currentPath'].includes('arm_name');
+                this.operationPool['currentPath'].includes('arm_description');
         }
         if (this.type.indexOf('copyMatch') !== -1) {
-            return this.operationPool['copy'] && this.operationPool['currentPath'] !== this.path && !this.operationPool['currentPath'].includes('arm_name') &&
+            return this.operationPool['copy'] && this.operationPool['currentPath'] !== this.path && !this.operationPool['currentPath'].includes('arm_description') &&
                 !this.isNestedInside(this.operationPool['currentPath'], this.path);
         }
         // Hide other destination button except root 'arm' when copy an arm
         if (!_.isUndefined(this.operationPool['currentPath']) && this.operationPool['currentPath'].includes(',')) {
             const currentPathArr = this.operationPool['currentPath'].split(',');
-            if (currentPathArr.length === 2 && currentPathArr[0] === 'arm_name' && Number(currentPathArr[1]) >= 0) {
+            if (currentPathArr.length === 2 && currentPathArr[0] === 'arm_description' && Number(currentPathArr[1]) >= 0) {
                 return false;
             }
         }
@@ -757,18 +752,20 @@ export class PanelComponent implements OnInit {
     }
     modifyArmGroup(type, arm?: Arm) {
         if (type === 'add') {
-            const armToAdd: Arm = {
-                arm_name: '',
-                arm_status: '',
-                arm_description: '',
-                arm_eligibility: '',
-                arm_code: '',
-                arm_internal_id: '',
-                arm_suspended: '',
-                match: []
-            };
-            this.prepareArmData(this.armInput, armToAdd);
-            this.originalArms.push(armToAdd);
+            if (_.isUndefined(arm)) {
+                const armToAdd: Arm = {
+                    arm_code: '',
+                    arm_description: '',
+                    arm_internal_id: '',
+                    arm_suspended: '',
+                    arm_eligibility: '',
+                    arm_info: '',
+                    match: []
+                };
+                this.prepareArmData(this.armInput, armToAdd);
+                arm = armToAdd;
+            }
+            this.originalArms.push(arm);
         } else if (type === 'delete') {
             const tempIndex = Number(this.path.split(',')[1].trim());
             this.originalArms.splice(tempIndex, 1);
@@ -787,5 +784,10 @@ export class PanelComponent implements OnInit {
                 delete armToSave[key];
             }
         });
+    }
+    unCheckRadio(event) {
+        if (event.target.value === this.armInput.arm_suspended) {
+            this.armInput.arm_suspended = '';
+        }
     }
 }

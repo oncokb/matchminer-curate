@@ -12,7 +12,6 @@ export class ArmComponent implements OnInit {
     @Input() path = '';
     operationPool: {};
     armInput: Arm;
-    statusOptions = this.trialService.getStatusOptions();
     oncokb: boolean;
 
     constructor(private trialService: TrialService) {
@@ -26,6 +25,11 @@ export class ArmComponent implements OnInit {
         this.trialService.armInputObs.subscribe((message) => {
             this.armInput = message;
         });
+    }
+    unCheckRadio(event) {
+        if (event.target.value === this.armInput.arm_suspended) {
+            this.armInput.arm_suspended = '';
+        }
     }
 
 }

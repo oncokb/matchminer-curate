@@ -93,13 +93,10 @@ export class TrialComponent implements OnInit, AfterViewInit {
            const trialInfo = res.json();
            const armsInfo: any = [];
            _.each(trialInfo.arms, function(arm) {
-               if (arm.arm_type !== null && arm.arm_description !== null) {
+               if (arm.arm_description !== null) {
                     armsInfo.push({
-                        arm_name: arm.arm_name,
-                        arm_status: '',
-                        arm_type: arm.arm_type,
-                        arm_description: arm.arm_description,
-                        arm_eligibility: '',
+                        arm_description: arm.arm_name,
+                        arm_info: arm.arm_description,
                         match: []
                     });
                }

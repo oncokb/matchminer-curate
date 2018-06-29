@@ -38,7 +38,6 @@ export class GenomicComponent implements OnInit {
     };
     geneValidation = false;
     exampleValidation = false;
-    displayOptionalFields = false;
 
     search = (text$: Observable<string>) =>
         text$
@@ -65,15 +64,6 @@ export class GenomicComponent implements OnInit {
         this.trialService.operationPoolObs.subscribe((message) => {
             this.operationPool = message;
         });
-        let optionalFields = ['ms_status', 'mmr_status'];
-        if (!this.oncokb) {
-            optionalFields = optionalFields.concat(['display_name', 'fusion_partner_hugo_symbol']);
-        }
-        _.some(optionalFields, function(key) {
-            if (!_.isEmpty(this.unit) && this.unit.genomic[key]) {
-                this.displayOptionalFields = true;
-            }
-        }, this);
     }
     getStyle() {
         return this.trialService.getStyle(this.indent);
@@ -126,17 +116,9 @@ export class GenomicComponent implements OnInit {
     getDisplayContent(key: string) {
         return this.trialService.getNodeDisplayContent(key, this.unit['genomic']);
     }
-    collapse() {
-        if (this.displayOptionalFields) {
-            this.displayOptionalFields = false;
-        } else {
-            this.displayOptionalFields = true;
-        }
-    }
     unCheckRadio(event) {
         if (event.target.value === this.genomicInput.wildtype) {
             this.genomicInput.wildtype = '';
         }
     }
-
 }
