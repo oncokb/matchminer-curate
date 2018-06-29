@@ -282,15 +282,15 @@
                     </div>
                 </div>
                 <div class="row borderMargin">
-                    <div class="col-sm-4">display_name:</div>
-                    <div class="col-sm-8">
-                        <input [(ngModel)]="genomicInput.display_name" size="36" />
-                    </div>
-                </div>
-                <div class="row borderMargin">
                     <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
                     <div class="col-sm-8">
                         <input [(ngModel)]="genomicInput.fusion_partner_hugo_symbol" size="36" />
+                    </div>
+                </div>
+                <div class="row borderMargin">
+                    <div class="col-sm-4">display_name:</div>
+                    <div class="col-sm-8">
+                        <input [(ngModel)]="genomicInput.display_name" size="36" />
                     </div>
                 </div>
             </div>
@@ -396,26 +396,6 @@
                     </div>
                 </div>
                 <div *ngIf="false">
-                    <div *ngIf="unit.genomic.display_name">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <label>display_name: </label>
-                            </div>
-                            <div class="col-sm-8">
-                                <span>{{getDisplayContent('display_name')}}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div *ngIf="unit.genomic.fusion_partner_hugo_symbol">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <label>fusion_partner_hugo_symbol: </label>
-                            </div>
-                            <div class="col-sm-8">
-                                <span>{{getDisplayContent('fusion_partner_hugo_symbol')}}</span>
-                            </div>
-                        </div>
-                    </div>
                     <div *ngIf="unit.genomic.ms_status">
                         <div class="row">
                             <div class="col-sm-4">
@@ -433,6 +413,26 @@
                             </div>
                             <div class="col-sm-8">
                                 <span>{{getDisplayContent('mmr_status')}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="unit.genomic.fusion_partner_hugo_symbol">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>fusion_partner_hugo_symbol: </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <span>{{getDisplayContent('fusion_partner_hugo_symbol')}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="unit.genomic.display_name">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>display_name: </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <span>{{getDisplayContent('display_name')}}</span>
                             </div>
                         </div>
                     </div>
