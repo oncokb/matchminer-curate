@@ -110,36 +110,38 @@
                     </span>
                 </div>
             </div>
-            <div class="row borderMargin">
-                <div class="col-sm-3">ms_status:</div>
-                <div class="col-sm-1">
-                    <label for="no_ms_status1">Not</label>
-                    <input id="no_ms_status1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_ms_status"/>
+            <div *ngIf="false">
+                <div class="row borderMargin">
+                    <div class="col-sm-3">ms_status:</div>
+                    <div class="col-sm-1">
+                        <label for="no_ms_status1">Not</label>
+                        <input id="no_ms_status1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_ms_status"/>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type="text" size="36" [(ngModel)]="genomicInput.ms_status"/>
+                    </div>
                 </div>
-                <div class="col-sm-8">
-                    <input type="text" size="36" [(ngModel)]="genomicInput.ms_status"/>
+                <div class="row borderMargin">
+                    <div class="col-sm-3">mmr_status:</div>
+                    <div class="col-sm-1">
+                        <label for="no_mmr_status1">Not</label>
+                        <input id="no_mmr_status1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_mmr_status"/>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type="text" size="36" [(ngModel)]="genomicInput.mmr_status"/>
+                    </div>
                 </div>
-            </div>
-            <div class="row borderMargin">
-                <div class="col-sm-3">mmr_status:</div>
-                <div class="col-sm-1">
-                    <label for="no_mmr_status1">Not</label>
-                    <input id="no_mmr_status1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_mmr_status"/>
+                <div class="row borderMargin">
+                    <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
+                    <div class="col-sm-8">
+                        <input type="text" size="36" [(ngModel)]="genomicInput.fusion_partner_hugo_symbol"/>
+                    </div>
                 </div>
-                <div class="col-sm-8">
-                    <input type="text" size="36" [(ngModel)]="genomicInput.mmr_status"/>
-                </div>
-            </div>
-            <div class="row borderMargin">
-                <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
-                <div class="col-sm-8">
-                    <input type="text" size="36" [(ngModel)]="genomicInput.fusion_partner_hugo_symbol"/>
-                </div>
-            </div>
-            <div class="row borderMargin">
-                <div class="col-sm-4">display_name:</div>
-                <div class="col-sm-8">
-                    <input type="text" size="36" [(ngModel)]="genomicInput.display_name"/>
+                <div class="row borderMargin">
+                    <div class="col-sm-4">display_name:</div>
+                    <div class="col-sm-8">
+                        <input type="text" size="36" [(ngModel)]="genomicInput.display_name"/>
+                    </div>
                 </div>
             </div>
         </div>
@@ -258,36 +260,38 @@
                     </span>
                 </div>
             </div>
-            <div class="row borderMargin">
-                <div class="col-sm-3">ms_status:</div>
-                <div class="col-sm-1">
-                    <label for="no_ms_status2">Not</label>
-                    <input id="no_ms_status2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_ms_status"/>
+            <div *ngIf="false">
+                <div class="row borderMargin">
+                    <div class="col-sm-3">ms_status:</div>
+                    <div class="col-sm-1">
+                        <label for="no_ms_status2">Not</label>
+                        <input id="no_ms_status2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_ms_status"/>
+                    </div>
+                    <div class="col-sm-8">
+                        <input [(ngModel)]="genomicInput.ms_status" size="36" />
+                    </div>
                 </div>
-                <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.ms_status" size="36" />
+                <div class="row borderMargin">
+                    <div class="col-sm-3">mmr_status:</div>
+                    <div class="col-sm-1">
+                        <label for="no_mmr_status2">Not</label>
+                        <input id="no_mmr_status2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_mmr_status"/>
+                    </div>
+                    <div class="col-sm-8">
+                        <input [(ngModel)]="genomicInput.mmr_status" size="36" />
+                    </div>
                 </div>
-            </div>
-            <div class="row borderMargin">
-                <div class="col-sm-3">mmr_status:</div>
-                <div class="col-sm-1">
-                    <label for="no_mmr_status2">Not</label>
-                    <input id="no_mmr_status2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_mmr_status"/>
+                <div class="row borderMargin">
+                    <div class="col-sm-4">display_name:</div>
+                    <div class="col-sm-8">
+                        <input [(ngModel)]="genomicInput.display_name" size="36" />
+                    </div>
                 </div>
-                <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.mmr_status" size="36" />
-                </div>
-            </div>
-            <div class="row borderMargin">
-                <div class="col-sm-4">display_name:</div>
-                <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.display_name" size="36" />
-                </div>
-            </div>
-            <div class="row borderMargin">
-                <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
-                <div class="col-sm-8">
-                    <input [(ngModel)]="genomicInput.fusion_partner_hugo_symbol" size="36" />
+                <div class="row borderMargin">
+                    <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
+                    <div class="col-sm-8">
+                        <input [(ngModel)]="genomicInput.fusion_partner_hugo_symbol" size="36" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -391,43 +395,45 @@
                         </div>
                     </div>
                 </div>
-                <div *ngIf="unit.genomic.display_name">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <label>display_name: </label>
-                        </div>
-                        <div class="col-sm-8">
-                            <span>{{getDisplayContent('display_name')}}</span>
-                        </div>
-                    </div>
-                </div>
-                <div *ngIf="unit.genomic.fusion_partner_hugo_symbol">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <label>fusion_partner_hugo_symbol: </label>
-                        </div>
-                        <div class="col-sm-8">
-                            <span>{{getDisplayContent('fusion_partner_hugo_symbol')}}</span>
+                <div *ngIf="false">
+                    <div *ngIf="unit.genomic.display_name">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>display_name: </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <span>{{getDisplayContent('display_name')}}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div *ngIf="unit.genomic.ms_status">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <label>ms_status: </label>
-                        </div>
-                        <div class="col-sm-8">
-                            <span>{{getDisplayContent('ms_status')}}</span>
+                    <div *ngIf="unit.genomic.fusion_partner_hugo_symbol">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>fusion_partner_hugo_symbol: </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <span>{{getDisplayContent('fusion_partner_hugo_symbol')}}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div *ngIf="unit.genomic.mmr_status">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <label>mmr_status: </label>
+                    <div *ngIf="unit.genomic.ms_status">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>ms_status: </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <span>{{getDisplayContent('ms_status')}}</span>
+                            </div>
                         </div>
-                        <div class="col-sm-8">
-                            <span>{{getDisplayContent('mmr_status')}}</span>
+                    </div>
+                    <div *ngIf="unit.genomic.mmr_status">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>mmr_status: </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <span>{{getDisplayContent('mmr_status')}}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

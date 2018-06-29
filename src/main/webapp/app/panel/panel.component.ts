@@ -752,17 +752,20 @@ export class PanelComponent implements OnInit {
     }
     modifyArmGroup(type, arm?: Arm) {
         if (type === 'add') {
-            const armToAdd: Arm = {
-                arm_code: '',
-                arm_description: '',
-                arm_internal_id: '',
-                arm_suspended: '',
-                arm_eligibility: '',
-                arm_info: '',
-                match: []
-            };
-            this.prepareArmData(this.armInput, armToAdd);
-            this.originalArms.push(armToAdd);
+            if (_.isUndefined(arm)) {
+                const armToAdd: Arm = {
+                    arm_code: '',
+                    arm_description: '',
+                    arm_internal_id: '',
+                    arm_suspended: '',
+                    arm_eligibility: '',
+                    arm_info: '',
+                    match: []
+                };
+                this.prepareArmData(this.armInput, armToAdd);
+                arm = armToAdd;
+            }
+            this.originalArms.push(arm);
         } else if (type === 'delete') {
             const tempIndex = Number(this.path.split(',')[1].trim());
             this.originalArms.splice(tempIndex, 1);
