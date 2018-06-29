@@ -28,8 +28,6 @@
             </div>
             <div class="col-sm-8">
                 <input [(ngModel)]="genomicInput.matching_examples" size="36" (change)="validateGenomicExample()" />
-                <i *ngIf="oncokb" class="icon-margin" aria-hidden="true" title="Display optional attributes"
-                   ngClass="{{ displayOptionalFields ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down'}}" (click)="collapse()"></i>
             </div>
         </div>
         <div *ngIf="!oncokb">
@@ -110,12 +108,8 @@
                             <input id="wildtype-false" type="radio" value="false" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio($event)">false
                         </label>
                     </span>
-                    <i *ngIf="!oncokb" class="icon-margin" aria-hidden="true" title="Display optional attributes"
-                       ngClass="{{ displayOptionalFields ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down'}}" (click)="collapse()"></i>
                 </div>
             </div>
-        </div>
-        <div *ngIf="displayOptionalFields">
             <div class="row borderMargin">
                 <div class="col-sm-3">ms_status:</div>
                 <div class="col-sm-1">
@@ -136,18 +130,16 @@
                     <input type="text" size="36" [(ngModel)]="genomicInput.mmr_status"/>
                 </div>
             </div>
-            <div *ngIf="!oncokb">
-                <div class="row borderMargin">
-                    <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
-                    <div class="col-sm-8">
-                        <input type="text" size="36" [(ngModel)]="genomicInput.fusion_partner_hugo_symbol"/>
-                    </div>
+            <div class="row borderMargin">
+                <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
+                <div class="col-sm-8">
+                    <input type="text" size="36" [(ngModel)]="genomicInput.fusion_partner_hugo_symbol"/>
                 </div>
-                <div class="row borderMargin">
-                    <div class="col-sm-4">display_name:</div>
-                    <div class="col-sm-8">
-                        <input type="text" size="36" [(ngModel)]="genomicInput.display_name"/>
-                    </div>
+            </div>
+            <div class="row borderMargin">
+                <div class="col-sm-4">display_name:</div>
+                <div class="col-sm-8">
+                    <input type="text" size="36" [(ngModel)]="genomicInput.display_name"/>
                 </div>
             </div>
         </div>
@@ -186,8 +178,6 @@
             </div>
             <div class="col-sm-8">
                 <input [(ngModel)]="genomicInput.matching_examples" size="36" (change)="validateGenomicExample()" />
-                <i *ngIf="oncokb" class="icon-margin" aria-hidden="true" title="Display optional attributes"
-                   ngClass="{{ displayOptionalFields ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down'}}" (click)="collapse()"></i>
             </div>
         </div>
         <div *ngIf="!oncokb">
@@ -266,12 +256,8 @@
                             <input id="wildtype-false" type="radio" value="false" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio($event)">false
                         </label>
                     </span>
-                    <i *ngIf="!oncokb" class="icon-margin" aria-hidden="true" title="Display optional attributes"
-                       ngClass="{{ displayOptionalFields ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down'}}" (click)="collapse()"></i>
                 </div>
             </div>
-        </div>
-        <div *ngIf="displayOptionalFields">
             <div class="row borderMargin">
                 <div class="col-sm-3">ms_status:</div>
                 <div class="col-sm-1">
@@ -292,18 +278,16 @@
                     <input [(ngModel)]="genomicInput.mmr_status" size="36" />
                 </div>
             </div>
-            <div *ngIf="!oncokb">
-                <div class="row borderMargin">
-                    <div class="col-sm-4">display_name:</div>
-                    <div class="col-sm-8">
-                        <input [(ngModel)]="genomicInput.display_name" size="36" />
-                    </div>
+            <div class="row borderMargin">
+                <div class="col-sm-4">display_name:</div>
+                <div class="col-sm-8">
+                    <input [(ngModel)]="genomicInput.display_name" size="36" />
                 </div>
-                <div class="row borderMargin">
-                    <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
-                    <div class="col-sm-8">
-                        <input [(ngModel)]="genomicInput.fusion_partner_hugo_symbol" size="36" />
-                    </div>
+            </div>
+            <div class="row borderMargin">
+                <div class="col-sm-4">fusion_partner_hugo_symbol:</div>
+                <div class="col-sm-8">
+                    <input [(ngModel)]="genomicInput.fusion_partner_hugo_symbol" size="36" />
                 </div>
             </div>
         </div>
@@ -427,24 +411,24 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div *ngIf="unit.genomic.ms_status">
-                <div class="row">
-                    <div class="col-sm-4">
-                        <label>ms_status: </label>
-                    </div>
-                    <div class="col-sm-8">
-                        <span>{{getDisplayContent('ms_status')}}</span>
+                <div *ngIf="unit.genomic.ms_status">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>ms_status: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('ms_status')}}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div *ngIf="unit.genomic.mmr_status">
-                <div class="row">
-                    <div class="col-sm-4">
-                        <label>mmr_status: </label>
-                    </div>
-                    <div class="col-sm-8">
-                        <span>{{getDisplayContent('mmr_status')}}</span>
+                <div *ngIf="unit.genomic.mmr_status">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>mmr_status: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <span>{{getDisplayContent('mmr_status')}}</span>
+                        </div>
                     </div>
                 </div>
             </div>
