@@ -5,7 +5,7 @@ realtime database to store all trials.
 
 ## Preparation
 ### Install Project
-Before you can build this project, you must install and configure the following dependencies on your machine:
+It is necessary to install and configure the following dependencies:
 
 1. [Node.js][]: We use Node to run a development web server and build the project.
    Depending on your system, you can install Node either from source or as a pre-packaged bundle.
