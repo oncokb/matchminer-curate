@@ -18,11 +18,11 @@ interface Arm {
     arm_description: string;
     match?: Array<Match>;
 }
-interface DoseLevel {
-    match?: Array<Match>;
-    level_internal_id: number;
-    level_code: string;
-    level_description: string;
-    level_suspended: string;
-}
+// interface DoseLevel {
+//     match?: Array<Match>;
+//     level_internal_id: number;
+//     level_code: string;
+//     level_description: string;
+//     level_suspended: string;
+// }
 interface Match { }
