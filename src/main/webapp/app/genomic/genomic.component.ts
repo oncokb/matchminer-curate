@@ -1,8 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Http, Response } from '@angular/http';
-import { environment } from '../environments/environment';
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -31,7 +30,7 @@ export class GenomicComponent implements OnInit {
     'protein_altering', 'splice site_mutation', 'stop_retained', 'synonymous', '3\'UTR', '3_prime_UTR',
     '5\'Flank', '5\'UTR', '5\'UTR_mutation', '5_prime_UTR'];
     annotated_variants = this.trialService.getOncokbVariants();
-    oncokb = environment.oncokb ? environment.oncokb : false;
+    oncokb = this.trialService.oncokb;
     validationMessage = {
         gene: '',
         example: ''

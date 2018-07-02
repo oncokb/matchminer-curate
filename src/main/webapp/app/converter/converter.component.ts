@@ -8,7 +8,6 @@ import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
 import * as YAML from 'js-yaml';
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
-import { NgModel } from '@angular/forms';
 import { Trial } from '../trial/trial.model';
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
@@ -36,7 +35,6 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         color: ''
     };
     tableDestroied = false;
-    @ViewChild('selectModel') private selectModel: NgModel;
 
     constructor(private trialService: TrialService) {
         this.trialService.trialListObs.subscribe((message) => {

@@ -8,6 +8,5 @@ export const environment = {
         messagingSenderId: ''
     },
     devEmail: '', // set development team email to receive error notifications
-    oncokb: true, // set to true to customized interface for oncokb
-    production: false // set to false if doing frontend development
+    frontEndOnly: true // set to true if doing frontend development
 };

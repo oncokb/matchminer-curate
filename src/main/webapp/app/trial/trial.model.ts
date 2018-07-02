@@ -17,11 +17,11 @@ interface Arm {
     arm_info: string, // Real arm description. Store in Firebase and do not send to MongoDB.
     match?: Array<Match>;
 }
-interface DoseLevel {
-    match?: Array<Match>;
-    level_internal_id: number;
-    level_code: string;
-    level_description: string;
-    level_suspended: string;
-}
+// interface DoseLevel {
+//     match?: Array<Match>;
+//     level_internal_id: number;
+//     level_code: string;
+//     level_description: string;
+//     level_suspended: string;
+// }
 interface Match { }

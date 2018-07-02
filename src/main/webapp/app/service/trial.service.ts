@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { AngularFireDatabase, AngularFireObject, AngularFireList } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { Trial } from '../trial/trial.model';
 import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
@@ -13,8 +13,8 @@ import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
 @Injectable()
 export class TrialService {
-    production = environment.production ? environment.production : false;
     oncokb = environment.oncokb ? environment.oncokb : false;
+    frontEndOnly = environment.frontEndOnly ? environment.frontEndOnly : false;
 
     private nctIdChosenSource = new BehaviorSubject<string>('');
     nctIdChosenObs = this.nctIdChosenSource.asObservable();
@@ -328,22 +328,7 @@ export class TrialService {
         return result;
     }
     getAPIUrl(type: string) {
-        if (this.production === true) {
-            switch (type) {
-                case 'MainType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
-                case 'SubType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
-                case 'OncoKBVariant':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
-                case 'GeneValidation':
-                    return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
-                case 'ClinicalTrials':
-                    return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-                case 'ExampleValidation':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
-            }
-        } else {
+        if (this.frontEndOnly) {
             switch (type) {
                 case 'MainType':
                     return 'http://oncotree.mskcc.org/api/mainTypes';
@@ -357,6 +342,21 @@ export class TrialService {
                     return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
                 case 'ExampleValidation':
                     return 'http://oncokb.org/api/v1/utils/match/variant?';
+            }
+        } else {
+            switch (type) {
+                case 'MainType':
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
+                case 'SubType':
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
+                case 'OncoKBVariant':
+                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
+                case 'GeneValidation':
+                    return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
+                case 'ClinicalTrials':
+                    return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
+                case 'ExampleValidation':
+                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
             }
         }
     }
