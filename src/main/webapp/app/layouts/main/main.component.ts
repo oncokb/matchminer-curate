@@ -15,7 +15,7 @@ export class JhiMainComponent implements OnInit {
         private router: Router,
         private trialService: TrialService
     ) {
-        this.trialService.authorizedObs.subscribe(message => this.authorized = message);
+        this.trialService.authorizedObs.subscribe((message) => this.authorized = message);
         this.showHeader = this.trialService.showHeader;
         this.showFooter = this.trialService.showFooter;
     }

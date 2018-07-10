@@ -40,8 +40,7 @@ import {
 } from './layouts';
 import { EmailService } from './service/email.service';
 import { ConverterComponent } from './converter/converter.component';
-import { ConnectionService } from "./service/connection.service";
-import { EmailService } from "./service/email.service";
+import { ConnectionService } from './service/connection.service';
 
 @NgModule({
     imports: [

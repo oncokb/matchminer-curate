@@ -12,7 +12,7 @@ import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
 import { NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ConnectionService } from "../service/connection.service";
+import { ConnectionService } from '../service/connection.service';
 
 @Component({
   selector: 'jhi-trial',
@@ -45,9 +45,9 @@ export class TrialComponent implements OnInit, AfterViewInit {
   @ViewChild('selectModel') private selectModel: NgModel;
 
   constructor(private trialService: TrialService, public db: AngularFireDatabase, private connectionService: ConnectionService, private router: Router ) {
-    this.trialService.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
-    this.trialService.trialChosenObs.subscribe(message => this.trialChosen = message);
-    this.trialService.trialListObs.subscribe(message => {
+    this.trialService.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
+    this.trialService.trialChosenObs.subscribe((message) => this.trialChosen = message);
+    this.trialService.trialListObs.subscribe((message) => {
         this.trialList = message;
         this.nctIdList = _.map(this.trialList, function(trial) {
             return trial.nct_id;
@@ -76,7 +76,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
   }
   importTrials() {
     this.messages = [];
-    this.mongoMessage.content = "";
+    this.mongoMessage.content = '';
     const newTrials: Array<string>  = this.trialsToImport.split(',');
     let setChosenTrial = false;
     let result = true;
@@ -167,7 +167,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
     }
   curateTrial(nctId: string) {
-      this.mongoMessage.content = "";
+      this.mongoMessage.content = '';
       this.trialService.setTrialChosen(nctId);
       this.originalTrialStatus = this.trialChosen['status'];
       document.querySelector('#trialDetail').scrollIntoView();
@@ -213,13 +213,13 @@ export class TrialComponent implements OnInit, AfterViewInit {
   }
 
   loadMongo() {
-    this.mongoMessage.content = "Loading the trial ......";
+    this.mongoMessage.content = 'Loading the trial ......';
     this.mongoMessage.color = '#ffc107';
     this.connectionService.loadMongo(this.trialChosen).subscribe((res) => {
         if (res.status === 200) {
             if (this.trialChosen['archived'] === 'Yes') {
                 // Remove archived trials from database
-                alert("This archived trial has been removed from database.");
+                alert('This archived trial has been removed from database.');
                 return;
             }
             this.mongoMessage.content = 'Send trial ' + this.nctIdChosen + ' successfully!';

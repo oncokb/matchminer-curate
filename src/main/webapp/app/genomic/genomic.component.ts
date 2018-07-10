@@ -1,13 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import { Genomic } from './genomic.model';
 import * as _ from 'underscore';
-import { ConnectionService } from "../service/connection.service";
+import { ConnectionService } from '../service/connection.service';
 
 @Component({
     selector: 'jhi-genomic',
@@ -93,7 +92,8 @@ export class GenomicComponent implements OnInit {
     }
     validateGenomicExample() {
         if (this.genomicInput.hugo_symbol && this.genomicInput.annotated_variant && this.genomicInput.matching_examples) {
-            const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol +'&variant=' + this.genomicInput.annotated_variant +'&examples=' + this.genomicInput.matching_examples;
+            const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol + '&variant=' +
+                this.genomicInput.annotated_variant + '&examples=' + this.genomicInput.matching_examples;
             this.connectionService.validateGenomicExample(variantsTobeValidated).subscribe((result) => {
                 if (result[this.genomicInput.matching_examples] === true) {
                     this.validationMessage['example'] = 'Valid';

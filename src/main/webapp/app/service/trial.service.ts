@@ -9,17 +9,17 @@ import { Arm } from '../arm/arm.model';
 import * as _ from 'underscore';
 import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
-import { ConnectionService } from "./connection.service";
+import { ConnectionService } from './connection.service';
 
 @Injectable()
 export class TrialService {
     oncokb = environment.oncokb ? environment.oncokb : false;
     frontEndOnly = environment.frontEndOnly ? environment.frontEndOnly : false;
     isPermitted = environment.isPermitted ? environment.isPermitted : false;
-    showHeader = environment.showHeader ? environment.showHeader : true;
-    showFooter = environment.showFooter ? environment.showFooter : true;
-    showImportTrial = environment.showImportTrial ? environment.showImportTrial : true;
-    showTrialTable = environment.showTrialTable ? environment.showTrialTable : true;
+    showHeader = environment['showHeader'] ? environment['showHeader'] : true;
+    showFooter = environment['showFooter'] ? environment['showFooter'] : true;
+    showImportTrial = environment['showImportTrial'] ? environment['showImportTrial'] : true;
+    showTrialTable = environment['showTrialTable'] ? environment['showTrialTable'] : true;
 
     private nctIdChosenSource = new BehaviorSubject<string>('');
     nctIdChosenObs = this.nctIdChosenSource.asObservable();
@@ -85,7 +85,7 @@ export class TrialService {
     errorList: Array<object> = [];
 
     constructor(public connectionService: ConnectionService, public db: AngularFireDatabase, private emailService: EmailService) {
-        this.nctIdChosenObs.subscribe(message => this.nctIdChosen = message);
+        this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
 
         // prepare main types list
@@ -103,8 +103,8 @@ export class TrialService {
             const queries =  {
                 'queries': mainTypeQueries
               };
-            this.connectionService.getSubType(queries).subscribe((res: Array<any>) => {
-                const tempSubTypes = res;
+            this.connectionService.getSubType(queries).subscribe((response: Array<any>) => {
+                const tempSubTypes = response;
                 let currentSubtype = '';
                 let currentMaintype = '';
                 for (const items of tempSubTypes) {
@@ -129,7 +129,7 @@ export class TrialService {
         // prepare oncokb variant list
         this.connectionService.getOncoKBVariant().subscribe((res) => {
            const allAnnotatedVariants = res;
-           for(const item of  allAnnotatedVariants) {
+           for (const item of  allAnnotatedVariants) {
                 if (item['gene']['hugoSymbol']) {
                     if (this.annotated_variants[item['gene']['hugoSymbol']]) {
                         this.annotated_variants[item['gene']['hugoSymbol']].push(item['alteration']);
