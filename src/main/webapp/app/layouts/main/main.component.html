@@ -1,21 +1,19 @@
 <jhi-page-ribbon></jhi-page-ribbon>
-<div>
+<div *ngIf="showHeader">
     <router-outlet name="navbar"></router-outlet>
 </div>
 <div class="container-fluid">
     <div class="card jh-card">
-        <!--<router-outlet></router-outlet>
-        <router-outlet name="popup"></router-outlet>-->
         <div *ngIf="authorized; else permission">
             <router-outlet></router-outlet>
-            <!--<jhi-trial></jhi-trial>-->
         </div>
         <ng-template #permission>
             <div class="container" style="min-height:550px">
                 Matchminer Curation Platform is proprietary resource. If you are not authorized to access this system, please exit immediately.
             </div>
         </ng-template>
-
     </div>
-    <jhi-footer></jhi-footer>
+</div>
+<div style="margin-top: 20px;">
+    <jhi-footer *ngIf="showFooter && authorized"></jhi-footer>
 </div>

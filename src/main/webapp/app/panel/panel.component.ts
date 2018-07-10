@@ -36,8 +36,8 @@ export class PanelComponent implements OnInit {
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
     statusOptions = this.trialService.getStatusOptions();
-    isPermitted = true;
     nctIdChosen: string;
+    isPermitted = this.trialService.isPermitted;
     trialChosen: {};
     genomicInput: Genomic;
     clinicalInput: Clinical;
@@ -706,7 +706,7 @@ export class PanelComponent implements OnInit {
         return this.type.indexOf('destination') !== -1 && this.path !== 'arms' &&
             this.operationPool['relocate'] !== true &&
             (this.operationPool['copy'] === true && this.operationPool['currentPath'] !== this.path &&
-                    !this.isNestedInside(this.operationPool['currentPath'], this.path));
+                !this.isNestedInside(this.operationPool['currentPath'], this.path));
     }
     displayPencil() {
         if (this.isPermitted === false) { return false; }

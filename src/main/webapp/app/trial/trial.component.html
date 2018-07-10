@@ -14,45 +14,50 @@
                     <span class="red"> {{message}} </span>
             </ng-template>
         </div>
+        <br/>
+        <br/>
     </div>
     <br/>
     <br/>
-    <div class="float-right">
-        <label for="hideArchived">Hide archived trials:</label>
-        <span id="hideArchived">
-            <label for="hideArchivedOption" class="noteEdit">Yes</label>
-            <input id="hideArchivedOption" type="radio" value="Yes" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
-            <label for="displayArchivedOption" class="noteEdit">No</label>
-            <input id="displayArchivedOption" type="radio" value="No" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
-        </span>
+    <div *ngIf="showTrialTable">
+        <div class="float-right">
+            <label for="hideArchived">Hide archived trials:</label>
+            <span id="hideArchived">
+                <label for="hideArchivedOption" class="noteEdit">Yes</label>
+                <input id="hideArchivedOption" type="radio" value="Yes" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
+                <label for="displayArchivedOption" class="noteEdit">No</label>
+                <input id="displayArchivedOption" type="radio" value="No" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
+            </span>
+        </div>
+        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+            <thead>
+              <tr>
+                <th>NCT ID</th>
+                <th>Status</th>
+                <th>Title</th>
+                <th>Curation Status</th>
+                <th>Archived</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let trial of trialList">
+                <td><a (click)="curateTrial(trial.nct_id)">{{ trial.nct_id }}</a></td>
+                <td>{{ trial.status }}</td>
+                <td>{{ trial.short_title }}</td>
+                <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
+                <td>{{ trial.archived }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <br/>
     </div>
-    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
-        <thead>
-          <tr>
-            <th>NCT ID</th>
-            <th>Status</th>
-            <th>Title</th>
-            <th>Curation Status</th>
-            <th [hidden]="true">Archived</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let trial of trialList">
-            <td><a (click)="curateTrial(trial.nct_id)">{{ trial.nct_id }}</a></td>
-            <td>{{ trial.status }}</td>
-            <td>{{ trial.short_title }}</td>
-            <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
-            <td [hidden]="true">{{ trial.archived }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <br/>
     <div id="trialDetail"><br/></div>
     <div *ngIf="nctIdChosen" class="trial-bottom">
-        <hr>
+        <hr *ngIf="showTrialTable">
         <div>
             <label for="curation_status">Curation Status:</label>
-            <span id="curation_status">
+            <span *ngIf="!isPermitted" class="noteEdit">{{ trialChosen.curation_status }}</span>
+            <span *ngIf="isPermitted" id="curation_status">
                 <label for="progress" class="noteDelete">In progress </label>
                 <input id="progress" type="radio" value="In progress" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
                 <label for="complete" class="noteAdd">Completed </label>
@@ -60,23 +65,27 @@
             </span>
             <br/>
             <label for="archive_status">Archive:</label>
-            <span id="archive_status">
-                <label for="archive" class="noteDelete">Yes </label>
-                <input id="archive" type="radio" value="Yes" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
-                <label for="retrieve" class="noteAdd">No </label>
-                <input id="retrieve" type="radio" value="No" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
-            </span>
+                <span *ngIf="!isPermitted" class="noteEdit">{{ trialChosen.archived }}</span>
+                <span *ngIf="isPermitted" id="archive_status">
+                    <label for="archive" class="noteDelete">Yes </label>
+                    <input id="archive" type="radio" value="Yes" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
+                    <label for="retrieve" class="noteAdd">No </label>
+                    <input id="retrieve" type="radio" value="No" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
+                </span>
             <br/><br/>
             <label for="nctId">NCT ID: </label>
             <span id="nctId" class="noteEdit">
                 <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{trialChosen.nct_id}}">{{ trialChosen.nct_id }}</a>
             </span>
+            <!--<button class="btn btn-primary" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Completed'" (click)="loadMongo()" class="noteEdit">Finish Curation</button>-->
+            <!--<span class="load-span" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Completed'" [style.color]="mongoMessage.color"> {{mongoMessage.content}} </span>-->
             <br/>
             <label for="phase">Phase: </label>
             <span id="phase" class="noteEdit">{{ trialChosen.phase }}</span>
             <br/>
             <label for="status">Status: </label>
-            <span id="status" class="noteEdit">
+            <span *ngIf="!isPermitted" class="noteEdit">{{ trialChosen.status }}</span>
+            <span  *ngIf="isPermitted" id="status" class="noteEdit">
                 <div class="status-select">
                     <ng-select class="selectStyle" #selectModel="ngModel" [items]="statusOptions" [(ngModel)]="trialChosen.status"
                                [clearable]="false" (change)="updateTrialStatusInDB()"></ng-select>
@@ -107,7 +116,7 @@
                 <div class="indent1 levelIndicator">
                     <jhi-match [match]="trialChosen.treatment_list.step[0].match" [path]="'match'"></jhi-match>
                 </div>
-                <div class="note-margin">
+                <div *ngIf="isPermitted" class="note-margin">
                     <p>
                         Note*
                         <i class="fa fa-plus noteAdd" aria-hidden="true"></i>: Add

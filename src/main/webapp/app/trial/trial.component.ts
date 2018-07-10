@@ -1,18 +1,18 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { AngularFireDatabase } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
 import * as _ from 'underscore';
 import { Trial } from './trial.model';
-import * as $ from 'jquery';
 import '../../../../../node_modules/jquery/dist/jquery.js';
 import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
 import { NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ConnectionService } from '../service/connection.service';
 
 @Component({
   selector: 'jhi-trial',
@@ -34,9 +34,17 @@ export class TrialComponent implements OnInit, AfterViewInit {
   hideArchived = 'Yes';
   statusOptions = this.trialService.getStatusOptions();
   originalTrialStatus = '';
+  frontEndOnly = this.trialService.frontEndOnly;
+  isPermitted = this.trialService.isPermitted;
+  showImportTrial = this.trialService.showImportTrial;
+  showTrialTable = this.trialService.showTrialTable;
+  mongoMessage = {
+    content: '',
+    color: ''
+  };
   @ViewChild('selectModel') private selectModel: NgModel;
 
-  constructor(public http: Http, private trialService: TrialService, public db: AngularFireDatabase, private router: Router ) {
+  constructor(private trialService: TrialService, public db: AngularFireDatabase, private connectionService: ConnectionService, private router: Router ) {
     this.trialService.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
     this.trialService.trialChosenObs.subscribe((message) => this.trialChosen = message);
     this.trialService.trialListObs.subscribe((message) => {
@@ -68,6 +76,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
   }
   importTrials() {
     this.messages = [];
+    this.mongoMessage.content = '';
     const newTrials: Array<string>  = this.trialsToImport.split(',');
     let setChosenTrial = false;
     let result = true;
@@ -87,81 +96,78 @@ export class TrialComponent implements OnInit, AfterViewInit {
         if (!result) {
             continue;
         }
-
-        this.http.get(this.trialService.getAPIUrl('ClinicalTrials') + tempTrial)
-        .subscribe((res: Response) => {
-           const trialInfo = res.json();
-           const armsInfo: any = [];
-           _.each(trialInfo.arms, function(arm) {
-               if (arm.arm_description !== null) {
+        this.connectionService.importTrials(tempTrial).subscribe((res) => {
+            const trialInfo = res;
+            const armsInfo: any = [];
+            _.each(trialInfo['arms'], function(arm) {
+                if (arm.arm_description !== null) {
                     armsInfo.push({
                         arm_description: arm.arm_name,
                         arm_info: arm.arm_description,
                         match: []
                     });
-               }
-           });
-           const trial: Trial = {
-                   curation_status: 'In progress',
-                   archived: 'No',
-                   nct_id: trialInfo.nct_id,
-                   long_title: trialInfo.official_title,
-                   short_title: trialInfo.brief_title,
-                   phase: trialInfo.phase.phase,
-                   status: trialInfo.current_trial_status,
-                   treatment_list: {
-                       step: [{
+                }
+            });
+            const trial: Trial = {
+                curation_status: 'In progress',
+                archived: 'No',
+                nct_id: trialInfo['nct_id'],
+                long_title: trialInfo['official_title'],
+                short_title: trialInfo['brief_title'],
+                phase: trialInfo['phase']['phase'],
+                status: trialInfo['current_trial_status'],
+                treatment_list: {
+                    step: [{
                         arm:  armsInfo,
                         match: []
                     }]
-                   }
-               };
-           this.db.object('Trials/' + trialInfo.nct_id).set(trial).then((response) => {
-            this.messages.push('Successfully imported ' + trialInfo.nct_id);
-            if (setChosenTrial === false) {
-                 this.nctIdChosen = trialInfo.nct_id;
-                 this.trialService.setTrialChosen(this.nctIdChosen);
-                 this.originalTrialStatus = this.trialChosen['status'];
-                 setChosenTrial = true;
-            }
-           }).catch((error) => {
-            this.messages.push('Fail to save to database ' + tempTrial);
-           });
-        },
-            (error) => {
+                }
+            };
+            this.db.object('Trials/' + trialInfo['nct_id']).set(trial).then((response) => {
+                this.messages.push('Successfully imported ' + trialInfo['nct_id']);
+                if (setChosenTrial === false) {
+                    this.nctIdChosen = trialInfo['nct_id'];
+                    this.trialService.setTrialChosen(this.nctIdChosen);
+                    this.originalTrialStatus = this.trialChosen['status'];
+                    setChosenTrial = true;
+                }
+            }).catch((error) => {
+                this.messages.push('Fail to save to database ' + tempTrial);
+            });
+        }, (error) => {
             this.messages.push(tempTrial + ' not found');
-        }
-        );
+        });
     }
-    this.trialsToImport = '';
+      this.trialsToImport = '';
   }
-  updateStatus(type: string) {
-      if (type === 'curation') {
-        this.db.object('Trials/' + this.nctIdChosen).update({
-            curation_status: this.trialChosen['curation_status']
-        }).then((result) => {
-            console.log('success saving curation status');
-        }).catch((error) => {
-            console.log('error', error);
-        });
-      } else if (type === 'archive') {
-        this.db.object('Trials/' + this.nctIdChosen).update({
-            archived: this.trialChosen['archived']
-        }).then((result) => {
-            console.log('success saving archive status');
-            if (this.trialChosen['archived'] === 'Yes') {
-                this.curateTrial('');
-            }
-        }).catch((error) => {
-            console.log('error', error);
-        });
-      } else if (type === 'hideArchived') {
-          this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-            dtInstance.draw();
-          });
-      }
-  }
+    updateStatus(type: string) {
+        if (type === 'curation') {
+            this.db.object('Trials/' + this.nctIdChosen).update({
+                curation_status: this.trialChosen['curation_status']
+            }).then((result) => {
+                console.log('success saving curation status');
+            }).catch((error) => {
+                console.log('error', error);
+            });
+        } else if (type === 'archive') {
+            this.db.object('Trials/' + this.nctIdChosen).update({
+                archived: this.trialChosen['archived']
+            }).then((result) => {
+                console.log('success saving archive status');
+                if (this.trialChosen['archived'] === 'Yes') {
+                    this.curateTrial('');
+                }
+            }).catch((error) => {
+                console.log('error', error);
+            });
+        } else if (type === 'hideArchived') {
+            this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+                dtInstance.draw();
+            });
+        }
+    }
   curateTrial(nctId: string) {
+      this.mongoMessage.content = '';
       this.trialService.setTrialChosen(nctId);
       this.originalTrialStatus = this.trialChosen['status'];
       document.querySelector('#trialDetail').scrollIntoView();
@@ -204,5 +210,25 @@ export class TrialComponent implements OnInit, AfterViewInit {
             this.trialChosen['status'] = this.originalTrialStatus;
         });
     }
+  }
+
+  loadMongo() {
+    this.mongoMessage.content = 'Loading the trial ......';
+    this.mongoMessage.color = '#ffc107';
+    this.connectionService.loadMongo(this.trialChosen).subscribe((res) => {
+        if (res.status === 200) {
+            if (this.trialChosen['archived'] === 'Yes') {
+                // Remove archived trials from database
+                alert('This archived trial has been removed from database.');
+                return;
+            }
+            this.mongoMessage.content = 'Send trial ' + this.nctIdChosen + ' successfully!';
+            this.mongoMessage.color = 'green';
+        }
+    }, (error) => {
+        this.mongoMessage.content = 'Request for sending trial ' + this.nctIdChosen + ' failed!';
+        this.mongoMessage.color = 'red';
+        return Observable.throw(error);
+    });
   }
 }

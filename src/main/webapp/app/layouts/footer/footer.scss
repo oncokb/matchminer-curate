@@ -1,0 +1,34 @@
+.footer {
+    width: 100%;
+    padding: 10px 0;
+    color: #fff;
+    background-color: #353d47;
+    text-align: center;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 300;
+}
+
+.footer .footer-row-2 {
+    line-height: 50px;
+    margin-bottom: 0;
+}
+
+.footer a {
+    color: #fff;
+    border-right: .5px solid #fff;
+    padding: 0 5px;
+    font-weight: unset;
+}
+
+.footer a:last-child {
+    border: 0;
+}
+
+.footer .mskcc-footer-logo, .footer .mskcc-footer-logo0-wrapper {
+    height: 55px;
+}
+
+.footer .mskcc {
+    padding: 0;
+}
