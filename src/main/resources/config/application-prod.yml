@@ -27,7 +27,7 @@ spring:
             enabled: false
     data:
         mongodb:
-            uri: ${MONGODB_URI}?authMode=scram-sha1
+            uri:
             database:
     mail:
         host: localhost
