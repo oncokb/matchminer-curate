@@ -14,9 +14,9 @@ export class ConnectionService {
         if (this.frontEndOnly) {
             switch (type) {
             case 'MainType':
-                return 'http://oncotree.mskcc.org/api/mainTypes';
+                return 'http://oncokb.org/api/private/utils/oncotree/mainTypes';
             case 'SubType':
-                return 'http://oncotree.mskcc.org/api/tumorTypes/search';
+                return 'http://oncokb.org/api/private/utils/oncotree/subtypes';
             case 'OncoKBVariant':
                 return 'http://oncokb.org/api/v1/variants';
             case 'GeneValidation':
@@ -29,9 +29,9 @@ export class ConnectionService {
         } else {
             switch (type) {
             case 'MainType':
-                return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
+                return SERVER_API_URL + 'proxy/http/oncokb.org/api/private/utils/oncotree/mainTypes';
             case 'SubType':
-                return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
+                return SERVER_API_URL + 'proxy/http/oncokb.org/api/private/utils/oncotree/subtypes';
             case 'OncoKBVariant':
                 return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
             case 'GeneValidation':
@@ -60,8 +60,8 @@ export class ConnectionService {
         return this.http.get(this.getAPIUrl('MainType'));
     }
 
-    getSubType(queries: any) {
-        return this.http.post(this.getAPIUrl('SubType'), queries);
+    getSubType() {
+        return this.http.get(this.getAPIUrl('SubType'));
     }
 
     getOncoKBVariant(): Observable<Array<any>> {

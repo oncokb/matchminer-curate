@@ -90,34 +90,17 @@ export class TrialService {
 
         // prepare main types list
         this.connectionService.getMainType().subscribe((res: Array<string>) => {
-            const mainTypeQueries = [];
-            for (const item of res) {
-                mainTypeQueries.push({
-                    'exactMatch': true,
-                    'query': item,
-                    'type': 'mainType'
-                });
-                this.mainTypesOptions.push(item);
-            }
-            // prepare subtypes by maintype
-            const queries =  {
-                'queries': mainTypeQueries
-              };
-            this.connectionService.getSubType(queries).subscribe((response: Array<any>) => {
-                const tempSubTypes = response;
-                let currentSubtype = '';
-                let currentMaintype = '';
-                for (const items of tempSubTypes) {
-                    for (const item of items) {
-                        currentMaintype = item.mainType;
-                        currentSubtype = item.name;
-                        this.allSubTypesOptions.push(currentSubtype);
-                        this.subToMainMapping[currentSubtype] = currentMaintype;
-                        if (this.subTypesOptions[currentMaintype] === undefined) {
-                            this.subTypesOptions[currentMaintype] = [currentSubtype];
-                        } else {
-                            this.subTypesOptions[currentMaintype].push(currentSubtype);
-                        }
+            this.mainTypesOptions = this.mainTypesOptions.concat(res);
+            this.connectionService.getSubType().subscribe((response: Array<any>) => {
+                for (const item of response) {
+                    const currentMaintype = item.mainType.name;
+                    const currentSubtype = item.name;
+                    this.allSubTypesOptions.push(currentSubtype);
+                    this.subToMainMapping[currentSubtype] = currentMaintype;
+                    if (this.subTypesOptions[currentMaintype] === undefined) {
+                        this.subTypesOptions[currentMaintype] = [currentSubtype];
+                    } else {
+                        this.subTypesOptions[currentMaintype].push(currentSubtype);
                     }
                     this.subTypesOptions[currentMaintype].sort(function(a, b) {
                         return a > b;
