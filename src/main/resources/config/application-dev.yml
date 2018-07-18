@@ -33,7 +33,7 @@ spring:
     data:
         mongodb:
             uri: mongodb://localhost:27017
-            database: matchminerCurate
+            database: matchminer
     mail:
         host: localhost
         port: 25

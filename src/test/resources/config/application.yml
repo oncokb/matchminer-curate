@@ -23,9 +23,10 @@ spring:
         type: simple
     data:
         mongodb:
+            uri: mongodb://localhost:27017
             host: localhost
-            port: 0
-            database: matchminerCurate
+            port: 27017
+            database: matchminer
     mail:
         host: localhost
     messages:
@@ -88,3 +89,5 @@ jhipster:
 # ===================================================================
 
 application:
+    matchengine:
+        path:

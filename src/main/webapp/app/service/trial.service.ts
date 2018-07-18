@@ -6,15 +6,15 @@ import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from '../panel/movingPath.model';
 import { Arm } from '../arm/arm.model';
-import { Http, Response } from '@angular/http';
 import * as _ from 'underscore';
-import { SERVER_API_URL } from '../app.constants';
 import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
+import { ConnectionService } from './connection.service';
+
 @Injectable()
 export class TrialService {
-    oncokb = environment.oncokb ? environment.oncokb : false;
-    frontEndOnly = environment.frontEndOnly ? environment.frontEndOnly : false;
+    oncokb = environment['oncokb'] ? environment['oncokb'] : false;
+    isPermitted = environment.isPermitted ? environment.isPermitted : false;
 
     private nctIdChosenSource = new BehaviorSubject<string>('');
     nctIdChosenObs = this.nctIdChosenSource.asObservable();
@@ -79,35 +79,18 @@ export class TrialService {
     nctIdChosen = '';
     errorList: Array<object> = [];
 
-    constructor(public http: Http, public db: AngularFireDatabase, private emailService: EmailService) {
+    constructor(public connectionService: ConnectionService, public db: AngularFireDatabase, private emailService: EmailService) {
         this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
 
         // prepare main types list
-        this.http.get(this.getAPIUrl('MainType'))
-        .subscribe((res: Response) => {
-            const mainTypeQueries = [];
-            for (const item of res.json()) {
-                mainTypeQueries.push({
-                    'exactMatch': true,
-                    'query': item,
-                    'type': 'mainType'
-                });
-                this.mainTypesOptions.push(item);
-            }
-            // prepare subtypes by maintype
-            const queries =  {
-                'queries': mainTypeQueries
-              };
-            this.http.post(this.getAPIUrl('SubType'), queries)
-            .subscribe((response: Response) => {
-                const tempSubTypes = response.json();
-                let currentSubtype = '';
-                let currentMaintype = '';
-                for (const items of tempSubTypes) {
-                    for (const item of items) {
-                        currentMaintype = item.mainType;
-                        currentSubtype = item.name;
+        this.connectionService.getMainType().subscribe((res: Array<string>) => {
+            this.mainTypesOptions = this.mainTypesOptions.concat(res);
+            this.connectionService.getSubType().subscribe((response: Array<any>) => {
+                for (const item of response) {
+                    if (item.level !== 0) {
+                        const currentMaintype = item.mainType.name;
+                        const currentSubtype = item.name;
                         this.allSubTypesOptions.push(currentSubtype);
                         this.subToMainMapping[currentSubtype] = currentMaintype;
                         if (this.subTypesOptions[currentMaintype] === undefined) {
@@ -115,18 +98,17 @@ export class TrialService {
                         } else {
                             this.subTypesOptions[currentMaintype].push(currentSubtype);
                         }
+                        this.subTypesOptions[currentMaintype].sort(function(a, b) {
+                            return a > b;
+                        });
+                        this.subTypesOptions[''] = this.allSubTypesOptions;
                     }
-                    this.subTypesOptions[currentMaintype].sort(function(a, b) {
-                        return a > b;
-                    });
-                    this.subTypesOptions[''] = this.allSubTypesOptions;
                 }
             });
         });
         // prepare oncokb variant list
-        this.http.get(this.getAPIUrl('OncoKBVariant'))
-        .subscribe((res: Response) => {
-           const allAnnotatedVariants = res.json();
+        this.connectionService.getOncoKBVariant().subscribe((res) => {
+           const allAnnotatedVariants = res;
            for (const item of  allAnnotatedVariants) {
                 if (item['gene']['hugoSymbol']) {
                     if (this.annotated_variants[item['gene']['hugoSymbol']]) {
@@ -326,38 +308,5 @@ export class TrialService {
             result += node[key];
         }
         return result;
-    }
-    getAPIUrl(type: string) {
-        if (this.frontEndOnly) {
-            switch (type) {
-                case 'MainType':
-                    return 'http://oncotree.mskcc.org/api/mainTypes';
-                case 'SubType':
-                    return 'http://oncotree.mskcc.org/api/tumorTypes/search';
-                case 'OncoKBVariant':
-                    return 'http://oncokb.org/api/v1/variants';
-                case 'GeneValidation':
-                    return 'http://mygene.info/v3/query?species=human&q=symbol:';
-                case 'ClinicalTrials':
-                    return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-                case 'ExampleValidation':
-                    return 'http://oncokb.org/api/v1/utils/match/variant?';
-            }
-        } else {
-            switch (type) {
-                case 'MainType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes';
-                case 'SubType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
-                case 'OncoKBVariant':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
-                case 'GeneValidation':
-                    return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
-                case 'ClinicalTrials':
-                    return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-                case 'ExampleValidation':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
-            }
-        }
     }
 }

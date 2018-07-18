@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, NavigationEnd } from '@angular/router';
-
 import { Title } from '@angular/platform-browser';
 import { TrialService } from '../../service/trial.service';
 @Component({

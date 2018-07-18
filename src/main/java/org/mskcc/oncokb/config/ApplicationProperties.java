@@ -11,4 +11,20 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
 
+    public final Matchengine matchengine = new Matchengine();
+
+    public Matchengine getMatchengine() {
+        return matchengine;
+    }
+
+    public static class Matchengine {
+        private String path;
+
+        public String getPath() {
+            return path;
+        }
+        public void setPath(String path) {
+            this.path = path;
+        }
+    }
 }
