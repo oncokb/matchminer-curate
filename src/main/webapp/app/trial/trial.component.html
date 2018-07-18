@@ -33,7 +33,7 @@
             <th>Status</th>
             <th>Title</th>
             <th>Curation Status</th>
-            <th>Archived</th>
+            <th [hidden]="true">Archived</th>
           </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@
             <td>{{ trial.status }}</td>
             <td>{{ trial.short_title }}</td>
             <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
-            <td>{{ trial.archived }}</td>
+            <td [hidden]="true">{{ trial.archived }}</td>
           </tr>
         </tbody>
       </table>
