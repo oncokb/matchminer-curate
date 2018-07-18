@@ -17,41 +17,39 @@
     </div>
     <br/>
     <br/>
-    <div *ngIf="showTrialTable">
-        <div class="float-right">
-            <label for="hideArchived">Hide archived trials:</label>
-            <span id="hideArchived">
-                <label for="hideArchivedOption" class="noteEdit">Yes</label>
-                <input id="hideArchivedOption" type="radio" value="Yes" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
-                <label for="displayArchivedOption" class="noteEdit">No</label>
-                <input id="displayArchivedOption" type="radio" value="No" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
-            </span>
-        </div>
-        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
-            <thead>
-              <tr>
-                <th>NCT ID</th>
-                <th>Status</th>
-                <th>Title</th>
-                <th>Curation Status</th>
-                <th>Archived</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let trial of trialList">
-                <td><a (click)="curateTrial(trial.nct_id)">{{ trial.nct_id }}</a></td>
-                <td>{{ trial.status }}</td>
-                <td>{{ trial.short_title }}</td>
-                <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
-                <td>{{ trial.archived }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <br/>
+    <div class="float-right">
+        <label for="hideArchived">Hide archived trials:</label>
+        <span id="hideArchived">
+            <label for="hideArchivedOption" class="noteEdit">Yes</label>
+            <input id="hideArchivedOption" type="radio" value="Yes" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
+            <label for="displayArchivedOption" class="noteEdit">No</label>
+            <input id="displayArchivedOption" type="radio" value="No" name="hideArchived" [(ngModel)]="hideArchived" (change)="updateStatus('hideArchived')">
+        </span>
     </div>
+    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+        <thead>
+          <tr>
+            <th>NCT ID</th>
+            <th>Status</th>
+            <th>Title</th>
+            <th>Curation Status</th>
+            <th>Archived</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let trial of trialList">
+            <td><a (click)="curateTrial(trial.nct_id)">{{ trial.nct_id }}</a></td>
+            <td>{{ trial.status }}</td>
+            <td>{{ trial.short_title }}</td>
+            <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
+            <td>{{ trial.archived }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <br/>
     <div id="trialDetail"><br/></div>
     <div *ngIf="nctIdChosen" class="trial-bottom">
-        <hr *ngIf="showTrialTable">
+        <hr>
         <div>
             <label for="curation_status">Curation Status:</label>
             <span *ngIf="!isPermitted" class="noteEdit">{{ trialChosen.curation_status }}</span>

@@ -36,8 +36,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
   originalTrialStatus = '';
   frontEndOnly = this.trialService.frontEndOnly;
   isPermitted = this.trialService.isPermitted;
-  showImportTrial = this.trialService.showImportTrial;
-  showTrialTable = this.trialService.showTrialTable;
   mongoMessage = {
     content: '',
     color: ''

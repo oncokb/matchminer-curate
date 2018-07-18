@@ -8,16 +8,12 @@ import { TrialService } from '../../service/trial.service';
 })
 export class JhiMainComponent implements OnInit {
     authorized = false;
-    showHeader = false;
-    showFooter = false;
     constructor(
         private titleService: Title,
         private router: Router,
         private trialService: TrialService
     ) {
         this.trialService.authorizedObs.subscribe((message) => this.authorized = message);
-        this.showHeader = this.trialService.showHeader;
-        this.showFooter = this.trialService.showFooter;
     }
 
     private getPageTitle(routeSnapshot: ActivatedRouteSnapshot) {
