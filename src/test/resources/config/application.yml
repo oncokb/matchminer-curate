@@ -91,5 +91,3 @@ jhipster:
 application:
     matchengine:
         path:
-        git-url:
-        branch:
