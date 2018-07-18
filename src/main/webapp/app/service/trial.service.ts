@@ -13,7 +13,7 @@ import { ConnectionService } from './connection.service';
 
 @Injectable()
 export class TrialService {
-    oncokb = environment.oncokb ? environment.oncokb : false;
+    oncokb = environment['oncokb'] ? environment['oncokb'] : false;
     frontEndOnly = environment.frontEndOnly ? environment.frontEndOnly : false;
     isPermitted = environment.isPermitted ? environment.isPermitted : false;
     showHeader = environment['showHeader'] ? environment['showHeader'] : true;
@@ -93,19 +93,21 @@ export class TrialService {
             this.mainTypesOptions = this.mainTypesOptions.concat(res);
             this.connectionService.getSubType().subscribe((response: Array<any>) => {
                 for (const item of response) {
-                    const currentMaintype = item.mainType.name;
-                    const currentSubtype = item.name;
-                    this.allSubTypesOptions.push(currentSubtype);
-                    this.subToMainMapping[currentSubtype] = currentMaintype;
-                    if (this.subTypesOptions[currentMaintype] === undefined) {
-                        this.subTypesOptions[currentMaintype] = [currentSubtype];
-                    } else {
-                        this.subTypesOptions[currentMaintype].push(currentSubtype);
+                    if (item.level !== 0) {
+                        const currentMaintype = item.mainType.name;
+                        const currentSubtype = item.name;
+                        this.allSubTypesOptions.push(currentSubtype);
+                        this.subToMainMapping[currentSubtype] = currentMaintype;
+                        if (this.subTypesOptions[currentMaintype] === undefined) {
+                            this.subTypesOptions[currentMaintype] = [currentSubtype];
+                        } else {
+                            this.subTypesOptions[currentMaintype].push(currentSubtype);
+                        }
+                        this.subTypesOptions[currentMaintype].sort(function(a, b) {
+                            return a > b;
+                        });
+                        this.subTypesOptions[''] = this.allSubTypesOptions;
                     }
-                    this.subTypesOptions[currentMaintype].sort(function(a, b) {
-                        return a > b;
-                    });
-                    this.subTypesOptions[''] = this.allSubTypesOptions;
                 }
             });
         });

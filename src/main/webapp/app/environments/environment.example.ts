@@ -10,5 +10,4 @@ export const environment = {
     devEmail: '', // set development team email to receive error notifications
     frontEndOnly: true, // set to true if doing frontend development
     isPermitted: true, // set to false for building read-only website
-    oncokb: true, // set to true to customized interface for oncokb
 };
