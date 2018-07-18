@@ -14,7 +14,6 @@ import { ConnectionService } from './connection.service';
 @Injectable()
 export class TrialService {
     oncokb = environment['oncokb'] ? environment['oncokb'] : false;
-    frontEndOnly = environment.frontEndOnly ? environment.frontEndOnly : false;
     isPermitted = environment.isPermitted ? environment.isPermitted : false;
 
     private nctIdChosenSource = new BehaviorSubject<string>('');

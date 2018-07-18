@@ -34,7 +34,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
   hideArchived = 'Yes';
   statusOptions = this.trialService.getStatusOptions();
   originalTrialStatus = '';
-  frontEndOnly = this.trialService.frontEndOnly;
   isPermitted = this.trialService.isPermitted;
   mongoMessage = {
     content: '',
