@@ -112,6 +112,18 @@
                 <div class="indent1 levelIndicator">
                     <jhi-match [match]="trialChosen.treatment_list.step[0].match" [path]="'match'"></jhi-match>
                 </div>
+                <div class="note-margin">
+                    <p class="note-p-margin">
+                        <label>Additional Information (Optional):</label>
+                        <i *ngIf="isPermitted && !noteEditable" class="fa fa-pencil noteEdit" aria-hidden="true" (click)="editNote()"></i>
+                        <span *ngIf="noteEditable">
+                            <button class="btn btn-success editButtonStyle" (click)="updateNote()">Save</button>
+                            <button class="btn btn-warning editButtonStyle" (click)="cancelUpdateNote()">Cancel</button>
+                        </span>
+                    </p>
+                    <p *ngIf="!noteEditable">{{additionalChosen.note}}</p>
+                    <textarea *ngIf="noteEditable" rows="5" cols="100" [(ngModel)]="additionalInput.note"></textarea>
+                </div>
                 <div *ngIf="isPermitted" class="note-margin">
                     <p>
                         Note*

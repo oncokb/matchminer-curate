@@ -42,9 +42,9 @@ export class PanelComponent implements OnInit {
     genomicInput: Genomic;
     clinicalInput: Clinical;
     clinicalFields = ['age_numerical', 'oncotree_primary_diagnosis'];
-    genomicFields = ['hugo_symbol', 'annotated_variant', 'matching_examples', 'protein_change', 'wildcard_protein_change',
+    genomicFields = ['hugo_symbol', 'annotated_variant', 'matching_examples', 'germline', 'protein_change', 'wildcard_protein_change',
     'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype', 'ms_status', 'mmr_status'];
-    oncokbGenomicFields = ['hugo_symbol', 'annotated_variant'];
+    oncokbGenomicFields = ['hugo_symbol', 'annotated_variant', 'germline'];
     oncokb: boolean;
     hasErrorInputField: boolean;
     copyMatch = false;
@@ -225,7 +225,7 @@ export class PanelComponent implements OnInit {
     }
     saveBacktoDB() {
         return new Promise((resolve, reject) => {
-            this.trialService.getTrialRef(this.nctIdChosen).set({
+            this.trialService.getRef('Trials/' + this.nctIdChosen + '/treatment_list/step/0').set({
                 arm: this.originalArms,
                 match: this.originalMatch
             }).then((result) => {

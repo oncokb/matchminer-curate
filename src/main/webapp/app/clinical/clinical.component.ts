@@ -20,7 +20,6 @@ export class ClinicalComponent implements OnInit {
     validation = false;
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
-    displayOptionalFields = false;
 
     constructor(private trialService: TrialService) { }
 
@@ -31,13 +30,6 @@ export class ClinicalComponent implements OnInit {
         this.trialService.operationPoolObs.subscribe((message) => {
             this.operationPool = message;
         });
-        const optionalFields = ['gender'];
-        _.some(optionalFields, function(key) {
-            if (!_.isEmpty(this.unit) && this.unit.clinical[key]) {
-                this.displayOptionalFields = true;
-                return true;
-            }
-        }, this);
     }
     getStyle() {
         return this.trialService.getStyle(this.indent);
@@ -123,13 +115,6 @@ export class ClinicalComponent implements OnInit {
     }
     getDisplayContent(key: string) {
         return this.trialService.getNodeDisplayContent(key, this.unit['clinical']);
-    }
-    collapse() {
-        if (this.displayOptionalFields) {
-            this.displayOptionalFields = false;
-        } else {
-            this.displayOptionalFields = true;
-        }
     }
     unCheckRadio(event) {
         if (event.target.value === this.clinicalInput.gender) {
