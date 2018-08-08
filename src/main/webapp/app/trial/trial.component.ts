@@ -60,17 +60,15 @@ export class TrialComponent implements OnInit, AfterViewInit {
             this.additionalsObject = message;
         } );
     }
-
     ngOnInit(): void {
         $.fn[ 'dataTable' ].ext.search.push( ( settings, data ) => {
             if ( this.hideArchived === 'Yes' && data[ 4 ] === 'Yes' ) {
                 return false;
-            } else
-                if ( this.hideArchived === 'No' && data[ 4 ] === 'No' ) {
-                    return false;
-                } else {
-                    return true;
-                }
+            } else if ( this.hideArchived === 'No' && data[ 4 ] === 'No' ) {
+                return false;
+            } else {
+                return true;
+            }
         } );
         this.dtOptions = {
             paging: false,
@@ -81,7 +79,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
             this.curateTrial( nctId );
         }
     }
-
     importTrials() {
         this.messages = [];
         this.mongoMessage.content = '';
@@ -148,7 +145,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
         this.trialsToImport = '';
     }
-
     updateStatus( type: string ) {
         if ( type === 'curation' ) {
             this.db.object( 'Trials/' + this.nctIdChosen ).update( {
@@ -158,26 +154,23 @@ export class TrialComponent implements OnInit, AfterViewInit {
             } ).catch( ( error ) => {
                 console.log( 'error', error );
             } );
-        } else
-            if ( type === 'archive' ) {
-                this.db.object( 'Trials/' + this.nctIdChosen ).update( {
-                    archived: this.trialChosen[ 'archived' ]
-                } ).then( ( result ) => {
-                    console.log( 'success saving archive status' );
-                    if ( this.trialChosen[ 'archived' ] === 'Yes' ) {
-                        this.curateTrial( '' );
-                    }
-                } ).catch( ( error ) => {
-                    console.log( 'error', error );
-                } );
-            } else
-                if ( type === 'hideArchived' ) {
-                    this.dtElement.dtInstance.then( ( dtInstance: DataTables.Api ) => {
-                        dtInstance.draw();
-                    } );
+        } else if ( type === 'archive' ) {
+            this.db.object( 'Trials/' + this.nctIdChosen ).update( {
+                archived: this.trialChosen[ 'archived' ]
+            } ).then( ( result ) => {
+                console.log( 'success saving archive status' );
+                if ( this.trialChosen[ 'archived' ] === 'Yes' ) {
+                    this.curateTrial( '' );
                 }
+            } ).catch( ( error ) => {
+                console.log( 'error', error );
+            } );
+        } else if ( type === 'hideArchived' ) {
+            this.dtElement.dtInstance.then( ( dtInstance: DataTables.Api ) => {
+                dtInstance.draw();
+            } );
+        }
     }
-
     curateTrial( nctId: string ) {
         this.mongoMessage.content = '';
         this.clearAdditional();
@@ -192,11 +185,9 @@ export class TrialComponent implements OnInit, AfterViewInit {
     getStatus( status: string ) {
         return status === 'Completed' ? { 'color': 'green' } : { 'color': 'red' };
     }
-
     ngAfterViewInit(): void {
         this.dtTrigger.next();
     }
-
     rerender(): void {
         if ( ! _.isUndefined( this.dtElement ) ) {
             this.dtElement.dtInstance.then( ( dtInstance: DataTables.Api ) => {
@@ -207,7 +198,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
             } );
         }
     }
-
     updateTrialStatusInDB() {
         if ( this.originalTrialStatus !== this.trialChosen[ 'status' ] ) {
             this.trialService.getRef( 'Trials/' + this.nctIdChosen + '/status' ).set( this.trialChosen[ 'status' ] ).then( ( result ) => {
