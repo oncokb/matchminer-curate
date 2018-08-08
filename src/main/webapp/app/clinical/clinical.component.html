@@ -24,24 +24,20 @@
                     <ng-select class="selectStyle" [items]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
                         [clearable]="true" placeholder="Select Subtype" (change)="onSingleSelected($event)">
                     </ng-select>
-                    <i class="collapse-margin" aria-hidden="true" title="Display optional attributes"
-                       ngClass="{{ displayOptionalFields ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down'}}" (click)="collapse()"></i>
                 </div>
             </div>
         </div>
-        <div *ngIf="displayOptionalFields">
-            <div class="row">
-                <div class="col-sm-4">gender:</div>
-                <div class="col-sm-8">
-                    <span id="gender1">
-                        <label for="gender-male1">
-                            <input id="gender-male1" type="radio" value="Male" name="gender" [(ngModel)]="clinicalInput.gender" (click)="unCheckRadio($event)">Male
-                        </label>
-                        <label for="gender-female1">
-                            <input id="gender-female1" type="radio" value="Female" name="gender" [(ngModel)]="clinicalInput.gender" (click)="unCheckRadio($event)">Female
-                        </label>
-                    </span>
-                </div>
+        <div class="row">
+            <div class="col-sm-4">gender:</div>
+            <div class="col-sm-8">
+                <span id="gender1">
+                    <label for="gender-male1">
+                        <input id="gender-male1" type="radio" value="Male" name="gender" [(ngModel)]="clinicalInput.gender" (click)="unCheckRadio($event)">Male
+                    </label>
+                    <label for="gender-female1">
+                        <input id="gender-female1" type="radio" value="Female" name="gender" [(ngModel)]="clinicalInput.gender" (click)="unCheckRadio($event)">Female
+                    </label>
+                </span>
             </div>
         </div>
     </div>
@@ -77,12 +73,10 @@
                     <ng-select class="selectStyle" [items]="subTypesOptions[clinicalInput.main_type]" [(ngModel)]="clinicalInput.sub_type"
                         [clearable]="true" placeholder="Select Subtype" (change)="onSingleSelected($event)">
                     </ng-select>
-                    <i class="collapse-margin" aria-hidden="true" title="Display optional attributes"
-                       ngClass="{{ displayOptionalFields ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down'}}" (click)="collapse()"></i>
                 </div>
             </div>
         </div>
-        <div class="row" *ngIf="displayOptionalFields">
+        <div class="row">
             <div class="col-sm-4">gender:</div>
             <div class="col-sm-8">
                 <span id="gender2">

@@ -13,8 +13,8 @@ interface Step {
     arm?: Array<Arm>;
 }
 interface Arm {
-    arm_description: string, // Arm name.
-    arm_info: string, // Real arm description. Store in Firebase and do not send to MongoDB.
+    arm_description: string; // Arm name.
+    arm_info: string; // Real arm description. Store in Firebase and do not send to MongoDB.
     match?: Array<Match>;
 }
 // interface DoseLevel {
@@ -25,3 +25,7 @@ interface Arm {
 //     level_suspended: string;
 // }
 interface Match { }
+
+export interface Additional {
+    note?: string;
+}

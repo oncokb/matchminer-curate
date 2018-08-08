@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
-import { Trial } from '../trial/trial.model';
+import { Additional, Trial } from '../trial/trial.model';
 import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from '../panel/movingPath.model';
@@ -25,6 +25,13 @@ export class TrialService {
 
     private trialListSource = new BehaviorSubject<Array<Trial>>([]);
     trialListObs = this.trialListSource.asObservable();
+
+    additional = this.createAdditional();
+    private additionalChosenSource = new BehaviorSubject<Additional>(this.additional);
+    additionalChosenObs = this.additionalChosenSource.asObservable();
+
+    private additionalSource = new BehaviorSubject<object>([]);
+    additionalObs = this.additionalSource.asObservable();
 
     private authorizedSource = new BehaviorSubject<boolean>(false);
     authorizedObs = this.authorizedSource.asObservable();
@@ -76,12 +83,15 @@ export class TrialService {
     annotated_variants = {};
     trialList: Array<Trial> = [];
     trialsRef: AngularFireObject<any>;
+    additionalObject = {};
+    additionalRef: AngularFireObject<any>;
     nctIdChosen = '';
     errorList: Array<object> = [];
 
     constructor(public connectionService: ConnectionService, public db: AngularFireDatabase, private emailService: EmailService) {
         this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
+        this.additionalRef = db.object('Additional');
 
         // prepare main types list
         this.connectionService.getMainType().subscribe((res: Array<string>) => {
@@ -130,14 +140,17 @@ export class TrialService {
                 hugo_symbol: '',
                 annotated_variant: '',
                 matching_examples: '',
+                germline: '',
                 no_hugo_symbol: false,
-                no_annotated_variant: false
+                no_annotated_variant: false,
+                no_germline: false
             };
         } else {
             genomicInput = {
                 hugo_symbol: '',
                 annotated_variant: '',
                 matching_examples: '',
+                germline: '',
                 protein_change: '',
                 wildcard_protein_change: '',
                 variant_classification: '',
@@ -147,7 +160,7 @@ export class TrialService {
                 wildtype: '',
                 no_hugo_symbol: false,
                 no_annotated_variant: false,
-                no_matching_examples: false,
+                no_germline: false,
                 no_protein_change: false,
                 no_wildcard_protein_change: false,
                 no_variant_classification: false,
@@ -178,8 +191,14 @@ export class TrialService {
             phase: '',
             status: '',
             treatment_list: { step: [] }
-        }
+        };
         return trial;
+    }
+    createAdditional() {
+        const additional: Additional = {
+            note: ''
+        };
+        return additional;
     }
     fetchTrials() {
         this.trialsRef.snapshotChanges().subscribe((action) => {
@@ -194,6 +213,18 @@ export class TrialService {
             this.authorizedSource.next(false);
         });
     }
+    fetchAdditional() {
+        this.additionalRef.snapshotChanges().subscribe((action) => {
+            this.authorizedSource.next(true);
+            for (const nctId of _.keys(action.payload.val())) {
+                this.additionalObject[nctId] = action.payload.val()[nctId];
+            }
+            this.additionalSource.next(this.additionalObject);
+        }, (error) => {
+            this.authorizedSource.next(false);
+        });
+    }
+
     fetchTrialById(id: string) {
         return new Promise((resolve, reject) => {
             this.db.object('Trials/' + id).valueChanges().subscribe((trial: any) => {
@@ -234,6 +265,11 @@ export class TrialService {
             }
         }
     }
+    setAdditionalChosen(nctId: string) {
+        if (!_.isUndefined(this.additionalObject[nctId])) {
+            this.additionalChosenSource.next(this.additionalObject[nctId]);
+        }
+    }
     setGenomicInput(genomicInput: Genomic) {
         this.genomicInputSource.next(genomicInput);
     }
@@ -267,11 +303,8 @@ export class TrialService {
     getOncokbVariants() {
         return this.annotated_variants;
     }
-    getTrialRef(nctId: string, path?: string) {
-        if (!_.isUndefined(path) && !_.isEmpty(path)) {
-            return this.db.object('Trials/' + nctId + '/' + path);
-        }
-        return this.db.object('Trials/' + nctId + '/treatment_list/step/0');
+    getRef(path: string) {
+        return this.db.object(path);
     }
     saveTrialById(id: string, data: object) {
         return new Promise((resolve, reject) => {
