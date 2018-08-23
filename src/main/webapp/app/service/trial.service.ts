@@ -10,10 +10,12 @@ import * as _ from 'underscore';
 import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
 import { ConnectionService } from './connection.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable()
 export class TrialService {
     oncokb = environment['oncokb'] ? environment['oncokb'] : false;
+    oncotreeVersion = environment.oncotreeVersion ? environment.oncotreeVersion : 'oncotree_latest_stable';
     isPermitted = environment.isPermitted ? environment.isPermitted : false;
 
     private nctIdChosenSource = new BehaviorSubject<string>('');
@@ -96,25 +98,43 @@ export class TrialService {
         // prepare main types list
         this.connectionService.getMainType().subscribe((res: Array<string>) => {
             this.mainTypesOptions = this.mainTypesOptions.concat(res);
-            this.connectionService.getSubType().subscribe((response: Array<any>) => {
-                for (const item of response) {
-                    if (item.level !== 0) {
-                        const currentMaintype = item.mainType.name;
-                        const currentSubtype = item.name;
+            const mainTypeQueries = [];
+            for (const item of res) {
+                mainTypeQueries.push({
+                    'query': item,
+                    'version': this.oncotreeVersion,
+                    'type': 'mainType'
+                });
+            }
+            // prepare subtypes by maintype
+            const queries =  {
+                'queries': mainTypeQueries
+            };
+            this.connectionService.getSubType(queries).subscribe((response: Array<any>) => {
+                let currentSubtype = '';
+                let currentMaintype = '';
+                for (const items of response) {
+                    for (const item of items) {
+                        currentMaintype = item.mainType;
+                        currentSubtype = item.name;
                         this.allSubTypesOptions.push(currentSubtype);
                         this.subToMainMapping[currentSubtype] = currentMaintype;
-                        if (this.subTypesOptions[currentMaintype] === undefined) {
+                        if (_.isUndefined(this.subTypesOptions[currentMaintype])) {
                             this.subTypesOptions[currentMaintype] = [currentSubtype];
                         } else {
                             this.subTypesOptions[currentMaintype].push(currentSubtype);
                         }
-                        this.subTypesOptions[currentMaintype].sort(function(a, b) {
-                            return a > b;
-                        });
-                        this.subTypesOptions[''] = this.allSubTypesOptions;
                     }
+                    this.subTypesOptions[currentMaintype].sort(function(a, b) {
+                        return a > b;
+                    });
+                    this.subTypesOptions[''] = this.allSubTypesOptions;
                 }
+            }, (error: HttpErrorResponse) => {
+                this.getErrorResponse(error, 'subtype');
             });
+        }, (error: HttpErrorResponse) => {
+            this.getErrorResponse(error, 'main type');
         });
         // prepare oncokb variant list
         this.connectionService.getOncoKBVariant().subscribe((res) => {
@@ -341,5 +361,21 @@ export class TrialService {
             result += node[key];
         }
         return result;
+    }
+    getErrorResponse(error: HttpErrorResponse, type: string) {
+        if (error.status === 400) {
+            alert('Sorry, your query is invalid.');
+        } else if (error.status === 404) {
+            alert('Sorry, we cannot find ' + type + '.');
+        } else if (error.status === 503) {
+            alert('Sorry, required data source is unavailable now.');
+        } else {
+            this.emailService.sendEmail({
+                sendTo: environment.devEmail,
+                subject: 'Matchminer Curate http request failed.',
+                content: 'Error: \n' + JSON.stringify(error)
+            });
+            alert('Sorry, unexpected error happens. Our development team has been notified.');
+        }
     }
 }

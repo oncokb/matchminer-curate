@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable';
 @Injectable()
 export class ConnectionService {
     frontEndOnly = environment.frontEndOnly ? environment.frontEndOnly : false;
+    oncotreeVersion = environment.oncotreeVersion ? environment.oncotreeVersion : 'oncotree_latest_stable';
 
     constructor(private http: HttpClient) { }
 
@@ -14,9 +15,9 @@ export class ConnectionService {
         if (this.frontEndOnly) {
             switch (type) {
                 case 'MainType':
-                    return 'http://oncokb.org/api/private/utils/oncotree/mainTypes';
+                    return 'http://oncotree.mskcc.org/api/mainTypes?version=' + this.oncotreeVersion;
                 case 'SubType':
-                    return 'http://oncokb.org/api/private/utils/oncotree/subtypes';
+                    return 'http://oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return 'http://oncokb.org/api/v1/variants';
                 case 'GeneValidation':
@@ -29,9 +30,9 @@ export class ConnectionService {
         } else {
             switch (type) {
                 case 'MainType':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/private/utils/oncotree/mainTypes';
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes?version=' + this.oncotreeVersion;
                 case 'SubType':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/private/utils/oncotree/subtypes';
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
                 case 'GeneValidation':
@@ -60,8 +61,8 @@ export class ConnectionService {
         return this.http.get(this.getAPIUrl('MainType'));
     }
 
-    getSubType() {
-        return this.http.get(this.getAPIUrl('SubType'));
+    getSubType(query: any) {
+        return this.http.post(this.getAPIUrl('SubType'), query);
     }
 
     getOncoKBVariant(): Observable<Array<any>> {
