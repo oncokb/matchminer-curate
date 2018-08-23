@@ -370,12 +370,12 @@ export class TrialService {
         } else if (error.status === 503) {
             alert('Sorry, required data source is unavailable now.');
         } else {
-            alert('Sorry, unexpected error happens. Our development team has been notified.');
             this.emailService.sendEmail({
                 sendTo: environment.devEmail,
                 subject: 'Matchminer Curate http request failed.',
                 content: 'Error: \n' + JSON.stringify(error)
             });
+            alert('Sorry, unexpected error happens. Our development team has been notified.');
         }
     }
 }
