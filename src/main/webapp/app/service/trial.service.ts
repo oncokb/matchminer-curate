@@ -10,6 +10,7 @@ import * as _ from 'underscore';
 import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
 import { ConnectionService } from './connection.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable()
 export class TrialService {
@@ -129,7 +130,11 @@ export class TrialService {
                     });
                     this.subTypesOptions[''] = this.allSubTypesOptions;
                 }
+            }, (error: HttpErrorResponse) => {
+                this.getErrorResponse(error, 'subtype');
             });
+        }, (error: HttpErrorResponse) => {
+            this.getErrorResponse(error, 'main type');
         });
         // prepare oncokb variant list
         this.connectionService.getOncoKBVariant().subscribe((res) => {
@@ -356,5 +361,21 @@ export class TrialService {
             result += node[key];
         }
         return result;
+    }
+    getErrorResponse(error: HttpErrorResponse, type: string) {
+        if (error.status === 400) {
+            alert('Sorry, your query is invalid.');
+        } else if (error.status === 404) {
+            alert('Sorry, we cannot find ' + type + '.');
+        } else if (error.status === 503) {
+            alert('Sorry, required data source is unavailable now.');
+        } else {
+            alert('Sorry, unexpected error happens. Our development team has been notified.');
+            this.emailService.sendEmail({
+                sendTo: environment.devEmail,
+                subject: 'Matchminer Curate http request failed.',
+                content: 'Error: \n' + JSON.stringify(error)
+            });
+        }
     }
 }
