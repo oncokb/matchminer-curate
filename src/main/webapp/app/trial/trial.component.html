@@ -58,6 +58,8 @@
                 <input id="progress" type="radio" value="In progress" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
                 <label for="complete" class="noteAdd">Completed </label>
                 <input id="complete" type="radio" value="Completed" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
+                <label for="import" class="importStatus">Ready to import </label>
+                <input id="import" type="radio" value="Ready to import" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
             </span>
             <br/>
             <label for="archive_status">Archive:</label>
@@ -73,8 +75,8 @@
             <span id="nctId" class="noteEdit">
                 <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{trialChosen.nct_id}}">{{ trialChosen.nct_id }}</a>
             </span>
-            <!--<button class="btn btn-primary" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Completed'" (click)="loadMongo()" class="noteEdit">Finish Curation</button>-->
-            <!--<span class="load-span" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Completed'" [style.color]="mongoMessage.color"> {{mongoMessage.content}} </span>-->
+            <!--<button class="btn btn-primary" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" (click)="loadMongo()" class="noteEdit">Finish Curation</button>-->
+            <!--<span class="load-span" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" [style.color]="mongoMessage.color"> {{mongoMessage.content}} </span>-->
             <br/>
             <label for="phase">Phase: </label>
             <span id="phase" class="noteEdit">{{ trialChosen.phase }}</span>

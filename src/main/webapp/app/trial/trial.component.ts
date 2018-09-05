@@ -183,7 +183,15 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.additionalChosen = { note: '' };
     }
     getStatus( status: string ) {
-        return status === 'Completed' ? { 'color': 'green' } : { 'color': 'red' };
+        let color = '';
+        if (status === 'Completed') {
+            color = 'green';
+        } else if (status === 'In progress') {
+            color = 'red';
+        } else {
+            color = '#3E8ACC';
+        }
+        return { 'color': color };
     }
     ngAfterViewInit(): void {
         this.dtTrigger.next();
