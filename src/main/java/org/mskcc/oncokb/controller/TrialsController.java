@@ -1,9 +1,12 @@
 package org.mskcc.oncokb.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mongodb.client.MongoDatabase;
 import io.swagger.annotations.ApiParam;
 import org.json.JSONObject;
 import org.mskcc.oncokb.controller.api.TrialsApi;
+import org.mskcc.oncokb.service.WebtokenService;
 import org.mskcc.oncokb.service.util.FileUtil;
 import org.mskcc.oncokb.service.util.HttpUtil;
 import org.mskcc.oncokb.service.util.MongoUtil;
@@ -14,13 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import java.io.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.io.File;
 
 /**
  * @author jingsu
@@ -42,103 +45,136 @@ public class TrialsController implements TrialsApi {
     @Autowired
     private String firebaseProjectId;
 
+    @Autowired
+    private WebtokenService webtokenService;
+
+    private static final String ALLOWED_TRIAL_STATUS = "Ready to import";
+
     @Override
-    public ResponseEntity<Void> create(@ApiParam(value = "a trial json object " ,required=true )  @Valid @RequestBody Object trial) {
-        // check if MatchEngine is accessible.
-        if (this.matchenginePath == null || this.matchenginePath.length() == 0 ) {
-            log.error("Cannot' find matchminer-engine path!");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Void> create(@ApiParam(value = "a trial json object ", required = true) @Valid @RequestBody Object trial,
+                                       @ApiParam(value = "Access token.") @RequestParam(value = "token", required = false) String token) {
+        boolean valid = true;
+        if (this.webtokenService.isWebtokenEnabled()) {
+            valid = this.webtokenService.isValidToken(token);
         }
-        try{
-            String mongoUri = MongoUtil.getPureMongoUri(this.uri);
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            String json = ow.writeValueAsString(trial);
-            JSONObject trialObj = new JSONObject(json);
-            String nctId = trialObj.get("nct_id").toString();
-            String archived = trialObj.get("archived").toString();
-            String curationStatus = trialObj.get("curation_status").toString();
-            // Archived trials have to be deleted in Mongo DB.
-            if( archived.equals("Yes")) {
-                Boolean isDeletedTrialMatch = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
-                Boolean isDeletedTrial = MongoUtil.deleteMany(this.mongoDatabase, "trial", nctId);
-                if (!isDeletedTrialMatch) {
-                    log.warn("Delete the trial related matched record in MongoDB failed!");
-                }
-                if (!isDeletedTrial) {
-                    log.warn("Delete the trial in MongoDB failed!");
-                }
-                return new ResponseEntity<>(HttpStatus.OK);
+        if (valid) {
+            // check if MatchEngine is accessible.
+            if (this.matchenginePath == null || this.matchenginePath.length() == 0) {
+                log.error("Cannot' find matchminer-engine path!");
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-            if (curationStatus.equals("Completed")) {
-                File tempFile = File.createTempFile("trial", ".json");
-                String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
-
-                ProcessBuilder pb = new ProcessBuilder("python", this.matchenginePath + "/matchengine.py",
-                    "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", mongoUri);
-                Boolean isLoad = PythonUtil.runPythonScript(pb);
-                tempFile.delete();
-
-                if(!isLoad) {
-                    log.error("Load trial json temp file failed!");
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                } else {
-                    log.info("Updated trial nct_id: " + nctId);
-
-                    Boolean isDeleted = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
-                    if (!isDeleted) {
+            try {
+                String mongoUri = MongoUtil.getPureMongoUri(this.uri);
+                ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+                String json = ow.writeValueAsString(trial);
+                JSONObject trialObj = new JSONObject(json);
+                String nctId = trialObj.get("nct_id").toString();
+                String archived = trialObj.get("archived").toString();
+                String curationStatus = trialObj.get("curation_status").toString();
+                // Archived trials have to be deleted in Mongo DB.
+                if (archived.equals("Yes")) {
+                    Boolean isDeletedTrialMatch = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
+                    Boolean isDeletedTrial = MongoUtil.deleteMany(this.mongoDatabase, "trial", nctId);
+                    if (!isDeletedTrialMatch) {
                         log.warn("Delete the trial related matched record in MongoDB failed!");
                     }
+                    if (!isDeletedTrial) {
+                        log.warn("Delete the trial in MongoDB failed!");
+                    }
+                    return new ResponseEntity<>(HttpStatus.OK);
                 }
+
+                if (curationStatus.equals("Completed")) {
+                    File tempFile = File.createTempFile("trial", ".json");
+                    String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
+
+                    ProcessBuilder pb = new ProcessBuilder("python", this.matchenginePath + "/matchengine.py",
+                        "load", "-t", trialPath, "--trial-format", "json", "--mongo-uri", mongoUri);
+                    Boolean isLoad = PythonUtil.runPythonScript(pb);
+                    tempFile.delete();
+
+                    if (!isLoad) {
+                        log.error("Load trial json temp file failed!");
+                        throw new Exception();
+                    } else {
+                        log.info("Updated trial nct_id: " + nctId);
+
+                        Boolean isDeleted = MongoUtil.deleteMany(this.mongoDatabase, "trial_match", nctId);
+                        if (!isDeleted) {
+                            log.warn("Delete the trial related matched record in MongoDB failed!");
+                            throw new Exception();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<String> getTrialById(@ApiParam(value = "Search by NCT ID.",required=true )
-                                                 @PathVariable("id") String id) {
-        String response = HttpUtil.getRequest("https://" + firebaseProjectId +
-            ".firebaseio.com/Trials/" + id + ".json?access_token=" + firebaseToken, true);
-        if (response == null) {
-            return new ResponseEntity<>("Sorry, some issues happened in backend.", HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> getTrialById(@ApiParam(value = "Search by NCT ID.", required = true)
+                                               @PathVariable("id") String id,
+                                               @ApiParam(value = "Access token.") @RequestParam(value = "token", required = false) String token) {
+        boolean valid = true;
+        if (this.webtokenService.isWebtokenEnabled()) {
+            valid = this.webtokenService.isValidToken(token);
         }
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        if (valid) {
+            String response = HttpUtil.getRequest("https://" + firebaseProjectId +
+                ".firebaseio.com/Trials/" + id + ".json?access_token=" + firebaseToken, true);
+            if (response == null) {
+                return new ResponseEntity<>("Sorry, some issues happened in backend.", HttpStatus.INTERNAL_SERVER_ERROR);
+            } else if (response.equals("null")) {
+                return new ResponseEntity<>("Trial is not available.", HttpStatus.NOT_FOUND);
+            } else {
+                JSONObject trialObj = new JSONObject(response);
+                String curationStatus = trialObj.has("curation_status") ? trialObj.get("curation_status").toString() : null;
+                if (curationStatus == null || !curationStatus.equals(ALLOWED_TRIAL_STATUS)) {
+                    return new ResponseEntity<>("Trial is not available.", HttpStatus.NOT_FOUND);
+                }
+            }
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @Override
     public ResponseEntity<String> getTrialsData(@ApiParam(value = "Size of results.") @RequestParam(value = "size", required = false) String size,
-                                              @ApiParam(value = "Search by trial status.") @RequestParam(value = "trialStatus", required = false) String trialStatus) throws InterruptedException  {
-        int sizeInt = 0;
-        if (size != null && size.length() > 0) {
-            sizeInt = Integer.parseInt(size);
+                                                @ApiParam(value = "Access token.") @RequestParam(value = "token", required = false) String token) throws InterruptedException {
+        boolean valid = true;
+        if (this.webtokenService.isWebtokenEnabled()) {
+            valid = this.webtokenService.isValidToken(token);
         }
-        String response;
-        if (trialStatus != null && trialStatus.length() > 0) {
+        if (valid) {
+            int sizeInt = 0;
+            if (size != null && size.length() > 0) {
+                sizeInt = Integer.parseInt(size);
+            }
+            String response;
             if (sizeInt > 0) {
                 response = HttpUtil.getRequest("https://" + firebaseProjectId +
-                    ".firebaseio.com/Trials.json?access_token=" + firebaseToken +
-                    "&orderBy=\"status\"&equalTo=\"" + trialStatus.replaceAll(" ", "+") + "\"&limitToFirst=" + sizeInt, true);
+                    ".firebaseio.com/Trials.json?access_token=" + firebaseToken + "&orderBy=\"curation_status\"&equalTo=\""
+                    + ALLOWED_TRIAL_STATUS.replaceAll(" ", "+") + "\"&limitToFirst=" + sizeInt, true);
             } else {
                 response = HttpUtil.getRequest("https://" + firebaseProjectId +
-                    ".firebaseio.com/Trials.json?access_token=" + firebaseToken +
-                    "&orderBy=\"status\"&equalTo=\"" + trialStatus.replaceAll(" ", "+") + "\"", true);
+                    ".firebaseio.com/Trials.json?access_token=" + firebaseToken + "&orderBy=\"curation_status\"&equalTo=\""
+                    + ALLOWED_TRIAL_STATUS.replaceAll(" ", "+") + "\"", true);
             }
-        } else if (sizeInt > 0) {
-            response = HttpUtil.getRequest("https://" + firebaseProjectId +
-                ".firebaseio.com/Trials.json?access_token=" + firebaseToken + "&orderBy=\"$key\"&limitToFirst=" + sizeInt, true);
+
+            if (response == null) {
+                return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
+            } else if (response.equals("null")) {
+                return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            response = HttpUtil.getRequest("https://" + firebaseProjectId +
-                ".firebaseio.com/Trials.json?access_token=" + firebaseToken, true);
+            return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
         }
-
-        if (response == null) {
-            return new ResponseEntity<>("Sorry, some issues happened in backend.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

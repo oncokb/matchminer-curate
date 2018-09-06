@@ -291,12 +291,13 @@
             <artifactId>spring-security-data</artifactId>
         </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
+
+        <!-- Firebase Java SDK -->
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>6.1.0</version>
+            <version>6.4.0</version>
         </dependency>
-        <!-- Firebase Java SDK -->
     </dependencies>
 
     <build>

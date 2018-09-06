@@ -99,5 +99,8 @@ jhipster:
 # ===================================================================
 
 application:
+    webtoken:
+        enabled:
+        whitelist:
     matchengine:
         path:
