@@ -16,34 +16,37 @@ import javax.validation.Valid;
 @Api(value = "trials", description = "the trials API")
 public interface TrialsApi {
 
-    @ApiOperation(value = "", notes = "Load trial data into Mongo DB.", response = Void.class, tags={  })
+    @ApiOperation(value = "", notes = "Load trial data into Mongo DB.", response = Void.class, tags = {})
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Load to Mongo DB successfully.", response = Void.class),
-        @ApiResponse(code = 500, message = "Load the trial failed!", response = Void.class) })
+        @ApiResponse(code = 500, message = "Load the trial failed!", response = Void.class)})
 
     @RequestMapping(value = "/trials/create",
-        consumes = { "application/json" },
+        consumes = {"application/json"},
         method = RequestMethod.POST)
-    public ResponseEntity<Void> create(@ApiParam(value = "a trial json object " ,required=true )  @Valid @RequestBody Object trial);
+    public ResponseEntity<Void> create(@ApiParam(value = "a trial json object ", required = true) @Valid @RequestBody Object trial,
+                                       @ApiParam(value = "Access token.") @RequestParam(value = "token", required = false) String token);
 
-    @ApiOperation(value = "", notes = "Get trial json data by nct_id.", response = Void.class, tags={  })
+    @ApiOperation(value = "", notes = "Get trial json data by nct_id.", response = Void.class, tags = {})
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Return trials successfully.", response = Void.class),
-        @ApiResponse(code = 500, message = "Exception occured at the backend.", response = Void.class) })
+        @ApiResponse(code = 500, message = "Exception occured at the backend.", response = Void.class)})
 
     @RequestMapping(value = "/trials/{id}",
-        produces = { "application/json" },
+        produces = {"application/json"},
         method = RequestMethod.GET)
-    public ResponseEntity<String> getTrialById(@ApiParam(value = "Search by NCT ID.",required=true ) @PathVariable("id") String id);
+    public ResponseEntity<String> getTrialById(@ApiParam(value = "Search by NCT ID.", required = true) @PathVariable("id") String id,
+                                               @ApiParam(value = "Access token.") @RequestParam(value = "token", required = false) String token);
 
 
-    @ApiOperation(value = "", notes = "Get trial json data.", response = Void.class, tags={  })
+    @ApiOperation(value = "", notes = "Get trial json data.", response = Void.class, tags = {})
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Return trials successfully.", response = Void.class),
-        @ApiResponse(code = 500, message = "Exception occured at the backend.", response = Void.class) })
+        @ApiResponse(code = 500, message = "Exception occured at the backend.", response = Void.class)})
 
     @RequestMapping(value = "/trials",
-        produces = { "application/json" },
+        produces = {"application/json"},
         method = RequestMethod.GET)
-    public ResponseEntity<String> getTrialsData(@ApiParam(value = "Size of results.") @RequestParam(value = "size", required = false) String size, @ApiParam(value = "Search by trial status.") @RequestParam(value = "trialStatus", required = false) String trialStatus) throws InterruptedException;
+    public ResponseEntity<String> getTrialsData(@ApiParam(value = "Size of results.") @RequestParam(value = "size", required = false) String size
+        , @ApiParam(value = "Access token.") @RequestParam(value = "token", required = false) String token) throws InterruptedException;
 }
