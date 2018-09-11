@@ -163,7 +163,6 @@ export class TrialService {
                 germline: '',
                 no_hugo_symbol: false,
                 no_annotated_variant: false,
-                no_germline: false
             };
         } else {
             genomicInput = {
@@ -180,7 +179,6 @@ export class TrialService {
                 wildtype: '',
                 no_hugo_symbol: false,
                 no_annotated_variant: false,
-                no_germline: false,
                 no_protein_change: false,
                 no_wildcard_protein_change: false,
                 no_variant_classification: false,

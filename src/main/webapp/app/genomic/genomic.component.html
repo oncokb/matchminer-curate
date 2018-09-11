@@ -31,13 +31,16 @@
             </div>
         </div>
         <div class="row borderMargin">
-            <div class="col-sm-3">germline:</div>
-            <div class="col-sm-1">
-                <label for="no_germline">Not</label>
-                <input id="no_germline" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_germline" />
-            </div>
+            <div class="col-sm-4">germline:</div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.germline"/>
+                <span id="germline1">
+                    <label for="germline1-true">
+                        <input id="germline1-true" type="radio" value="true" name="germline" [(ngModel)]="genomicInput.germline" (click)="unCheckRadio('germline', $event)">true
+                    </label>
+                    <label for="germline1-false">
+                        <input id="germline1-false" type="radio" value="false" name="germline" [(ngModel)]="genomicInput.germline" (click)="unCheckRadio('germline', $event)">false
+                    </label>
+                </span>
             </div>
         </div>
         <div *ngIf="!oncokb">
@@ -112,10 +115,10 @@
                 <div class="col-sm-8">
                     <span id="wildtype">
                         <label for="wildtype-true">
-                            <input id="wildtype-true" type="radio" value="true" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio($event)">true
+                            <input id="wildtype-true" type="radio" value="true" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio('wildtype', $event)">true
                         </label>
                         <label for="wildtype-false">
-                            <input id="wildtype-false" type="radio" value="false" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio($event)">false
+                            <input id="wildtype-false" type="radio" value="false" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio('wildtype', $event)">false
                         </label>
                     </span>
                 </div>
@@ -193,13 +196,16 @@
             </div>
         </div>
         <div class="row borderMargin">
-            <div class="col-sm-3">germline:</div>
-            <div class="col-sm-1">
-                <label for="no_germline2">Not</label>
-                <input id="no_germline2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_germline" />
-            </div>
+            <div class="col-sm-4">germline:</div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.germline"/>
+                <span id="germline2">
+                    <label for="germline2-true">
+                        <input id="germline2-true" type="radio" value="true" name="germline" [(ngModel)]="genomicInput.germline" (click)="unCheckRadio('germline', $event)">true
+                    </label>
+                    <label for="germline2-false">
+                        <input id="germline2-false" type="radio" value="false" name="germline" [(ngModel)]="genomicInput.germline" (click)="unCheckRadio('germline', $event)">false
+                    </label>
+                </span>
             </div>
         </div>
         <div *ngIf="!oncokb">
@@ -272,10 +278,10 @@
                 <div class="col-sm-8">
                     <span id="wildtype">
                         <label for="wildtype-true">
-                            <input id="wildtype-true" type="radio" value="true" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio($event)">true
+                            <input id="wildtype-true" type="radio" value="true" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio('wildtype', $event)">true
                         </label>
                         <label for="wildtype-false">
-                            <input id="wildtype-false" type="radio" value="false" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio($event)">false
+                            <input id="wildtype-false" type="radio" value="false" name="wildtype" [(ngModel)]="genomicInput.wildtype" (click)="unCheckRadio('wildtype', $event)">false
                         </label>
                     </span>
                 </div>
@@ -350,7 +356,7 @@
                         <label>germline: </label>
                     </div>
                     <div class="col-sm-8">
-                        <span>{{getDisplayContent('germline')}}</span>
+                        <span>{{unit.genomic.germline}}</span>
                     </div>
                 </div>
             </div>

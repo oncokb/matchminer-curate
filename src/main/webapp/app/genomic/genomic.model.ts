@@ -16,7 +16,6 @@ export interface Genomic {
     mmr_status?: string,
     no_hugo_symbol?: boolean,
     no_annotated_variant?: boolean,
-    no_germline?: boolean,
     no_protein_change?: boolean,
     no_wildcard_protein_change?: boolean,
     no_variant_classification?: boolean,
