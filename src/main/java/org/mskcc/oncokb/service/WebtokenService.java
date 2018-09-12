@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service class for managing users.
+ * Service class for managing web tokens.
+ *
+ * @Author Hongxin hang
  */
 @Service
 public class WebtokenService {

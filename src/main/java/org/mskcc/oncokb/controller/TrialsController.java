@@ -6,6 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import io.swagger.annotations.ApiParam;
 import org.json.JSONObject;
 import org.mskcc.oncokb.controller.api.TrialsApi;
+import org.mskcc.oncokb.service.FirebaseService;
 import org.mskcc.oncokb.service.WebtokenService;
 import org.mskcc.oncokb.service.util.FileUtil;
 import org.mskcc.oncokb.service.util.HttpUtil;
@@ -40,10 +41,9 @@ public class TrialsController implements TrialsApi {
     private String matchenginePath;
     @Autowired
     private MongoDatabase mongoDatabase;
+
     @Autowired
-    private String firebaseToken;
-    @Autowired
-    private String firebaseProjectId;
+    private FirebaseService firebaseService;
 
     @Autowired
     private WebtokenService webtokenService;
@@ -125,20 +125,24 @@ public class TrialsController implements TrialsApi {
             valid = this.webtokenService.isValidToken(token);
         }
         if (valid) {
-            String response = HttpUtil.getRequest("https://" + firebaseProjectId +
-                ".firebaseio.com/Trials/" + id + ".json?access_token=" + firebaseToken, true);
-            if (response == null) {
-                return new ResponseEntity<>("Sorry, some issues happened in backend.", HttpStatus.INTERNAL_SERVER_ERROR);
-            } else if (response.equals("null")) {
-                return new ResponseEntity<>("Trial is not available.", HttpStatus.NOT_FOUND);
-            } else {
-                JSONObject trialObj = new JSONObject(response);
-                String curationStatus = trialObj.has("curation_status") ? trialObj.get("curation_status").toString() : null;
-                if (curationStatus == null || !curationStatus.equals(ALLOWED_TRIAL_STATUS)) {
+            try {
+                String response = HttpUtil.getRequest("https://" + firebaseService.getFirebaseProjectId() +
+                    ".firebaseio.com/Trials/" + id + ".json?access_token=" + firebaseService.getFirebaseToken(), true);
+                if (response == null) {
+                    return new ResponseEntity<>("Sorry, some issues happened in backend.", HttpStatus.INTERNAL_SERVER_ERROR);
+                } else if (response.equals("null")) {
                     return new ResponseEntity<>("Trial is not available.", HttpStatus.NOT_FOUND);
+                } else {
+                    JSONObject trialObj = new JSONObject(response);
+                    String curationStatus = trialObj.has("curation_status") ? trialObj.get("curation_status").toString() : null;
+                    if (curationStatus == null || !curationStatus.equals(ALLOWED_TRIAL_STATUS)) {
+                        return new ResponseEntity<>("Trial is not available.", HttpStatus.NOT_FOUND);
+                    }
                 }
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }catch (Exception e) {
+                return new ResponseEntity<>("", HttpStatus.SERVICE_UNAVAILABLE);
             }
-            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
         }
@@ -157,22 +161,26 @@ public class TrialsController implements TrialsApi {
                 sizeInt = Integer.parseInt(size);
             }
             String response;
-            if (sizeInt > 0) {
-                response = HttpUtil.getRequest("https://" + firebaseProjectId +
-                    ".firebaseio.com/Trials.json?access_token=" + firebaseToken + "&orderBy=\"curation_status\"&equalTo=\""
-                    + ALLOWED_TRIAL_STATUS.replaceAll(" ", "+") + "\"&limitToFirst=" + sizeInt, true);
-            } else {
-                response = HttpUtil.getRequest("https://" + firebaseProjectId +
-                    ".firebaseio.com/Trials.json?access_token=" + firebaseToken + "&orderBy=\"curation_status\"&equalTo=\""
-                    + ALLOWED_TRIAL_STATUS.replaceAll(" ", "+") + "\"", true);
-            }
+            try {
+                if (sizeInt > 0) {
+                    response = HttpUtil.getRequest("https://" + firebaseService.getFirebaseProjectId() +
+                        ".firebaseio.com/Trials.json?access_token=" + firebaseService.getFirebaseToken() + "&orderBy=\"curation_status\"&equalTo=\""
+                        + ALLOWED_TRIAL_STATUS.replaceAll(" ", "+") + "\"&limitToFirst=" + sizeInt, true);
+                } else {
+                    response = HttpUtil.getRequest("https://" + firebaseService.getFirebaseProjectId() +
+                        ".firebaseio.com/Trials.json?access_token=" + firebaseService.getFirebaseToken() + "&orderBy=\"curation_status\"&equalTo=\""
+                        + ALLOWED_TRIAL_STATUS.replaceAll(" ", "+") + "\"", true);
+                }
 
-            if (response == null) {
-                return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
-            } else if (response.equals("null")) {
-                return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+                if (response == null) {
+                    return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
+                } else if (response.equals("null")) {
+                    return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+                }
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }catch (Exception e) {
+                return new ResponseEntity<>("", HttpStatus.SERVICE_UNAVAILABLE);
             }
-            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
         }
