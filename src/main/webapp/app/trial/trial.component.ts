@@ -277,7 +277,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             if (result) {
                 this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( {protocol_no: this.trialChosen['protocol_no']} )
                 .then((res) => {
-                    this.protocolNoMessage.content = 'Update Protocol No successfully.';
+                    this.protocolNoMessage.content = 'Update Protocol No. successfully.';
                     this.protocolNoMessage.color = 'green';
                 })
                 .catch( ( error ) => {
