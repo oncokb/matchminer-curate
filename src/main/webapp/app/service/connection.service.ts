@@ -24,6 +24,8 @@ export class ConnectionService {
                     return 'http://mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
                     return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
+                case 'MskTrials':
+                    return 'https://discover.mskcc.org:443/api/trials/';
                 case 'ExampleValidation':
                     return 'http://oncokb.org/api/v1/utils/match/variant?';
             }
@@ -39,6 +41,8 @@ export class ConnectionService {
                     return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
                     return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
+                case 'MskTrials':
+                    return SERVER_API_URL + 'proxy/https/discover.mskcc.org:443/api/trials/';
                 case 'ExampleValidation':
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
             }
@@ -55,6 +59,10 @@ export class ConnectionService {
 
     importTrials(tempTrial: string) {
         return this.http.get(this.getAPIUrl('ClinicalTrials') + tempTrial);
+    }
+
+    getTrialByProtocolNo(protocolNo: string) {
+        return this.http.get(this.getAPIUrl('MskTrials') + protocolNo);
     }
 
     getMainType() {

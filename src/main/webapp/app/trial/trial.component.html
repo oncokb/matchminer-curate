@@ -1,6 +1,6 @@
 <div class="container curation-container-height">
     <div class="input-group">
-        <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Enter trial in the format: NCT02057133, NCT03006172"
+        <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Enter trial in the format: NCT02057133 or 14-085"
             size="100">
         <span class="input-group-btn">
             <button class="btn btn-primary" [disabled]="!trialsToImport" (click)="importTrials()">Import New Trials</button>
@@ -30,6 +30,7 @@
         <thead>
           <tr>
             <th>NCT ID</th>
+            <th>Protocol No</th>
             <th>Status</th>
             <th>Title</th>
             <th>Curation Status</th>
@@ -39,6 +40,7 @@
         <tbody>
           <tr *ngFor="let trial of trialList">
             <td><a (click)="curateTrial(trial.nct_id)">{{ trial.nct_id }}</a></td>
+            <td>{{ trial.protocol_no }}</a></td>
             <td>{{ trial.status }}</td>
             <td>{{ trial.short_title }}</td>
             <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
@@ -74,6 +76,11 @@
             <label for="nctId">NCT ID: </label>
             <span id="nctId" class="noteEdit">
                 <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{trialChosen.nct_id}}">{{ trialChosen.nct_id }}</a>
+            </span>
+            <br/>
+            <label for="protocolNo">Protocol No: </label>
+            <span id="protocolNo" class="noteEdit">
+                <input [(ngModel)]="trialChosen.protocol_no" (blur)="updateProtocolNo()"/>
             </span>
             <!--<button class="btn btn-primary" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" (click)="loadMongo()" class="noteEdit">Finish Curation</button>-->
             <!--<span class="load-span" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" [style.color]="mongoMessage.color"> {{mongoMessage.content}} </span>-->

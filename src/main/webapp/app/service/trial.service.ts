@@ -80,7 +80,7 @@ export class TrialService {
     subToMainMapping = {};
     mainTypesOptions = ['All Solid Tumors', 'All Liquid Tumors', 'All Tumors', 'All Pediatric Tumors'];
     statusOptions = ['Active', 'Administratively Complete', 'Approved', 'Closed to Accrual', 'Closed to Accrual and Intervention',
-    'Complete', 'Enrolling by Invitation', 'In Review', 'Temporarily Closed to Accrual', 'Temporarily Closed to Accrual and Intervention',
+    'Complete', 'Enrolling by Invitation', 'In Review', 'Open to Accrual', 'Temporarily Closed to Accrual', 'Temporarily Closed to Accrual and Intervention',
     'Withdrawn'];
     annotated_variants = {};
     trialList: Array<Trial> = [];
@@ -204,6 +204,7 @@ export class TrialService {
             curation_status: '',
             archived: '',
             nct_id: '',
+            protocol_no: '',
             long_title: '',
             short_title: '',
             phase: '',
