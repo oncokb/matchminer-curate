@@ -37,8 +37,12 @@ export class TrialComponent implements OnInit, AfterViewInit {
     dtTrigger: Subject<any> = new Subject();
     hideArchived = 'Yes';
     statusOptions = this.trialService.getStatusOptions();
-    originalTrialStatus = '';
+    originalTrial = {};
     isPermitted = this.trialService.isPermitted;
+    protocolNoMessage = {
+        content: '',
+        color: ''
+    };
     mongoMessage = {
         content: '',
         color: ''
@@ -83,15 +87,12 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.messages = [];
         this.mongoMessage.content = '';
         const newTrials: Array<string> = this.trialsToImport.split( ',' );
-        let setChosenTrial = false;
         let result = true;
+        let nctId = '';
+        let protocolNo = '';
         for ( const newTrial of newTrials ) {
             const tempTrial = newTrial.trim();
             if ( tempTrial.length === 0 ) {
-                continue;
-            }
-            if ( ! tempTrial.match( /NCT[0-9]+/g ) ) {
-                this.messages.push( tempTrial + ' is invalid trial format' );
                 continue;
             }
             if ( this.nctIdList.indexOf( tempTrial ) !== - 1 ) {
@@ -101,49 +102,69 @@ export class TrialComponent implements OnInit, AfterViewInit {
             if ( ! result ) {
                 continue;
             }
-            this.connectionService.importTrials( tempTrial ).subscribe( ( res ) => {
-                const trialInfo = res;
-                const armsInfo: any = [];
-                _.each( trialInfo[ 'arms' ], function( arm ) {
-                    if ( arm.arm_description !== null ) {
-                        armsInfo.push( {
-                            arm_description: arm.arm_name,
-                            arm_info: arm.arm_description,
-                            match: []
-                        } );
-                    }
-                } );
-                const trial: Trial = {
-                    curation_status: 'In progress',
-                    archived: 'No',
-                    nct_id: trialInfo[ 'nct_id' ],
-                    long_title: trialInfo[ 'official_title' ],
-                    short_title: trialInfo[ 'brief_title' ],
-                    phase: trialInfo[ 'phase' ][ 'phase' ],
-                    status: trialInfo[ 'current_trial_status' ],
-                    treatment_list: {
-                        step: [ {
-                            arm: armsInfo,
-                            match: []
-                        } ]
-                    }
-                };
-                this.db.object( 'Trials/' + trialInfo[ 'nct_id' ] ).set( trial ).then( ( response ) => {
-                    this.messages.push( 'Successfully imported ' + trialInfo[ 'nct_id' ] );
-                    if ( setChosenTrial === false ) {
-                        this.nctIdChosen = trialInfo[ 'nct_id' ];
-                        this.trialService.setTrialChosen( this.nctIdChosen );
-                        this.originalTrialStatus = this.trialChosen[ 'status' ];
-                        setChosenTrial = true;
-                    }
-                } ).catch( ( error ) => {
-                    this.messages.push( 'Fail to save to database ' + tempTrial );
-                } );
-            }, ( error ) => {
-                this.messages.push( tempTrial + ' not found' );
-            } );
+            if ( tempTrial.match( /NCT[0-9]+/g ) ) {
+                nctId = tempTrial;
+                this.importTrialsFromNct(nctId, '');
+            } else if ( tempTrial.match( /^\d+-\d+$/g ) ) {
+                this.connectionService.getTrialByProtocolNo( tempTrial ).subscribe( ( res ) => {
+                    protocolNo = res['msk_id'];
+                    nctId = res['tds_data']['nct_id'];
+                    this.importTrialsFromNct(nctId, protocolNo);
+                }, ( error ) => {
+                    this.messages.push( tempTrial + ' not found' );
+                });
+            } else {
+                this.messages.push( tempTrial + ' is invalid trial format' );
+                continue;
+            }
         }
         this.trialsToImport = '';
+    }
+
+    importTrialsFromNct(nctId: string, protocolNo: string) {
+        let setChosenTrial = false;
+        this.connectionService.importTrials( nctId ).subscribe( ( res ) => {
+            const trialInfo = res;
+            const armsInfo: any = [];
+            _.each( trialInfo[ 'arms' ], function( arm ) {
+                if ( arm.arm_description !== null ) {
+                    armsInfo.push( {
+                        arm_description: arm.arm_name,
+                        arm_info: arm.arm_description,
+                        match: []
+                    } );
+                }
+            } );
+            const trial: Trial = {
+                curation_status: 'In progress',
+                archived: 'No',
+                protocol_no: protocolNo,
+                nct_id: trialInfo[ 'nct_id' ],
+                long_title: trialInfo[ 'official_title' ],
+                short_title: trialInfo[ 'brief_title' ],
+                phase: trialInfo[ 'phase' ][ 'phase' ],
+                status: trialInfo[ 'current_trial_status' ],
+                treatment_list: {
+                    step: [ {
+                        arm: armsInfo,
+                        match: []
+                    } ]
+                }
+            };
+            this.db.object( 'Trials/' + trialInfo[ 'nct_id' ] ).set( trial ).then( ( response ) => {
+                this.messages.push( 'Successfully imported ' + trialInfo[ 'nct_id' ] );
+                if ( setChosenTrial === false ) {
+                    this.nctIdChosen = trialInfo[ 'nct_id' ];
+                    this.trialService.setTrialChosen( this.nctIdChosen );
+                    this.originalTrial = _.clone(this.trialChosen);
+                    setChosenTrial = true;
+                }
+            } ).catch( ( error ) => {
+                this.messages.push( 'Fail to save to database ' + nctId );
+            } );
+        }, ( error ) => {
+            this.messages.push( nctId + ' not found' );
+        } );
     }
     updateStatus( type: string ) {
         if ( type === 'curation' ) {
@@ -176,7 +197,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.clearAdditional();
         this.trialService.setTrialChosen( nctId );
         this.trialService.setAdditionalChosen( nctId );
-        this.originalTrialStatus = this.trialChosen[ 'status' ];
+        this.originalTrial = _.clone(this.trialChosen);
         document.querySelector( '#trialDetail' ).scrollIntoView();
     }
     clearAdditional() {
@@ -207,7 +228,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
     }
     updateTrialStatusInDB() {
-        if ( this.originalTrialStatus !== this.trialChosen[ 'status' ] ) {
+        if ( this.originalTrial['status'] !== this.trialChosen[ 'status' ] ) {
             this.trialService.getRef( 'Trials/' + this.nctIdChosen + '/status' ).set( this.trialChosen[ 'status' ] ).then( ( result ) => {
                 console.log( 'Save to DB Successfully!' );
             } ).catch( ( error ) => {
@@ -217,15 +238,15 @@ export class TrialComponent implements OnInit, AfterViewInit {
                     errorMessage,
                     {
                         nctId: this.trialChosen[ 'nct_id' ],
-                        oldContent: 'trial status: ' + this.originalTrialStatus,
+                        oldContent: 'trial status: ' + this.originalTrial[ 'status' ],
                         newContent: 'trial status: ' + this.trialChosen[ 'status' ]
                     },
                     error
                 );
                 alert( errorMessage );
                 // Rollback the trial status in ng-select option
-                this.selectModel.reset( this.originalTrialStatus );
-                this.trialChosen[ 'status' ] = this.originalTrialStatus;
+                this.selectModel.reset( this.originalTrial[ 'status' ] );
+                this.trialChosen[ 'status' ] = this.originalTrial[ 'status' ];
             } );
         }
     }
@@ -249,6 +270,33 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
     cancelUpdateNote() {
         this.noteEditable = false;
+    }
+    updateProtocolNo() {
+        if ( this.trialChosen['protocol_no'].match( /^\d+-\d+$/g ) ) {
+            const result = confirm('Are you sure to update Protocol No. to ' + this.trialChosen['protocol_no'] + '?');
+            if (result) {
+                this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( {protocol_no: this.trialChosen['protocol_no']} )
+                .then((res) => {
+                    this.protocolNoMessage.content = 'Update Protocol No. successfully.';
+                    this.protocolNoMessage.color = 'green';
+                })
+                .catch( ( error ) => {
+                    this.protocolNoMessage.content = 'Failed to update Protocol No.';
+                    this.protocolNoMessage.color = 'red';
+                    this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
+                } );
+            }
+        } else {
+            this.protocolNoMessage.content = 'Protocol No. should follow the format: number-number.';
+            this.protocolNoMessage.color = 'red';
+            this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
+        }
+    }
+    clearMessage(type: string) {
+        if (type === 'protocol_no') {
+            this.protocolNoMessage.content = '';
+            this.protocolNoMessage.color = '';
+        }
     }
     loadMongo() {
         this.mongoMessage.content = 'Loading the trial ......';
