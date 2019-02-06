@@ -80,7 +80,8 @@
             <br/>
             <label for="protocolNo">Protocol No: </label>
             <span id="protocolNo" class="noteEdit">
-                <input [(ngModel)]="trialChosen.protocol_no" (blur)="updateProtocolNo()"/>
+                <input [(ngModel)]="trialChosen.protocol_no" (blur)="updateProtocolNo()" (keypress)="clearMessage('protocol_no')"/>
+                <span *ngIf="protocolNoMessage.content" class="load-span" [style.color]="protocolNoMessage.color"> {{protocolNoMessage.content}} </span>
             </span>
             <!--<button class="btn btn-primary" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" (click)="loadMongo()" class="noteEdit">Finish Curation</button>-->
             <!--<span class="load-span" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" [style.color]="mongoMessage.color"> {{mongoMessage.content}} </span>-->

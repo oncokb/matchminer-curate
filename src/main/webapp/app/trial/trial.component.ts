@@ -39,6 +39,10 @@ export class TrialComponent implements OnInit, AfterViewInit {
     statusOptions = this.trialService.getStatusOptions();
     originalTrial = {};
     isPermitted = this.trialService.isPermitted;
+    protocolNoMessage = {
+        content: '',
+        color: ''
+    };
     mongoMessage = {
         content: '',
         color: ''
@@ -268,18 +272,30 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.noteEditable = false;
     }
     updateProtocolNo() {
-        if ( this.trialChosen['protocol_no'].match( /[0-9]+-[0-9]+/g ) ) {
+        if ( this.trialChosen['protocol_no'].match( /^\d+-\d+$/g ) ) {
             const result = confirm('Are you sure to update Protocol No to ' + this.trialChosen['protocol_no'] + '?');
             if (result) {
                 this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( {protocol_no: this.trialChosen['protocol_no']} )
-                .then()
+                .then((res) => {
+                    this.protocolNoMessage.content = 'Update Protocol No successfully.';
+                    this.protocolNoMessage.color = 'green';
+                })
                 .catch( ( error ) => {
+                    this.protocolNoMessage.content = 'Failed to update Protocol No.';
+                    this.protocolNoMessage.color = 'red';
                     this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
                 } );
             }
         } else {
-            alert('Sorry, Protocol No should follow the format: number-number.');
+            this.protocolNoMessage.content = 'Protocol No should follow the format: number-number.';
+            this.protocolNoMessage.color = 'red';
             this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
+        }
+    }
+    clearMessage(type: string) {
+        if (type === 'protocol_no') {
+            this.protocolNoMessage.content = '';
+            this.protocolNoMessage.color = '';
         }
     }
     loadMongo() {
