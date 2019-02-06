@@ -105,7 +105,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             if ( tempTrial.match( /NCT[0-9]+/g ) ) {
                 nctId = tempTrial;
                 this.importTrialsFromNct(nctId, '');
-            } else if ( tempTrial.match( /[0-9]+-[0-9]+/g ) ) {
+            } else if ( tempTrial.match( /^\d+-\d+$/g ) ) {
                 this.connectionService.getTrialByProtocolNo( tempTrial ).subscribe( ( res ) => {
                     protocolNo = res['msk_id'];
                     nctId = res['tds_data']['nct_id'];
@@ -273,7 +273,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
     updateProtocolNo() {
         if ( this.trialChosen['protocol_no'].match( /^\d+-\d+$/g ) ) {
-            const result = confirm('Are you sure to update Protocol No to ' + this.trialChosen['protocol_no'] + '?');
+            const result = confirm('Are you sure to update Protocol No. to ' + this.trialChosen['protocol_no'] + '?');
             if (result) {
                 this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( {protocol_no: this.trialChosen['protocol_no']} )
                 .then((res) => {
@@ -287,7 +287,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 } );
             }
         } else {
-            this.protocolNoMessage.content = 'Protocol No should follow the format: number-number.';
+            this.protocolNoMessage.content = 'Protocol No. should follow the format: number-number.';
             this.protocolNoMessage.color = 'red';
             this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
         }
