@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ConverterComponent } from './converter/converter.component';
 import { errorRoute, navbarRoute } from './layouts';
 import { TrialComponent } from './trial/trial.component';
+import { DEBUG_INFO_ENABLED } from './app.constants';
 
 const LAYOUT_ROUTES: Routes = [
     navbarRoute,
@@ -14,7 +15,7 @@ const LAYOUT_ROUTES: Routes = [
 
 @NgModule({
     imports: [
-        RouterModule.forRoot(LAYOUT_ROUTES, { useHash: true })
+        RouterModule.forRoot(LAYOUT_ROUTES, { useHash: true , enableTracing: DEBUG_INFO_ENABLED })
     ],
     exports: [
         RouterModule

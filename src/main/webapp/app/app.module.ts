@@ -1,17 +1,21 @@
 import './vendor.ts';
 
-import { NgModule } from '@angular/core';
+import { NgModule, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Ng2Webstorage } from 'ngx-webstorage';
 import { DataTablesModule } from 'angular-datatables';
+import { JhiEventManager } from 'ng-jhipster';
 
+import { AuthExpiredInterceptor } from './blocks/interceptor/auth-expired.interceptor';
+import { ErrorHandlerInterceptor } from './blocks/interceptor/errorhandler.interceptor';
+import { NotificationInterceptor } from './blocks/interceptor/notification.interceptor';
 import { MatchminerCurateSharedModule, UserRouteAccessService } from './shared';
 import { MatchminerCurateAppRoutingModule} from './app-routing.module';
 import { MatchminerCurateHomeModule } from './home/home.module';
 import { MatchminerCurateAdminModule } from './admin/admin.module';
 import { MatchminerCurateAccountModule } from './account/account.module';
 import { MatchminerCurateEntityModule } from './entities/entity.module';
-import { customHttpProvider } from './blocks/interceptor/http.provider';
 import { PaginationConfig } from './blocks/config/uib-pagination.config';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -30,6 +34,8 @@ import { LoginComponent } from './login/login.component';
 
 import { TrialService } from './service/trial.service';
 import { environment } from './environments/environment';
+import { StateStorageService } from './shared/auth/state-storage.service';
+// jhipster-needle-angular-add-module-import JHipster will add new module here
 import {
     JhiMainComponent,
     NavbarComponent,
@@ -77,13 +83,38 @@ import { MainutilService } from './service/mainutil.service';
     ],
     providers: [
         ProfileService,
-        customHttpProvider(),
         PaginationConfig,
         UserRouteAccessService,
         TrialService,
         ConnectionService,
         EmailService,
-        MainutilService
+        MainutilService,
+        UserRouteAccessService,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthExpiredInterceptor,
+            multi: true,
+            deps: [
+                StateStorageService,
+                Injector
+            ]
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: ErrorHandlerInterceptor,
+            multi: true,
+            deps: [
+                JhiEventManager
+            ]
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: NotificationInterceptor,
+            multi: true,
+            deps: [
+                Injector
+            ]
+        }
     ],
     bootstrap: [ JhiMainComponent ]
 })

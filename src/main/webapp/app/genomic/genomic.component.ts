@@ -46,7 +46,7 @@ export class GenomicComponent implements OnInit {
         .map((term) => (term.length < 1 || _.isUndefined(this.annotated_variants[this.genomicInput.hugo_symbol])) ? []
             : this.annotated_variants[this.genomicInput.hugo_symbol]
             .filter((v) => v.toLowerCase().indexOf(term.split(',').slice(-1)[0].trim().toLowerCase()) > -1)
-            .slice(0, 10));
+            .slice(0, 10))
     selectAnnotatedVariant($event) {
         if (this.genomicInput.annotated_variant.includes(',')) {
             $event.preventDefault();

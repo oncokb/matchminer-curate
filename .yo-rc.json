@@ -3,13 +3,13 @@
     "promptValues": {
       "packageName": "org.mskcc.oncokb"
     },
-    "jhipsterVersion": "4.13.3",
+    "jhipsterVersion": "4.14.5",
     "baseName": "matchminerCurate",
     "packageName": "org.mskcc.oncokb",
     "packageFolder": "org/mskcc/oncokb",
     "serverPort": "8090",
     "authenticationType": "session",
-    "cacheProvider": "ehcache",
+    "cacheProvider": "no",
     "enableHibernateCache": false,
     "websocket": false,
     "databaseType": "mongodb",
@@ -28,6 +28,7 @@
     "applicationType": "monolith",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "enableTranslation": false
+    "enableTranslation": false,
+    "herokuDeployType": "jar"
   }
 }

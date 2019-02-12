@@ -47,7 +47,7 @@ export class TrialService {
     movingPath: MovingPath = {
         from: '',
         to: ''
-    }
+    };
     private movingPathSource = new BehaviorSubject<MovingPath>(this.movingPath);
     movingPathObs = this.movingPathSource.asObservable();
 
@@ -185,7 +185,7 @@ export class TrialService {
                 no_variant_category: false,
                 no_exon: false,
                 no_cnv_call: false
-            }
+            };
         }
         return genomicInput;
     }
@@ -264,7 +264,7 @@ export class TrialService {
                             arm:  [],
                             match: []
                         }]
-                    }
+                    };
                 } else {
                     if (_.isUndefined(trial['treatment_list'].step[0].arm)) {
                         trial['treatment_list'].step[0].arm = [];
