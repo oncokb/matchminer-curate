@@ -100,7 +100,7 @@ jhipster:
 
 application:
     webtoken:
-        enabled:
-        whitelist:
+        enabled: true
+        whitelist: src/main/resources/config/tokens
     matchengine:
         path:

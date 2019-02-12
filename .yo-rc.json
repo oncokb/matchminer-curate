@@ -9,7 +9,7 @@
     "packageFolder": "org/mskcc/oncokb",
     "serverPort": "8090",
     "authenticationType": "session",
-    "cacheProvider": "ehcache",
+    "cacheProvider": "no",
     "enableHibernateCache": false,
     "websocket": false,
     "databaseType": "mongodb",
@@ -28,6 +28,7 @@
     "applicationType": "monolith",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "enableTranslation": false
+    "enableTranslation": false,
+    "herokuDeployType": "jar"
   }
 }
