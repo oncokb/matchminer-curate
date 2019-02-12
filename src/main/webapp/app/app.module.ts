@@ -88,7 +88,7 @@ import { MainutilService } from './service/mainutil.service';
         TrialService,
         ConnectionService,
         EmailService,
-        MainutilService
+        MainutilService,
         UserRouteAccessService,
         {
             provide: HTTP_INTERCEPTORS,
