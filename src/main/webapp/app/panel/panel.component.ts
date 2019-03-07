@@ -655,7 +655,7 @@ export class PanelComponent implements OnInit {
             if (_.keys(item).indexOf('and') !== -1) {
                 this.removeOriginalNode(item['and']);
                 // After original node is removed, we should check if its parent node is empty.
-                // If yes, we should also remove its parent node. Other wise, the array index will be messed up in firebase.
+                // If yes, we should also remove its parent node. Otherwise, the array index will be messed up in firebase.
                 if (_.isEmpty(item['and'])) {
                     match.splice(match.indexOf(item), 1);
                 }
