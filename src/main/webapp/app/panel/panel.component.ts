@@ -654,13 +654,16 @@ export class PanelComponent implements OnInit {
         for (const item of match) {
             if (_.keys(item).indexOf('and') !== -1) {
                 this.removeOriginalNode(item['and']);
+                // After original node is removed, we should check if its parent node is empty.
+                // If yes, we should also remove its parent node. Other wise, the array index will be messed up in firebase.
+                if (_.isEmpty(item['and'])) {
+                    match.splice(match.indexOf(item), 1);
+                }
             } else if (_.keys(item).indexOf('or') !== -1) {
                 this.removeOriginalNode(item['or']);
-            }
-            // After original node is removed, we should check if its parent node is empty.
-            // If yes, we should also remove its parent node. Other wise, the array index will be messed up in firebase.
-            if (_.isEmpty(item['and']) || _.isEmpty(item['or'])) {
-                match.splice(match.indexOf(item), 1);
+                if (_.isEmpty(item['or'])) {
+                    match.splice(match.indexOf(item), 1);
+                }
             }
         }
     }
