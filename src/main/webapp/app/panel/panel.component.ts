@@ -657,6 +657,11 @@ export class PanelComponent implements OnInit {
             } else if (_.keys(item).indexOf('or') !== -1) {
                 this.removeOriginalNode(item['or']);
             }
+            // After original node is removed, we should check if its parent node is empty.
+            // If yes, we should also remove its parent node. Other wise, the array index will be messed up in firebase.
+            if (_.isEmpty(item['and']) || _.isEmpty(item['or'])) {
+                match.splice(match.indexOf(item), 1);
+            }
         }
     }
     isNestedInside(currentPath: string, destinationPath: string) {
