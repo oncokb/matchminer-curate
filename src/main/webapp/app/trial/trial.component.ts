@@ -85,7 +85,8 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
     importTrials() {
         this.messages = [];
-        this.mongoMessage.content = '';
+        // this.mongoMessage.content = '';
+        this.protocolNoMessage.content = '';
         const newTrials: Array<string> = this.trialsToImport.split( ',' );
         let result = true;
         let nctId = '';
@@ -193,7 +194,8 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
     }
     curateTrial( nctId: string ) {
-        this.mongoMessage.content = '';
+        // this.mongoMessage.content = '';
+        this.protocolNoMessage.content = '';
         this.clearAdditional();
         this.trialService.setTrialChosen( nctId );
         this.trialService.setAdditionalChosen( nctId );
