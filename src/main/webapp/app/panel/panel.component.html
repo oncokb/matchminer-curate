@@ -90,6 +90,16 @@
         <div *ngIf="oncokb">
             <div class="row arm-row">
                 <div class="col-md-2">
+                    <span>arm type: </span>
+                </div>
+                <div class="col-md-10">
+                    <label for="control-arm">
+                        <input id="control-arm" type="checkbox" name="armType" value="Control Arm" [(ngModel)]="armInput.arm_type" (change)="checkboxChange($event, armInput.arm_type)"/> Control Arm
+                    </label>
+                </div>
+            </div>
+            <div class="row arm-row">
+                <div class="col-md-2">
                     <label for="info">arm info: </label>
                 </div>
                 <div class="col-md-10">

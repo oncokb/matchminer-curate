@@ -31,5 +31,11 @@ export class ArmComponent implements OnInit {
             this.armInput.arm_suspended = '';
         }
     }
-
+    checkboxChange(event, checked) {
+        if (checked) {
+            this.armInput.arm_type = event.target.value;
+        } else {
+            this.armInput.arm_type = '';
+        }
+    }
 }

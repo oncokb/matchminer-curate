@@ -1,6 +1,9 @@
 label {
     min-width:180px;
 }
+input[type="radio"], input[type="checkbox"] {
+    margin-right: 5px;
+}
 .levelIndicator {
     border-left: 6px solid red;
     background-color: lightgrey;

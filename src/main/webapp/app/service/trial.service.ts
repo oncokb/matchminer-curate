@@ -68,6 +68,7 @@ export class TrialService {
         arm_description: '',
         arm_internal_id: '',
         arm_suspended: '',
+        arm_type: '',
         arm_eligibility: '',
         arm_info: '',
         match: []
