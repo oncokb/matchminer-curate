@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Arm } from '../arm/arm.model';
+import { Drug } from '../drug/drug.model';
 @Component({
     selector: 'jhi-arm',
     templateUrl: './arm.component.html',
@@ -36,6 +37,11 @@ export class ArmComponent implements OnInit {
             this.armInput.arm_type = event.target.value;
         } else {
             this.armInput.arm_type = '';
+        }
+    }
+    displayDrugName(drugs: Array<Drug>) {
+        if (drugs && drugs.length > 0) {
+            return drugs.map( (drug) => drug.name).join(', ');
         }
     }
 }

@@ -126,6 +126,16 @@ export class TrialComponent implements OnInit, AfterViewInit {
         let setChosenTrial = false;
         this.connectionService.importTrials( nctId ).subscribe( ( res ) => {
             const trialInfo = res;
+            const armsInfo: any = [];
+            _.each( trialInfo[ 'arms' ], function( arm ) {
+                if ( arm.arm_description !== null ) {
+                    armsInfo.push( {
+                        arm_description: arm.arm_name,
+                        arm_info: arm.arm_description,
+                        match: []
+                    } );
+                }
+            } );
             const trial: Trial = {
                 curation_status: 'In progress',
                 archived: 'No',
@@ -137,7 +147,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 status: trialInfo[ 'current_trial_status' ],
                 treatment_list: {
                     step: [ {
-                        arm: [],
+                        arm: armsInfo,
                         match: []
                     } ]
                 }

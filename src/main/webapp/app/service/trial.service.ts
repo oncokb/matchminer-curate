@@ -11,6 +11,8 @@ import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
 import { ConnectionService } from './connection.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { of } from 'rxjs/observable/of';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class TrialService {
@@ -71,6 +73,7 @@ export class TrialService {
         arm_type: '',
         arm_eligibility: '',
         arm_info: '',
+        drugs: [],
         match: []
     };
     private armInputSource = new BehaviorSubject<Arm>(this.armInput);
@@ -311,6 +314,14 @@ export class TrialService {
     getSubTypesOptions() {
         return this.subTypesOptions;
     }
+    loadDrugsOptions(query: string) {
+        // prepare drugs list
+        return this.connectionService.getDrugs(query).pipe(
+            catchError(() => of([])),
+            map((rsp) =>  rsp['terms']),
+        );
+    }
+
     getSubToMainMapping() {
         return this.subToMainMapping;
     }

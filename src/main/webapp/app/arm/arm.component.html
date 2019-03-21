@@ -37,6 +37,10 @@
         <div class="armContent">
             <textarea id="arm-eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
         </div>
+        <span class="indent1">-drugs: </span>
+        <div class="armContent">
+            <jhi-drug [armInput]="armInput"></jhi-drug>
+        </div>
     </div>
 </div>
 <ng-template #dispalyArm>
@@ -54,6 +58,8 @@
         <div class="armContent">{{unit.arm_info}}</div>
         <span class="indent1">-arm eligibility: </span>
         <div class="armContent">{{unit.arm_eligibility}}</div>
+        <span class="indent1">-drugs: </span>
+        <div class="armContent">{{displayDrugName(unit.drugs)}}</div>
     </div>
 </ng-template>
 

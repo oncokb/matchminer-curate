@@ -522,6 +522,7 @@ export class PanelComponent implements OnInit {
                 arm_type: this.unit['arm_type'],
                 arm_info: this.unit['arm_info'],
                 arm_eligibility: this.unit['arm_eligibility'],
+                drugs: this.unit['drugs'],
                 match: this.unit['match']
             };
             this.trialService.setArmInput(armToAdd);
@@ -568,10 +569,10 @@ export class PanelComponent implements OnInit {
         this.addNode = true;
         if (this.arm === true) {
             if (this.trialService.oncokb) {
-                this.clearInputForm(['arm_code', 'arm_description', 'arm_internal_id', 'arm_suspended', 'arm_type',
-                    'arm_info', 'arm_eligibility'], 'arm');
+                this.clearInputForm(['arm_code', 'arm_description', 'arm_internal_id', 'arm_suspended', 'match', 'arm_type',
+                    'arm_info', 'arm_eligibility', 'drugs'], 'arm');
             } else {
-                this.clearInputForm(['arm_code', 'arm_description', 'arm_internal_id', 'arm_suspended'], 'arm');
+                this.clearInputForm(['arm_code', 'arm_description', 'arm_internal_id', 'arm_suspended', 'match'], 'arm');
             }
         }
     }
@@ -770,6 +771,7 @@ export class PanelComponent implements OnInit {
                     arm_type: '',
                     arm_eligibility: '',
                     arm_info: '',
+                    drugs: [],
                     match: []
                 };
                 this.prepareArmData(this.armInput, armToAdd);
