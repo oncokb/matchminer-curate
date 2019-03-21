@@ -82,7 +82,7 @@ export class ConnectionService {
     }
 
     getDrugs(query: string) {
-        return this.http.get(this.getAPIUrl('Drugs') + `?name=${query}&size=100`);
+        return this.http.get(this.getAPIUrl('Drugs') + `?name=${query}`);
     }
 
     loadMongo(trial: any) {
