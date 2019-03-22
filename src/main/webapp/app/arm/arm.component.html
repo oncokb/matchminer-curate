@@ -23,6 +23,12 @@
         </span>
     </div>
     <div *ngIf="oncokb">
+        <span class="indent1">-arm type: </span>
+        <div class="armContent">
+            <label for="control-arm">
+                <input id="control-arm" type="checkbox" name="armType" value="Control Arm" [(ngModel)]="armInput.arm_type" (change)="checkboxChange($event, armInput.arm_type)"/> Control Arm
+            </label>
+        </div>
         <span class="indent1">-arm info: </span>
         <div class="armContent">
             <textarea id="arm-info" rows="3" cols="100" [(ngModel)]="armInput.arm_info"></textarea>
@@ -30,6 +36,10 @@
         <span class="indent1">-arm eligibility: </span>
         <div class="armContent">
             <textarea id="arm-eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
+        </div>
+        <span class="indent1">-drugs: </span>
+        <div class="armContent">
+            <jhi-drug [armInput]="armInput"></jhi-drug>
         </div>
     </div>
 </div>
@@ -42,10 +52,14 @@
     <span class="indent1">-arm suspended: </span>
     <div class="armContent">{{unit.arm_suspended}}</div>
     <div *ngIf="oncokb">
+        <span class="indent1">-arm type: </span>
+        <div class="armContent">{{unit.arm_type}}</div>
         <span class="indent1">-arm info: </span>
         <div class="armContent">{{unit.arm_info}}</div>
         <span class="indent1">-arm eligibility: </span>
         <div class="armContent">{{unit.arm_eligibility}}</div>
+        <span class="indent1">-drugs: </span>
+        <div class="armContent">{{displayDrugName(unit.drugs)}}</div>
     </div>
 </ng-template>
 

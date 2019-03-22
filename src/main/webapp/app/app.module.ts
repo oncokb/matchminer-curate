@@ -48,6 +48,7 @@ import { EmailService } from './service/email.service';
 import { ConverterComponent } from './converter/converter.component';
 import { ConnectionService } from './service/connection.service';
 import { MainutilService } from './service/mainutil.service';
+import { DrugComponent } from './drug/drug.component';
 
 @NgModule({
     imports: [
@@ -76,6 +77,7 @@ import { MainutilService } from './service/mainutil.service';
         GenomicComponent,
         ClinicalComponent,
         ArmComponent,
+        DrugComponent,
         PanelComponent,
         MatchComponent,
         LoginComponent,
