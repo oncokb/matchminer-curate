@@ -12,6 +12,9 @@ export class ConnectionService {
     constructor(private http: HttpClient) { }
 
     getAPIUrl(type: string) {
+        if (type === 'Drugs'){
+            return 'https://clinicaltrialsapi.cancer.gov/v1/interventions';
+        }
         if (this.frontEndOnly) {
             switch (type) {
                 case 'MainType':
@@ -28,8 +31,6 @@ export class ConnectionService {
                     return 'https://discover.mskcc.org:443/api/trials/';
                 case 'ExampleValidation':
                     return 'http://oncokb.org/api/v1/utils/match/variant?';
-                case 'Drugs':
-                    return 'https://clinicaltrialsapi.cancer.gov/v1/interventions';
             }
         } else {
             switch (type) {
@@ -47,8 +48,6 @@ export class ConnectionService {
                     return SERVER_API_URL + 'proxy/https/discover.mskcc.org:443/api/trials/';
                 case 'ExampleValidation':
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
-                case 'Drugs':
-                    return SERVER_API_URL + 'proxy/http/clinicaltrialsapi.cancer.gov/v1/interventions';
             }
         }
     }
