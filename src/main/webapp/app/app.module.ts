@@ -1,6 +1,6 @@
 import './vendor.ts';
 
-import { NgModule, Injector } from '@angular/core';
+import {NgModule, Injector, ErrorHandler, Injectable} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Ng2Webstorage } from 'ngx-webstorage';
@@ -52,6 +52,20 @@ import { MetaService } from './service/meta.service';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import * as Sentry from "@sentry/browser";
+
+Sentry.init({
+    dsn: "https://73c005cfa16b49b9825b0ae57b7b9234@sentry.io/1423208"
+});
+
+@Injectable()
+export class SentryErrorHandler implements ErrorHandler {
+    constructor() {}
+    handleError(error) {
+        Sentry.captureException(error.originalError || error);
+        throw error;
+    }
+}
 
 @NgModule({
     imports: [
@@ -98,6 +112,10 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
         MainutilService,
         MetaService,
         UserRouteAccessService,
+        {
+            provide: ErrorHandler,
+            useClass: SentryErrorHandler
+        },
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthExpiredInterceptor,
