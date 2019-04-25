@@ -1,0 +1,87 @@
+<div class="container table-container">
+    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+        <thead>
+            <tr>
+                <th>NCT ID</th>
+                <th>Protocol No</th>
+                <th>Status</th>
+                <th>Title</th>
+                <th>Precision Medicine</th>
+                <th>Curated</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let meta of metaList"  (click)="clickMetaRow(meta)">
+                <td>
+                    <span *ngIf="meta.nct_id.length > 0">
+                        <a routerLink="{{'/trials/' + meta.nct_id + '/' + meta.protocol_no}}" class="button-margin">{{ meta.nct_id }}</a>
+                        <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{meta.nct_id}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                    </span>
+                </td>
+                <td>
+                    <span>
+                        <span class="button-margin">{{ meta.protocol_no }}</span>
+                        <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{meta.protocol_no}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                    </span>
+                </td>
+                <td>{{ meta.status }}</td>
+                <td>{{ meta.title }}</td>
+                <td>{{ meta.precision_medicine }}</td>
+                <td>{{ meta.curated }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="metaDetail"><br/></div>
+    <div *ngIf="metaInput">
+        <hr class="hr-margin">
+        <div>
+            <div class="meta-content">
+                <label for="protocolNo">Protocol No: </label>
+                <span id="protocolNo" class="noteEdit">{{ metaInput.protocol_no }}</span>
+            </div>
+            <div class="meta-content">
+                <label for="nctId">NCT ID: </label>
+                <span id="nctId" class="noteEdit">
+                    <input [(ngModel)]="metaInput.nct_id" (blur)="updateMeta('nct_id')" (keypress)="clearMessage('nct_id')"/>
+                    <span *ngIf="nctIdMessage.content" class="load-span" [style.color]="nctIdMessage.color"> {{nctIdMessage.content}} </span>
+                </span>
+            </div>
+            <div class="meta-content">
+                <label for="status">Status: </label>
+                <span *ngIf="!isPermitted" class="noteEdit">{{ metaInput.status }}</span>
+                <span  *ngIf="isPermitted" id="status" class="noteEdit">
+                    <ng-select class="meta-select" #selectModel="ngModel" [items]="statusOptions" [(ngModel)]="metaInput.status"
+                               [clearable]="false" (change)="updateMeta('status')"></ng-select>
+                </span>
+            </div>
+            <div class="meta-content">
+                <label for="shortTitle">Title: </label>
+                <span id="shortTitle" class="noteEdit">{{ metaInput.title }}</span>
+            </div>
+            <div class="meta-content">
+                <label>Precision Medicine:</label>
+                <span *ngIf="!isPermitted" class="noteEdit">{{ metaInput.precision_medicine }}</span>
+                <span *ngIf="isPermitted">
+                    <span class="label-margin">
+                        <input type="radio" value="YES" name="precision-medicine" [(ngModel)]="metaInput.precision_medicine" (click)="unCheckRadio('precision_medicine', $event)">YES
+                    </span>
+                    <span class="label-margin">
+                        <input type="radio" value="NO" name="precision-medicine" [(ngModel)]="metaInput.precision_medicine" (click)="unCheckRadio('precision_medicine', $event)">NO
+                    </span>
+                </span>
+            </div>
+            <div class="meta-content">
+                <label>Curated:</label>
+                <span *ngIf="!isPermitted" class="noteEdit">{{ metaInput.curated }}</span>
+                <span *ngIf="isPermitted">
+                    <span class="label-margin">
+                        <input type="radio" value="YES" name="curated" [(ngModel)]="metaInput.curated" (click)="unCheckRadio('curated', $event)">YES
+                    </span>
+                    <span class="label-margin">
+                        <input type="radio" value="NO" name="curated" [(ngModel)]="metaInput.curated" (click)="unCheckRadio('curated', $event)">NO
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

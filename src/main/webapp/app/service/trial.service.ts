@@ -13,6 +13,7 @@ import { ConnectionService } from './connection.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs/observable/of';
 import { catchError, map } from 'rxjs/operators';
+import { Meta } from '../meta/meta.model';
 
 @Injectable()
 export class TrialService {
@@ -29,6 +30,9 @@ export class TrialService {
 
     private trialListSource = new BehaviorSubject<Array<Trial>>([]);
     trialListObs = this.trialListSource.asObservable();
+
+    private metaListSource = new BehaviorSubject<Array<Meta>>([]);
+    metaListObs = this.metaListSource.asObservable();
 
     additional = this.createAdditional();
     private additionalChosenSource = new BehaviorSubject<Additional>(this.additional);
@@ -91,6 +95,8 @@ export class TrialService {
     trialsRef: AngularFireObject<any>;
     additionalObject = {};
     additionalRef: AngularFireObject<any>;
+    metaList: Array<Meta> = [];
+    metaRef: AngularFireObject<any>;
     nctIdChosen = '';
     errorList: Array<object> = [];
 
@@ -98,6 +104,7 @@ export class TrialService {
         this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
         this.additionalRef = db.object('Additional');
+        this.metaRef = db.object('Meta');
 
         // prepare main types list
         this.connectionService.getMainType().subscribe((res: Array<string>) => {
@@ -232,6 +239,19 @@ export class TrialService {
             }
             this.trialListSource.next(this.trialList);
             this.setTrialChosen(this.nctIdChosen);
+        }, (error) => {
+            this.authorizedSource.next(false);
+        });
+    }
+    fetchMetas() {
+        this.metaRef.snapshotChanges().subscribe((action) => {
+            this.authorizedSource.next(true);
+            this.metaList = [];
+            for (const protocolNo of _.keys(action.payload.val())) {
+                this.metaList.push(action.payload.val()[protocolNo]);
+            }
+            this.metaListSource.next(this.metaList);
+            // this.setTrialChosen(this.nctIdChosen);
         }, (error) => {
             this.authorizedSource.next(false);
         });
@@ -388,5 +408,12 @@ export class TrialService {
             });
             alert('Sorry, unexpected error happens. Our development team has been notified.');
         }
+    }
+    setMetaCurated(protocolNo: string, data: object) {
+        this.db.object('Meta/' + protocolNo).set(data).then((result) => {
+            console.log('Save Meta ' + protocolNo + ' successfully!');
+        }).catch((error) => {
+            console.log('Failed to save Meta' + protocolNo + ' to DB ', error);
+        });
     }
 }

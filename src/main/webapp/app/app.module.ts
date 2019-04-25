@@ -49,6 +49,7 @@ import { ConverterComponent } from './converter/converter.component';
 import { ConnectionService } from './service/connection.service';
 import { MainutilService } from './service/mainutil.service';
 import { DrugComponent } from './drug/drug.component';
+import { MetaComponent } from './meta/meta.component';
 
 @NgModule({
     imports: [
@@ -81,7 +82,8 @@ import { DrugComponent } from './drug/drug.component';
         PanelComponent,
         MatchComponent,
         LoginComponent,
-        ConverterComponent
+        ConverterComponent,
+        MetaComponent
     ],
     providers: [
         ProfileService,

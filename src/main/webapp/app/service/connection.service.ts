@@ -12,7 +12,7 @@ export class ConnectionService {
     constructor(private http: HttpClient) { }
 
     getAPIUrl(type: string) {
-        if (type === 'Drugs'){
+        if (type === 'Drugs') {
             return 'https://clinicaltrialsapi.cancer.gov/v1/interventions';
         }
         if (this.frontEndOnly) {

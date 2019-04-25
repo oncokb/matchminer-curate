@@ -15,18 +15,21 @@
     <div class="armContent">
         <span id="suspended">
             <label for="suspended-y">
-                <input id="suspended-y" type="radio" value="Y" name="suspended" [(ngModel)]="armInput.arm_suspended" (click)="unCheckRadio($event)">Y
+                <input id="suspended-y" type="radio" value="Y" name="suspended" [(ngModel)]="armInput.arm_suspended" (click)="unCheckRadio('arm_suspended', $event)">Y
             </label>
             <label for="suspended-n" class="indent1">
-                <input id="suspended-n" type="radio" value="N" name="suspended" [(ngModel)]="armInput.arm_suspended" (click)="unCheckRadio($event)">N
+                <input id="suspended-n" type="radio" value="N" name="suspended" [(ngModel)]="armInput.arm_suspended" (click)="unCheckRadio('arm_suspended', $event)">N
             </label>
         </span>
     </div>
     <div *ngIf="oncokb">
         <span class="indent1">-arm type: </span>
         <div class="armContent">
-            <label for="control-arm">
-                <input id="control-arm" type="checkbox" name="armType" value="Control Arm" [(ngModel)]="armInput.arm_type" (change)="checkboxChange($event, armInput.arm_type)"/> Control Arm
+            <label for="control-arm" class="label-margin">
+                <input id="control-arm" type="radio" name="arm-type" value="Control" [(ngModel)]="armInput.arm_type" (click)="unCheckRadio('arm_type', $event)"/> Control Arm
+            </label>
+            <label for="placebo-arm">
+                <input id="placebo-arm" type="radio" name="arm-type" value="Placebo" [(ngModel)]="armInput.arm_type" (click)="unCheckRadio('arm_type', $event)"/> Placebo Arm
             </label>
         </div>
         <span class="indent1">-arm info: </span>

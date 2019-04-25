@@ -76,11 +76,29 @@ export class TrialComponent implements OnInit, AfterViewInit {
         } );
         this.dtOptions = {
             paging: false,
-            scrollY: '300'
+            scrollY: '300',
+            columns: [
+                { 'width': '16%' },
+                { 'width': '10%' },
+                null,
+                null,
+                null,
+                null
+            ]
         };
         if ( this.router.url.includes( 'NCT' ) ) {
-            const nctId = this.router.url.split( '/' ).slice( - 1 )[ 0 ];
-            this.curateTrial( nctId );
+            const urlArray = this.router.url.split( '/' );
+            const nctId = urlArray[ 2 ];
+            let protocolNo = '';
+            if (urlArray.length > 3) {
+                protocolNo = urlArray[ 3 ];
+            }
+            if (this.nctIdList.includes(nctId)) {
+                this.curateTrial( nctId );
+            } else {
+                this.importTrialsFromNct(nctId, protocolNo);
+            }
+
         }
     }
     importTrials() {
@@ -154,6 +172,17 @@ export class TrialComponent implements OnInit, AfterViewInit {
             };
             this.db.object( 'Trials/' + trialInfo[ 'nct_id' ] ).set( trial ).then( ( response ) => {
                 this.messages.push( 'Successfully imported ' + trialInfo[ 'nct_id' ] );
+                if (protocolNo.length > 0) {
+                    const metaRecord = {
+                        protocol_no: protocolNo,
+                        nct_id: trialInfo[ 'nct_id' ],
+                        title: trialInfo[ 'brief_title' ],
+                        status: trialInfo[ 'current_trial_status' ],
+                        precision_medicine: 'YES',
+                        curated: 'YES'
+                    };
+                    this.trialService.setMetaCurated(protocolNo, metaRecord);
+                }
                 if ( setChosenTrial === false ) {
                     this.nctIdChosen = trialInfo[ 'nct_id' ];
                     this.trialService.setTrialChosen( this.nctIdChosen );

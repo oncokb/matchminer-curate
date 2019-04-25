@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Arm } from '../arm/arm.model';
 import { Drug } from '../drug/drug.model';
+import { MainutilService } from '../service/mainutil.service';
 @Component({
     selector: 'jhi-arm',
     templateUrl: './arm.component.html',
@@ -15,7 +16,7 @@ export class ArmComponent implements OnInit {
     armInput: Arm;
     oncokb: boolean;
 
-    constructor(private trialService: TrialService) {
+    constructor(private trialService: TrialService, public mainutilService: MainutilService) {
         this.oncokb = this.trialService.oncokb;
     }
 
@@ -27,17 +28,8 @@ export class ArmComponent implements OnInit {
             this.armInput = message;
         });
     }
-    unCheckRadio(event) {
-        if (event.target.value === this.armInput.arm_suspended) {
-            this.armInput.arm_suspended = '';
-        }
-    }
-    checkboxChange(event, checked) {
-        if (checked) {
-            this.armInput.arm_type = event.target.value;
-        } else {
-            this.armInput.arm_type = '';
-        }
+    unCheckRadio(key, event) {
+        this.armInput[key] = this.mainutilService.unCheckRadio(this.armInput[key], event.target.value);
     }
     displayDrugName(drugs: Array<Drug>) {
         if (drugs && drugs.length > 0) {
