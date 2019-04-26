@@ -14,7 +14,6 @@ export class LoginComponent {
         this.user.subscribe((res) => {
             if (res && res.uid) {
                 this.trialService.fetchTrials();
-                this.trialService.fetchMetas();
                 this.trialService.fetchAdditional();
             }
         });

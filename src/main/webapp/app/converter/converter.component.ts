@@ -2,7 +2,7 @@ import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import '../../../../../node_modules/jquery/dist/jquery.js';
 import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
 import * as YAML from 'js-yaml';
@@ -110,7 +110,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     createTrialZipFile(idList: Array<string>, zipFolder: any, isAll?: boolean) {
         let content = '';
         if (isAll) {
-            _.each(this.trialList, function(trialJson){
+            _.forEach(this.trialList, function(trialJson){
                 this.removeAttributes(trialJson);
                 const nctId = trialJson['nct_id'];
                 if ( this.fileType === 'json' ) {
@@ -122,8 +122,8 @@ export class ConverterComponent implements OnInit, AfterViewInit {
                 zipFolder.file( nctId + '.' + this.fileType, content);
             }, this);
         } else {
-            _.each(idList, function(nctId) {
-                _.each(this.trialList, function(trialJson){
+            _.forEach(idList, function(nctId) {
+                _.forEach(this.trialList, function(trialJson){
                     if (nctId === trialJson['nct_id']) {
                         this.removeAttributes(trialJson);
                         if ( this.fileType === 'json' ) {
@@ -141,7 +141,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     uploadFiles() {
         let result = true;
         this.uploadFailedFileList = [];
-        _.each(this.filesToUpload, function(file) {
+        _.forEach(this.filesToUpload, function(file) {
             const fileReader = new FileReader();
             fileReader.readAsText(file);
             fileReader.onload = (e) => {
@@ -185,7 +185,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
         this.uploadFileNames = '';
         this.filesToUpload = $event.target.files;
         if (this.filesToUpload.length > 1) {
-            _.each(this.filesToUpload, function(file) {
+            _.forEach(this.filesToUpload, function(file) {
                 fileArray.push(file.name);
             });
             this.uploadFileNames = fileArray.join(', ');
@@ -202,13 +202,13 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     removeAttributes(data: object) {
         // Remove attributes not in CTML.
         const removedFields = ['archived', 'curation_status'];
-        _.each(removedFields, function(item) {
+        _.forEach(removedFields, function(item) {
             delete data[item];
         });
         if (data['treatment_list']['step'][0]['arm'].length > 0) {
             const removedArmFields = ['arm_info', 'arm_eligibility'];
-            _.each(data['treatment_list']['step'][0]['arm'], function(arm) {
-                _.each(removedArmFields, function(item) {
+            _.forEach(data['treatment_list']['step'][0]['arm'], function(arm) {
+                _.forEach(removedArmFields, function(item) {
                     delete arm[item];
                 });
             });

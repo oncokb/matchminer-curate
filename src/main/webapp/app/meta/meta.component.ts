@@ -1,15 +1,15 @@
-import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnInit, OnDestroy } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import '../../../../../node_modules/jquery/dist/jquery.js';
 import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
 import { Subject } from 'rxjs/Subject';
 import { DataTableDirective } from 'angular-datatables';
 import { Meta } from './meta.model';
 import { MainutilService } from '../service/mainutil.service';
-import { NgModel } from '@angular/forms';
+import { MetaService } from '../service/meta.service';
 
 @Component({
     selector: 'jhi-meta',
@@ -17,41 +17,41 @@ import { NgModel } from '@angular/forms';
     styleUrls: ['meta.scss']
 })
 
-export class MetaComponent implements OnInit, AfterViewInit {
+export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild(DataTableDirective) private dtElement: DataTableDirective;
-    @ViewChild( 'selectModel' ) private selectModel: NgModel;
     isPermitted = this.trialService.isPermitted;
     metaList: Array<Meta> = [];
-    metaInput: Meta;
-    originalMeta: Meta;
-    statusOptions = this.trialService.getStatusOptions();
     dtOptions: DataTables.Settings = {};
     dtTrigger: Subject<any> = new Subject();
+    dataLoaded = false;
     tableDestroied = false;
-    nctIdMessage = {
-        content: '',
-        color: ''
-    };
 
-    constructor(private trialService: TrialService, public mainutilService: MainutilService) {
-        this.trialService.metaListObs.subscribe((message) => {
-            this.metaList = message;
-            this.rerender();
+    constructor(private trialService: TrialService, public mainutilService: MainutilService, public metaService: MetaService) {
+        this.trialService.fetchMetas().then((result) => {
+            if (Array.isArray(result) && result.length > 0) {
+                this.metaList = result;
+                this.rerender();
+                this.dataLoaded = true;
+            }
         });
     }
     ngOnInit(): void {
         this.dtOptions = {
-            paging: false,
-            scrollY: '400',
+            paging: true,
+            scrollY: '70vh',
             columns: [
                 { 'width': '20%' },
                 { 'width': '10%' },
-                null,
-                null,
-                null,
-                null
+                { 'width': '15%' },
+                { 'width': '45%' },
+                { 'width': '5%' },
+                { 'width': '5%' }
             ]
         };
+    }
+    ngOnDestroy(): void {
+        // Update meta in firebase when user leave the page.
+        this.metaService.onDestroyEvent.emit('Meta');
     }
 
     ngAfterViewInit(): void {
@@ -71,55 +71,11 @@ export class MetaComponent implements OnInit, AfterViewInit {
             });
         }
     }
-    unCheckRadio(key, event) {
-        this.metaInput[key] = this.mainutilService.unCheckRadio(this.metaInput[key], event.target.value);
-        if (this.originalMeta[key] !== this.metaInput[key]) {
-            this.updateMeta(key);
-        }
-    }
-    clickMetaRow(meta: any) {
-        this.originalMeta = _.clone(meta);
-        this.metaInput = meta;
-    }
-    updateMeta(key: string) {
-        if (key === 'nct_id') {
-            this.updateNctId();
-        } else {
-            const metaToUpdate = {};
-            metaToUpdate[key] = this.metaInput[key];
-            this.trialService.getRef( 'Meta/' + this.metaInput['protocol_no'] ).update( metaToUpdate )
-            .then((res) => {})
-            .catch( ( error ) => {
-                console.log(error);
-                this.metaInput[key] = this.originalMeta[key];
-            });
-        }
-    }
-    updateNctId() {
-        if ( this.metaInput['nct_id'].match( /^NCT\d+$/g ) ) {
-            const result = confirm('Are you sure to update NCT ID to ' + this.metaInput['nct_id'] + '?');
-            if (result) {
-                this.trialService.getRef( 'Meta/' + this.metaInput['protocol_no'] ).update( {nct_id: this.metaInput['nct_id']} )
-                .then((res) => {
-                    this.nctIdMessage.content = 'Update NCT ID successfully.';
-                    this.nctIdMessage.color = 'green';
-                })
-                .catch( ( error ) => {
-                    this.nctIdMessage.content = 'Failed to update NCT ID.';
-                    this.nctIdMessage.color = 'red';
-                    this.metaInput['nct_id'] = this.originalMeta['nct_id'];
-                } );
-            }
-        } else {
-            this.nctIdMessage.content = 'NCT ID should follow the format: NCTxxxxxxx. (x:digit)';
-            this.nctIdMessage.color = 'red';
-            this.metaInput['nct_id'] = this.originalMeta['nct_id'];
-        }
-    }
-    clearMessage(type: string) {
-        if (type === 'nct_id') {
-            this.nctIdMessage.content = '';
-            this.nctIdMessage.color = '';
+    unCheckRadio(key: string, event: any, data: Meta) {
+        const originalData = _.clone(data);
+        data[key] = this.mainutilService.unCheckRadio(data[key], event.target.value);
+        if (originalData[key] !== data[key]) {
+            this.metaService.metasToUpdate[data['protocol_no']] = data;
         }
     }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 @Component({
   selector: 'jhi-match',
   templateUrl: './match.component.html',

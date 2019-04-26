@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import { Additional, Trial } from './trial.model';
 import '../../../../../node_modules/jquery/dist/jquery.js';
 import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
@@ -13,6 +13,7 @@ import { DataTableDirective } from 'angular-datatables';
 import { NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConnectionService } from '../service/connection.service';
+import { MetaService } from '../service/meta.service';
 
 @Component( {
     selector: 'jhi-trial',
@@ -49,7 +50,8 @@ export class TrialComponent implements OnInit, AfterViewInit {
     };
     @ViewChild( 'selectModel' ) private selectModel: NgModel;
 
-    constructor( private trialService: TrialService, public db: AngularFireDatabase, private connectionService: ConnectionService, private router: Router ) {
+    constructor( private trialService: TrialService, private metaService: MetaService, public db: AngularFireDatabase,
+        private connectionService: ConnectionService, private router: Router ) {
         this.trialService.nctIdChosenObs.subscribe( ( message ) => this.nctIdChosen = message );
         this.trialService.trialChosenObs.subscribe( ( message ) => this.trialChosen = message );
         this.trialService.trialListObs.subscribe( ( message ) => {
@@ -145,7 +147,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.connectionService.importTrials( nctId ).subscribe( ( res ) => {
             const trialInfo = res;
             const armsInfo: any = [];
-            _.each( trialInfo[ 'arms' ], function( arm ) {
+            _.forEach( trialInfo[ 'arms' ], function( arm ) {
                 if ( arm.arm_description !== null ) {
                     armsInfo.push( {
                         arm_description: arm.arm_name,
@@ -181,7 +183,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                         precision_medicine: 'YES',
                         curated: 'YES'
                     };
-                    this.trialService.setMetaCurated(protocolNo, metaRecord);
+                    this.metaService.setMetaCurated(protocolNo, metaRecord);
                 }
                 if ( setChosenTrial === false ) {
                     this.nctIdChosen = trialInfo[ 'nct_id' ];

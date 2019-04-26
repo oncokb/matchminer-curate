@@ -6,7 +6,7 @@ import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from '../panel/movingPath.model';
 import { Arm } from '../arm/arm.model';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
 import { ConnectionService } from './connection.service';
@@ -30,9 +30,6 @@ export class TrialService {
 
     private trialListSource = new BehaviorSubject<Array<Trial>>([]);
     trialListObs = this.trialListSource.asObservable();
-
-    private metaListSource = new BehaviorSubject<Array<Meta>>([]);
-    metaListObs = this.metaListSource.asObservable();
 
     additional = this.createAdditional();
     private additionalChosenSource = new BehaviorSubject<Additional>(this.additional);
@@ -95,7 +92,6 @@ export class TrialService {
     trialsRef: AngularFireObject<any>;
     additionalObject = {};
     additionalRef: AngularFireObject<any>;
-    metaList: Array<Meta> = [];
     metaRef: AngularFireObject<any>;
     nctIdChosen = '';
     errorList: Array<object> = [];
@@ -244,16 +240,20 @@ export class TrialService {
         });
     }
     fetchMetas() {
-        this.metaRef.snapshotChanges().subscribe((action) => {
-            this.authorizedSource.next(true);
-            this.metaList = [];
-            for (const protocolNo of _.keys(action.payload.val())) {
-                this.metaList.push(action.payload.val()[protocolNo]);
-            }
-            this.metaListSource.next(this.metaList);
-            // this.setTrialChosen(this.nctIdChosen);
-        }, (error) => {
-            this.authorizedSource.next(false);
+        const metaList: Array<Meta> = [];
+        return new Promise((resolve, reject) => {
+            this.metaRef.snapshotChanges().subscribe( ( action ) => {
+                this.authorizedSource.next( true );
+                const allMetas = action.payload.val();
+                const protocolNos = _.keys( allMetas );
+                for ( const protocolNo of protocolNos ) {
+                    metaList.push( allMetas[ protocolNo ] );
+                }
+                resolve(metaList);
+            }, ( error ) => {
+                this.authorizedSource.next( false );
+                reject(metaList);
+            } );
         });
     }
     fetchAdditional() {
@@ -293,7 +293,7 @@ export class TrialService {
                     if (_.isUndefined(trial['treatment_list'].step[0].arm)) {
                         trial['treatment_list'].step[0].arm = [];
                     } else {
-                        _.each(trial['treatment_list'].step[0].arm, function(armItem) {
+                        _.forEach(trial['treatment_list'].step[0].arm, function(armItem) {
                             if (_.isUndefined(armItem.match)) {
                                 armItem.match = [];
                             }
@@ -408,12 +408,5 @@ export class TrialService {
             });
             alert('Sorry, unexpected error happens. Our development team has been notified.');
         }
-    }
-    setMetaCurated(protocolNo: string, data: object) {
-        this.db.object('Meta/' + protocolNo).set(data).then((result) => {
-            console.log('Save Meta ' + protocolNo + ' successfully!');
-        }).catch((error) => {
-            console.log('Failed to save Meta' + protocolNo + ' to DB ', error);
-        });
     }
 }

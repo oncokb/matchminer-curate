@@ -50,6 +50,7 @@ import { ConnectionService } from './service/connection.service';
 import { MainutilService } from './service/mainutil.service';
 import { DrugComponent } from './drug/drug.component';
 import { MetaComponent } from './meta/meta.component';
+import { MetaService } from './service/meta.service';
 
 @NgModule({
     imports: [
@@ -93,6 +94,7 @@ import { MetaComponent } from './meta/meta.component';
         ConnectionService,
         EmailService,
         MainutilService,
+        MetaService,
         UserRouteAccessService,
         {
             provide: HTTP_INTERCEPTORS,

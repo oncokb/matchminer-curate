@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from './movingPath.model';
@@ -382,7 +382,7 @@ export class PanelComponent implements OnInit {
                     nodeData[key] = '!' + nodeData[key];
                     if (annotatedVariants.length > 1) {
                         nodeData[key] = '';
-                        _.each(annotatedVariants, function(variant) {
+                        _.forEach(annotatedVariants, function(variant) {
                             nodeData[key] += '!' + variant.trim() + ',';
                         });
                         nodeData[key] = nodeData[key].slice(0, -1);
@@ -399,7 +399,7 @@ export class PanelComponent implements OnInit {
         if (!_.isUndefined(genomicNode['annotated_variant']) && genomicNode['annotated_variant'].includes(',')) {
             const annotatedVariants = genomicNode['annotated_variant'].split(',');
             const genomicNodeToSave = { and: [] };
-            _.each(annotatedVariants, function(variant) {
+            _.forEach(annotatedVariants, function(variant) {
                 if (!_.isEmpty(variant)) {
                     const genomicNodeCopy = _.clone(genomicNode);
                     genomicNodeCopy['annotated_variant'] = variant.trim();
@@ -476,7 +476,7 @@ export class PanelComponent implements OnInit {
             }
         } else {
             if (this.copyMatch) {
-                _.each(this.dataBlockToMove, function(item){
+                _.forEach(this.dataBlockToMove, function(item){
                     obj.push(item);
                 });
             } else {
@@ -788,7 +788,7 @@ export class PanelComponent implements OnInit {
     }
     prepareArmData(armInput: Arm, armToSave: Arm) {
         const keys = _.keys(armInput);
-        _.each(keys, function(key) {
+        _.froEach(keys, function(key) {
             if (!_.isUndefined(armInput[key])) {
                 armToSave[key] = armInput[key];
             }
