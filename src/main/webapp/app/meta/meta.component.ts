@@ -22,7 +22,8 @@ export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
     oncokb = environment['oncokb'] ? environment['oncokb'] : false;
     @ViewChild(DataTableDirective) private dtElement: DataTableDirective;
     isPermitted = this.trialService.isPermitted;
-    metaList: Array<Meta> = [];
+    metaList: any = {};
+    protocolNoList: Array<string> = [];
     dtOptions: DataTables.Settings = {};
     dtTrigger: Subject<any> = new Subject();
     dataLoaded = false;
@@ -30,8 +31,9 @@ export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
 
     constructor(private trialService: TrialService, public mainutilService: MainutilService, public metaService: MetaService) {
         this.trialService.fetchMetas().then((result) => {
-            if (Array.isArray(result) && result.length > 0) {
+            if (!_.isEmpty(result)) {
                 this.metaList = result;
+                this.protocolNoList = Object.keys(result);
                 this.rerender();
                 this.dataLoaded = true;
             }

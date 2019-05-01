@@ -15,42 +15,42 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let meta of metaList">
+                <tr *ngFor="let protocolNo of protocolNoList">
                     <td>
-                        <span *ngIf="meta.nct_id.length > 0">
-                            <span class="button-margin">{{ meta.nct_id }}</span>
-                            <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{meta.nct_id}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                        <span *ngIf="metaList[protocolNo].nct_id.length > 0">
+                            <span class="button-margin">{{ metaList[protocolNo].nct_id }}</span>
+                            <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{metaList[protocolNo].nct_id}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
                         </span>
                     </td>
                     <td>
                         <span>
-                            <span class="button-margin">{{ meta.protocol_no }}</span>
-                            <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{meta.protocol_no}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                            <span class="button-margin">{{ protocolNo }}</span>
+                            <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{protocolNo}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
                         </span>
                     </td>
-                    <td>{{ meta.status }}</td>
-                    <td>{{ meta.title }}</td>
+                    <td>{{ metaList[protocolNo].status }}</td>
+                    <td>{{ metaList[protocolNo].title }}</td>
                     <td>
-                        <span *ngIf="!isPermitted">{{ meta.precision_medicine }}</span>
+                        <span *ngIf="!isPermitted">{{ metaList[protocolNo].precision_medicine }}</span>
                         <span *ngIf="isPermitted">
                             <form>
                                 <div>
-                                    <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="meta.precision_medicine" (click)="unCheckRadio('precision_medicine', $event, meta)">YES
+                                    <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="metaList[protocolNo].precision_medicine" (click)="unCheckRadio('precision_medicine', $event, metaList[protocolNo])">YES
                                 </div>
                                 <div>
-                                    <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="meta.precision_medicine" (click)="unCheckRadio('precision_medicine', $event, meta)">NO
+                                    <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="metaList[protocolNo].precision_medicine" (click)="unCheckRadio('precision_medicine', $event, metaList[protocolNo])">NO
                                 </div>
                             </form>
                         </span>
                     </td>
                     <td>
-                        <span *ngIf="!isPermitted">{{ meta.curated }}</span>
+                        <span *ngIf="!isPermitted">{{ metaList[protocolNo].curated }}</span>
                         <span *ngIf="isPermitted">
-                            <span *ngIf="meta.precision_medicine === 'YES' && meta.curated === 'NO' && meta.nct_id.length > 0">
-                                <a class="btn btn-primary a-no-hover" routerLink="{{'/trials/' + meta.nct_id + '/' + meta.protocol_no}}">Import Trial</a>
+                            <span *ngIf="metaList[protocolNo].precision_medicine === 'YES' && metaList[protocolNo].curated === 'NO' && metaList[protocolNo].nct_id.length > 0">
+                                <a class="btn btn-primary a-no-hover" routerLink="{{'/trials/' + metaList[protocolNo].nct_id + '/' + protocolNo}}">Import Trial</a>
                             </span>
-                            <span *ngIf="meta.precision_medicine !== 'YES' || meta.curated === 'YES' || meta.nct_id.length === 0">
-                                {{ meta.curated }}
+                            <span *ngIf="metaList[protocolNo].precision_medicine !== 'YES' || metaList[protocolNo].curated === 'YES' || metaList[protocolNo].nct_id.length === 0">
+                                {{ metaList[protocolNo].curated }}
                             </span>
                         </span>
                     </td>

@@ -244,12 +244,7 @@ export class TrialService {
         return new Promise((resolve, reject) => {
             this.metaRef.snapshotChanges().subscribe( ( action ) => {
                 this.authorizedSource.next( true );
-                const allMetas = action.payload.val();
-                const protocolNos = _.keys( allMetas );
-                for ( const protocolNo of protocolNos ) {
-                    metaList.push( allMetas[ protocolNo ] );
-                }
-                resolve(metaList);
+                resolve(action.payload.val());
             }, ( error ) => {
                 this.authorizedSource.next( false );
                 reject(metaList);
