@@ -1,6 +1,5 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
@@ -14,6 +13,8 @@ import { NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConnectionService } from '../service/connection.service';
 import { MetaService } from '../service/meta.service';
+import { Meta } from '../meta/meta.model';
+import { environment } from '../environments/environment';
 
 @Component( {
     selector: 'jhi-trial',
@@ -22,6 +23,7 @@ import { MetaService } from '../service/meta.service';
 } )
 
 export class TrialComponent implements OnInit, AfterViewInit {
+    oncokb = environment['oncokb'] ? environment['oncokb'] : false;
     @ViewChild( DataTableDirective )
     dtElement: DataTableDirective;
     trialsToImport = '';
@@ -173,11 +175,11 @@ export class TrialComponent implements OnInit, AfterViewInit {
             };
             this.db.object( 'Trials/' + trialInfo[ 'nct_id' ] ).set( trial ).then( ( response ) => {
                 this.messages.push( 'Successfully imported ' + trialInfo[ 'nct_id' ] );
-                if (protocolNo.length > 0) {
-                    const metaRecord = {
+                if (this.oncokb && protocolNo.length > 0) {
+                    const metaRecord: Meta = {
                         protocol_no: protocolNo,
                         nct_id: trialInfo[ 'nct_id' ],
-                        title: trialInfo[ 'brief_title' ],
+                        title: trialInfo[ 'official_title' ],
                         status: trialInfo[ 'current_trial_status' ],
                         precision_medicine: 'YES',
                         curated: 'YES'
