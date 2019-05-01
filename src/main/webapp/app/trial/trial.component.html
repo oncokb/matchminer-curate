@@ -16,7 +16,6 @@
         </div>
     </div>
     <br/>
-    <br/>
     <div class="float-right">
         <label for="hideArchived">Hide archived trials:</label>
         <span id="hideArchived">
@@ -91,8 +90,6 @@
                 <input [(ngModel)]="trialChosen.protocol_no" (blur)="updateProtocolNo()" (keypress)="clearMessage('protocol_no')"/>
                 <span *ngIf="protocolNoMessage.content" class="load-span" [style.color]="protocolNoMessage.color"> {{protocolNoMessage.content}} </span>
             </span>
-            <!--<button class="btn btn-primary" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" (click)="loadMongo()" class="noteEdit">Finish Curation</button>-->
-            <!--<span class="load-span" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" [style.color]="mongoMessage.color"> {{mongoMessage.content}} </span>-->
             <br/>
             <label for="phase">Phase: </label>
             <span id="phase" class="noteEdit">{{ trialChosen.phase }}</span>

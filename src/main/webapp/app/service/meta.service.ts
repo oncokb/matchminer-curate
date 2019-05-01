@@ -26,7 +26,7 @@ export class MetaService {
         this.db.object( 'Meta/' + data['protocol_no'] + '/' + key ).set( data[key] )
         .then((res) => {})
         .catch( ( error ) => {
-            console.log(error);
+            console.log('Failed to update Meta ' + data['protocol_no'] + ' to DB ', error);
         });
     }
 

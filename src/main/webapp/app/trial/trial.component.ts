@@ -44,10 +44,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
         content: '',
         color: ''
     };
-    mongoMessage = {
-        content: '',
-        color: ''
-    };
     @ViewChild( 'selectModel' ) private selectModel: NgModel;
 
     constructor( private trialService: TrialService, private metaService: MetaService, public db: AngularFireDatabase,
@@ -77,7 +73,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             }
         } );
         this.dtOptions = {
-            paging: false,
+            paging: true,
             scrollY: '300',
             columns: [
                 { 'width': '16%' },
@@ -88,6 +84,9 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 null
             ]
         };
+        this.nctIdChosen = '';
+        this.trialChosen = {};
+        this.messages = [];
         if ( this.router.url.includes( 'NCT' ) ) {
             const urlArray = this.router.url.split( '/' );
             const nctId = urlArray[ 2 ];
@@ -225,7 +224,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
     }
     curateTrial( nctId: string ) {
-        // this.mongoMessage.content = '';
         this.protocolNoMessage.content = '';
         this.clearAdditional();
         this.trialService.setTrialChosen( nctId );
@@ -330,24 +328,5 @@ export class TrialComponent implements OnInit, AfterViewInit {
             this.protocolNoMessage.content = '';
             this.protocolNoMessage.color = '';
         }
-    }
-    loadMongo() {
-        this.mongoMessage.content = 'Loading the trial ......';
-        this.mongoMessage.color = '#ffc107';
-        this.connectionService.loadMongo( this.trialChosen ).subscribe( ( res ) => {
-            if ( res.status === 200 ) {
-                if ( this.trialChosen[ 'archived' ] === 'Yes' ) {
-                    // Remove archived trials from database
-                    alert( 'This archived trial has been removed from database.' );
-                    return;
-                }
-                this.mongoMessage.content = 'Send trial ' + this.nctIdChosen + ' successfully!';
-                this.mongoMessage.color = 'green';
-            }
-        }, ( error ) => {
-            this.mongoMessage.content = 'Request for sending trial ' + this.nctIdChosen + ' failed!';
-            this.mongoMessage.color = 'red';
-            return Observable.throw( error );
-        } );
     }
 }

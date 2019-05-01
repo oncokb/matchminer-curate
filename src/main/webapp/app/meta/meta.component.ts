@@ -1,4 +1,4 @@
-import { Component, ViewChild, AfterViewInit, OnInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnInit, OnDestroy, HostListener } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
@@ -10,6 +10,7 @@ import { DataTableDirective } from 'angular-datatables';
 import { Meta } from './meta.model';
 import { MainutilService } from '../service/mainutil.service';
 import { MetaService } from '../service/meta.service';
+import { environment } from '../environments/environment';
 
 @Component({
     selector: 'jhi-meta',
@@ -18,6 +19,7 @@ import { MetaService } from '../service/meta.service';
 })
 
 export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
+    oncokb = environment['oncokb'] ? environment['oncokb'] : false;
     @ViewChild(DataTableDirective) private dtElement: DataTableDirective;
     isPermitted = this.trialService.isPermitted;
     metaList: Array<Meta> = [];
@@ -38,7 +40,7 @@ export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnInit(): void {
         this.dtOptions = {
             paging: true,
-            scrollY: '70vh',
+            scrollY: '810px',
             columns: [
                 { 'width': '20%' },
                 { 'width': '10%' },
@@ -50,7 +52,12 @@ export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
         };
     }
     ngOnDestroy(): void {
-        // Update meta in firebase when user leave the page.
+        // Update meta in firebase when a user redirects to another page.
+        this.metaService.onDestroyEvent.emit('Meta');
+    }
+
+    @HostListener('window:beforeunload', ['$event']) unloadHandler(event: Event) {
+        // Update meta in firebase when a user refreshes or closes the page.
         this.metaService.onDestroyEvent.emit('Meta');
     }
 

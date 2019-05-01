@@ -1,10 +1,16 @@
 label {
     font-weight:bold
 }
+.meta-container {
+    min-height:500px;
+}
 .loading-bar {
     margin: 0 auto;
     text-align: center;
 }
 .radio-margin {
     margin: 5px;
+}
+.a-no-hover{
+    font-weight: unset;
 }
