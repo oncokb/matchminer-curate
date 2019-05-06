@@ -788,7 +788,7 @@ export class PanelComponent implements OnInit {
     }
     prepareArmData(armInput: Arm, armToSave: Arm) {
         const keys = _.keys(armInput);
-        _.froEach(keys, function(key) {
+        _.forEach(keys, function(key) {
             if (!_.isUndefined(armInput[key])) {
                 armToSave[key] = armInput[key];
             }
