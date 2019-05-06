@@ -16,7 +16,6 @@
         </div>
     </div>
     <br/>
-    <br/>
     <div class="float-right">
         <label for="hideArchived">Hide archived trials:</label>
         <span id="hideArchived">
@@ -39,8 +38,16 @@
         </thead>
         <tbody>
           <tr *ngFor="let trial of trialList">
-            <td><a (click)="curateTrial(trial.nct_id)">{{ trial.nct_id }}</a></td>
-            <td>{{ trial.protocol_no }}</a></td>
+            <td>
+                <a (click)="curateTrial(trial.nct_id)">{{ trial.nct_id }}</a>
+                <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{trial.nct_id}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+            </td>
+              <td>
+                <span *ngIf="trial.protocol_no.length > 0">
+                    <span class="button-margin">{{ trial.protocol_no }}</span>
+                    <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{trial.protocol_no}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                </span>
+              </td>
             <td>{{ trial.status }}</td>
             <td>{{ trial.short_title }}</td>
             <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
@@ -83,8 +90,6 @@
                 <input [(ngModel)]="trialChosen.protocol_no" (blur)="updateProtocolNo()" (keypress)="clearMessage('protocol_no')"/>
                 <span *ngIf="protocolNoMessage.content" class="load-span" [style.color]="protocolNoMessage.color"> {{protocolNoMessage.content}} </span>
             </span>
-            <!--<button class="btn btn-primary" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" (click)="loadMongo()" class="noteEdit">Finish Curation</button>-->
-            <!--<span class="load-span" *ngIf="isPermitted && !frontEndOnly && trialChosen.archived === 'No' && trialChosen.curation_status === 'Ready to import'" [style.color]="mongoMessage.color"> {{mongoMessage.content}} </span>-->
             <br/>
             <label for="phase">Phase: </label>
             <span id="phase" class="noteEdit">{{ trialChosen.phase }}</span>

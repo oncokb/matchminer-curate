@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Clinical } from './clinical.model';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import { MainutilService } from '../service/mainutil.service';
 
 @Component({

@@ -1,0 +1,61 @@
+<div *ngIf="oncokb" class="container meta-container">
+    <div *ngIf="!dataLoaded" class="loading-bar">
+        <h1><i class="fa fa-spinner fa-spin"></i></h1>
+    </div>
+    <div [hidden]="!dataLoaded">
+        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+            <thead>
+                <tr>
+                    <th>NCT ID</th>
+                    <th>Protocol No</th>
+                    <th>Status</th>
+                    <th>Title</th>
+                    <th>Precision Medicine</th>
+                    <th>Curated</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let protocolNo of protocolNoList">
+                    <td>
+                        <span *ngIf="metaList[protocolNo].nct_id.length > 0">
+                            <span class="button-margin">{{ metaList[protocolNo].nct_id }}</span>
+                            <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{metaList[protocolNo].nct_id}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                        </span>
+                    </td>
+                    <td>
+                        <span>
+                            <span class="button-margin">{{ protocolNo }}</span>
+                            <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{protocolNo}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                        </span>
+                    </td>
+                    <td>{{ metaList[protocolNo].status }}</td>
+                    <td>{{ metaList[protocolNo].title }}</td>
+                    <td>
+                        <span *ngIf="!isPermitted">{{ metaList[protocolNo].precision_medicine }}</span>
+                        <span *ngIf="isPermitted">
+                            <form>
+                                <div>
+                                    <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="metaList[protocolNo].precision_medicine" (click)="unCheckRadio('precision_medicine', $event, metaList[protocolNo])">YES
+                                </div>
+                                <div>
+                                    <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="metaList[protocolNo].precision_medicine" (click)="unCheckRadio('precision_medicine', $event, metaList[protocolNo])">NO
+                                </div>
+                            </form>
+                        </span>
+                    </td>
+                    <td>
+                        <span *ngIf="!isPermitted">{{ metaList[protocolNo].curated }}</span>
+                        <span *ngIf="isPermitted">
+                            <span *ngIf="metaList[protocolNo].precision_medicine === 'YES' && metaList[protocolNo].curated === 'NO' && metaList[protocolNo].nct_id.length > 0">
+                                <a class="btn btn-primary a-no-hover" routerLink="{{'/trials/' + metaList[protocolNo].nct_id + '/' + protocolNo}}">Import Trial</a>
+                            </span>
+                            <span *ngIf="metaList[protocolNo].precision_medicine !== 'YES' || metaList[protocolNo].curated === 'YES' || metaList[protocolNo].nct_id.length === 0">
+                                {{ metaList[protocolNo].curated }}
+                            </span>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

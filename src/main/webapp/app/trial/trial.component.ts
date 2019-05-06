@@ -1,10 +1,9 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import { Additional, Trial } from './trial.model';
 import '../../../../../node_modules/jquery/dist/jquery.js';
 import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
@@ -13,6 +12,9 @@ import { DataTableDirective } from 'angular-datatables';
 import { NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConnectionService } from '../service/connection.service';
+import { MetaService } from '../service/meta.service';
+import { Meta } from '../meta/meta.model';
+import { environment } from '../environments/environment';
 
 @Component( {
     selector: 'jhi-trial',
@@ -21,6 +23,7 @@ import { ConnectionService } from '../service/connection.service';
 } )
 
 export class TrialComponent implements OnInit, AfterViewInit {
+    oncokb = environment['oncokb'] ? environment['oncokb'] : false;
     @ViewChild( DataTableDirective )
     dtElement: DataTableDirective;
     trialsToImport = '';
@@ -43,13 +46,10 @@ export class TrialComponent implements OnInit, AfterViewInit {
         content: '',
         color: ''
     };
-    mongoMessage = {
-        content: '',
-        color: ''
-    };
     @ViewChild( 'selectModel' ) private selectModel: NgModel;
 
-    constructor( private trialService: TrialService, public db: AngularFireDatabase, private connectionService: ConnectionService, private router: Router ) {
+    constructor( private trialService: TrialService, private metaService: MetaService, public db: AngularFireDatabase,
+        private connectionService: ConnectionService, private router: Router ) {
         this.trialService.nctIdChosenObs.subscribe( ( message ) => this.nctIdChosen = message );
         this.trialService.trialChosenObs.subscribe( ( message ) => this.trialChosen = message );
         this.trialService.trialListObs.subscribe( ( message ) => {
@@ -75,12 +75,33 @@ export class TrialComponent implements OnInit, AfterViewInit {
             }
         } );
         this.dtOptions = {
-            paging: false,
-            scrollY: '300'
+            paging: true,
+            scrollY: '300',
+            columns: [
+                { 'width': '16%' },
+                { 'width': '10%' },
+                null,
+                null,
+                null,
+                null
+            ]
         };
+        this.nctIdChosen = '';
+        this.trialChosen = {};
+        this.messages = [];
         if ( this.router.url.includes( 'NCT' ) ) {
-            const nctId = this.router.url.split( '/' ).slice( - 1 )[ 0 ];
-            this.curateTrial( nctId );
+            const urlArray = this.router.url.split( '/' );
+            const nctId = urlArray[ 2 ];
+            let protocolNo = '';
+            if (urlArray.length > 3) {
+                protocolNo = urlArray[ 3 ];
+            }
+            if (this.nctIdList.includes(nctId)) {
+                this.curateTrial( nctId );
+            } else {
+                this.importTrialsFromNct(nctId, protocolNo);
+            }
+
         }
     }
     importTrials() {
@@ -127,7 +148,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.connectionService.importTrials( nctId ).subscribe( ( res ) => {
             const trialInfo = res;
             const armsInfo: any = [];
-            _.each( trialInfo[ 'arms' ], function( arm ) {
+            _.forEach( trialInfo[ 'arms' ], function( arm ) {
                 if ( arm.arm_description !== null ) {
                     armsInfo.push( {
                         arm_description: arm.arm_name,
@@ -154,6 +175,17 @@ export class TrialComponent implements OnInit, AfterViewInit {
             };
             this.db.object( 'Trials/' + trialInfo[ 'nct_id' ] ).set( trial ).then( ( response ) => {
                 this.messages.push( 'Successfully imported ' + trialInfo[ 'nct_id' ] );
+                if (this.oncokb && protocolNo.length > 0) {
+                    const metaRecord: Meta = {
+                        protocol_no: protocolNo,
+                        nct_id: trialInfo[ 'nct_id' ],
+                        title: trialInfo[ 'official_title' ],
+                        status: trialInfo[ 'current_trial_status' ],
+                        precision_medicine: 'YES',
+                        curated: 'YES'
+                    };
+                    this.metaService.setMetaCurated(protocolNo, metaRecord);
+                }
                 if ( setChosenTrial === false ) {
                     this.nctIdChosen = trialInfo[ 'nct_id' ];
                     this.trialService.setTrialChosen( this.nctIdChosen );
@@ -194,7 +226,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
     }
     curateTrial( nctId: string ) {
-        // this.mongoMessage.content = '';
         this.protocolNoMessage.content = '';
         this.clearAdditional();
         this.trialService.setTrialChosen( nctId );
@@ -299,24 +330,5 @@ export class TrialComponent implements OnInit, AfterViewInit {
             this.protocolNoMessage.content = '';
             this.protocolNoMessage.color = '';
         }
-    }
-    loadMongo() {
-        this.mongoMessage.content = 'Loading the trial ......';
-        this.mongoMessage.color = '#ffc107';
-        this.connectionService.loadMongo( this.trialChosen ).subscribe( ( res ) => {
-            if ( res.status === 200 ) {
-                if ( this.trialChosen[ 'archived' ] === 'Yes' ) {
-                    // Remove archived trials from database
-                    alert( 'This archived trial has been removed from database.' );
-                    return;
-                }
-                this.mongoMessage.content = 'Send trial ' + this.nctIdChosen + ' successfully!';
-                this.mongoMessage.color = 'green';
-            }
-        }, ( error ) => {
-            this.mongoMessage.content = 'Request for sending trial ' + this.nctIdChosen + ' failed!';
-            this.mongoMessage.color = 'red';
-            return Observable.throw( error );
-        } );
     }
 }

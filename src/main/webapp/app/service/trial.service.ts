@@ -6,13 +6,14 @@ import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from '../panel/movingPath.model';
 import { Arm } from '../arm/arm.model';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
 import { ConnectionService } from './connection.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs/observable/of';
 import { catchError, map } from 'rxjs/operators';
+import { Meta } from '../meta/meta.model';
 
 @Injectable()
 export class TrialService {
@@ -91,6 +92,7 @@ export class TrialService {
     trialsRef: AngularFireObject<any>;
     additionalObject = {};
     additionalRef: AngularFireObject<any>;
+    metaRef: AngularFireObject<any>;
     nctIdChosen = '';
     errorList: Array<object> = [];
 
@@ -98,6 +100,7 @@ export class TrialService {
         this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
         this.additionalRef = db.object('Additional');
+        this.metaRef = db.object('Meta');
 
         // prepare main types list
         this.connectionService.getMainType().subscribe((res: Array<string>) => {
@@ -236,6 +239,18 @@ export class TrialService {
             this.authorizedSource.next(false);
         });
     }
+    fetchMetas() {
+        const metaList: Array<Meta> = [];
+        return new Promise((resolve, reject) => {
+            this.metaRef.snapshotChanges().subscribe( ( action ) => {
+                this.authorizedSource.next( true );
+                resolve(action.payload.val());
+            }, ( error ) => {
+                this.authorizedSource.next( false );
+                reject(metaList);
+            } );
+        });
+    }
     fetchAdditional() {
         this.additionalRef.snapshotChanges().subscribe((action) => {
             this.authorizedSource.next(true);
@@ -273,7 +288,7 @@ export class TrialService {
                     if (_.isUndefined(trial['treatment_list'].step[0].arm)) {
                         trial['treatment_list'].step[0].arm = [];
                     } else {
-                        _.each(trial['treatment_list'].step[0].arm, function(armItem) {
+                        _.forEach(trial['treatment_list'].step[0].arm, function(armItem) {
                             if (_.isUndefined(armItem.match)) {
                                 armItem.match = [];
                             }

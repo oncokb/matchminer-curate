@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import { Genomic } from './genomic.model';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import { ConnectionService } from '../service/connection.service';
 import { MainutilService } from '../service/mainutil.service';
 

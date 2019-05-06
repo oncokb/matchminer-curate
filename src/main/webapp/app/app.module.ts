@@ -49,6 +49,8 @@ import { ConverterComponent } from './converter/converter.component';
 import { ConnectionService } from './service/connection.service';
 import { MainutilService } from './service/mainutil.service';
 import { DrugComponent } from './drug/drug.component';
+import { MetaComponent } from './meta/meta.component';
+import { MetaService } from './service/meta.service';
 
 @NgModule({
     imports: [
@@ -81,7 +83,8 @@ import { DrugComponent } from './drug/drug.component';
         PanelComponent,
         MatchComponent,
         LoginComponent,
-        ConverterComponent
+        ConverterComponent,
+        MetaComponent
     ],
     providers: [
         ProfileService,
@@ -91,6 +94,7 @@ import { DrugComponent } from './drug/drug.component';
         ConnectionService,
         EmailService,
         MainutilService,
+        MetaService,
         UserRouteAccessService,
         {
             provide: HTTP_INTERCEPTORS,

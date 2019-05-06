@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Principal, LoginModalService, LoginService } from '../../shared';
 import { VERSION } from '../../app.constants';
+import { environment } from '../../environments/environment';
 
 @Component({
     selector: 'jhi-navbar',
@@ -18,6 +19,7 @@ export class NavbarComponent implements OnInit {
     swaggerEnabled: boolean;
     modalRef: NgbModalRef;
     version: string;
+    oncokb: boolean;
 
     constructor(
         private loginService: LoginService,
@@ -27,6 +29,7 @@ export class NavbarComponent implements OnInit {
     ) {
         this.version = VERSION ? 'v' + VERSION : '';
         this.isNavbarCollapsed = true;
+        this.oncokb = environment['oncokb'] ? environment['oncokb'] : false;
     }
 
     ngOnInit() {}
