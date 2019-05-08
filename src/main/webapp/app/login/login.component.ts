@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 import { TrialService } from '../service/trial.service';
+import { AngularFireAuth } from '@angular/fire/auth';
 @Component({
     selector: 'jhi-login',
     templateUrl: './login.component.html',

@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
 import { Meta } from '../meta/meta.model';
 import * as _ from 'lodash';
+import { AngularFireDatabase } from '@angular/fire/database';
 
 @Injectable()
 export class MetaService {

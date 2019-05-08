@@ -1,5 +1,5 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase } from '@angular/fire/database';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
@@ -75,7 +75,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             }
         } );
         this.dtOptions = {
-            paging: true,
+            paging: false,
             scrollY: '300',
             columns: [
                 { 'width': '16%' },
