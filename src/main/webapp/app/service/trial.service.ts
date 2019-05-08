@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { Additional, Trial } from '../trial/trial.model';
 import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
@@ -14,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs/observable/of';
 import { catchError, map } from 'rxjs/operators';
 import { Meta } from '../meta/meta.model';
+import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
 
 @Injectable()
 export class TrialService {

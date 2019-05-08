@@ -17,9 +17,7 @@ import { MatchminerCurateAdminModule } from './admin/admin.module';
 import { MatchminerCurateAccountModule } from './account/account.module';
 import { MatchminerCurateEntityModule } from './entities/entity.module';
 import { PaginationConfig } from './blocks/config/uib-pagination.config';
-import { AngularFireModule } from 'angularfire2';
-import { AngularFireAuthModule } from 'angularfire2/auth';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 
@@ -51,6 +49,8 @@ import { MainutilService } from './service/mainutil.service';
 import { DrugComponent } from './drug/drug.component';
 import { MetaComponent } from './meta/meta.component';
 import { MetaService } from './service/meta.service';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireModule } from '@angular/fire';
 
 @NgModule({
     imports: [

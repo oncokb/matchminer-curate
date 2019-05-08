@@ -41,7 +41,7 @@ export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     ngOnInit(): void {
         this.dtOptions = {
-            paging: true,
+            paging: false,
             scrollY: '810px',
             columns: [
                 { 'width': '20%' },
