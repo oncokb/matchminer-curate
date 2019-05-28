@@ -68,7 +68,7 @@ export class MetaComponent implements OnDestroy {
         const headers = ['Protocol No', 'Nct Id', 'Status', 'Title', 'Precision Medicine', 'Curated'];
         content.push(headers.join('\t'));
         this.rows.map((row) => {
-            content.push([row['protocol_no'], row['nct_id'], row['status'], row['title'], row['precision_medicine'], row['curated']].join('\t'));
+            content.push([row['protocol_no'], row['nct_id'], row['status'], row['title'].replace(/\n/g, ''), row['precision_medicine'], row['curated']].join('\t'));
         });
         const blob = new Blob([content.join('\n')], {
             type: 'text/plain;charset=utf-8;',
