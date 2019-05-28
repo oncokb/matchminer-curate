@@ -51,6 +51,7 @@ import { MetaComponent } from './meta/meta.component';
 import { MetaService } from './service/meta.service';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 @NgModule({
     imports: [
@@ -67,7 +68,8 @@ import { AngularFireModule } from '@angular/fire';
         AngularFireAuthModule,
         AngularFireDatabaseModule,
         NgSelectModule,
-        FormsModule
+        FormsModule,
+        NgxDatatableModule
     ],
     declarations: [
         JhiMainComponent,

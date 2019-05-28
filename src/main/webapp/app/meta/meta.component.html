@@ -1,61 +1,70 @@
 <div *ngIf="oncokb" class="container meta-container">
-    <div *ngIf="!dataLoaded" class="loading-bar">
+    <div *ngIf="loadingIndicator" class="loading-bar">
         <h1><i class="fa fa-spinner fa-spin"></i></h1>
     </div>
-    <div [hidden]="!dataLoaded">
-        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
-            <thead>
-                <tr>
-                    <th>NCT ID</th>
-                    <th>Protocol No</th>
-                    <th>Status</th>
-                    <th>Title</th>
-                    <th>Precision Medicine</th>
-                    <th>Curated</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let protocolNo of protocolNoList">
-                    <td>
-                        <span *ngIf="metaList[protocolNo].nct_id.length > 0">
-                            <span class="button-margin">{{ metaList[protocolNo].nct_id }}</span>
-                            <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{metaList[protocolNo].nct_id}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
-                        </span>
-                    </td>
-                    <td>
-                        <span>
-                            <span class="button-margin">{{ protocolNo }}</span>
-                            <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{protocolNo}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
-                        </span>
-                    </td>
-                    <td>{{ metaList[protocolNo].status }}</td>
-                    <td>{{ metaList[protocolNo].title }}</td>
-                    <td>
-                        <span *ngIf="!isPermitted">{{ metaList[protocolNo].precision_medicine }}</span>
-                        <span *ngIf="isPermitted">
-                            <form>
-                                <div>
-                                    <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="metaList[protocolNo].precision_medicine" (click)="unCheckRadio('precision_medicine', $event, metaList[protocolNo])">YES
-                                </div>
-                                <div>
-                                    <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="metaList[protocolNo].precision_medicine" (click)="unCheckRadio('precision_medicine', $event, metaList[protocolNo])">NO
-                                </div>
-                            </form>
-                        </span>
-                    </td>
-                    <td>
-                        <span *ngIf="!isPermitted">{{ metaList[protocolNo].curated }}</span>
-                        <span *ngIf="isPermitted">
-                            <span *ngIf="metaList[protocolNo].precision_medicine === 'YES' && metaList[protocolNo].curated === 'NO' && metaList[protocolNo].nct_id.length > 0">
-                                <a class="btn btn-primary a-no-hover" routerLink="{{'/trials/' + metaList[protocolNo].nct_id + '/' + protocolNo}}">Import Trial</a>
-                            </span>
-                            <span *ngIf="metaList[protocolNo].precision_medicine !== 'YES' || metaList[protocolNo].curated === 'YES' || metaList[protocolNo].nct_id.length === 0">
-                                {{ metaList[protocolNo].curated }}
-                            </span>
-                        </span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div [hidden]="loadingIndicator">
+        <div>
+            <input type="text" class="filter-input" placeholder="Search..." (keyup)='updateFilter($event)'/>
+            <button class="btn btn-primary button-margin download-button" (click)="download()">Download</button>
+        </div>
+        <ngx-datatable #table class="bootstrap"
+                       [rows]="rows"
+                       [columnMode]="'flex'"
+                       [headerHeight]="50"
+                       [footerHeight]="50"
+                       [rowHeight]="'auto'"
+                       [limit]="15">
+            <ngx-datatable-column prop="protocol_no" name="Protocol No" [flexGrow]="1">
+                <ng-template let-value="value" ngx-datatable-cell-template>
+                    <span class="button-margin">{{ value }}</span>
+                    <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{value}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column prop="nct_id" name="Nct Id" [flexGrow]="1">
+                <ng-template let-value="value" ngx-datatable-cell-template>
+                 <span *ngIf="value.length > 0">
+                    <span class="button-margin">{{ value }}</span>
+                    <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{value}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                </span>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Status" [flexGrow]="1">
+                <ng-template let-value="value" ngx-datatable-cell-template>
+                    {{value}}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Title" [flexGrow]="3">
+                <ng-template let-value="value" ngx-datatable-cell-template>
+                    {{value}}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column prop="precision_medicine" name="Precision Medicine" [flexGrow]="1">
+                <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row" let-value="value">
+                    <form>
+                        <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rowIndex]['precision_medicine']" (click)="updatePrecisionMedicine('precision_medicine', $event, row, rowIndex)">YES
+                        <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rowIndex]['precision_medicine']" (click)="updatePrecisionMedicine('precision_medicine', $event, row, rowIndex)">NO
+                    </form>
+                    <!--<span-->
+                        <!--title="Double click to edit"-->
+                        <!--(dblclick)="editing[rowIndex + '-precison_medicine'] = true"-->
+                        <!--*ngIf="!editing[rowIndex + '-precison_medicine']">-->
+                      <!--{{value}}-->
+                    <!--</span>-->
+                    <!--<select-->
+                        <!--*ngIf="editing[rowIndex + '-precison_medicine']"-->
+                        <!--(blur)="editing[rowIndex + '-precison_medicine'] = false"-->
+                        <!--(change)="updatePrecisionMedicine('precision_medicine', $event, row, rowIndex)"-->
+                        <!--[value]="value">-->
+                        <!--<option value="YES">YES</option>-->
+                        <!--<option value="NO">NO</option>-->
+                    <!--</select>-->
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Curated" [flexGrow]="1">
+                <ng-template let-value="value" ngx-datatable-cell-template>
+                    {{value}}
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
     </div>
 </div>
