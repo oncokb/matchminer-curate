@@ -15,6 +15,7 @@ import { ConnectionService } from '../service/connection.service';
 import { MetaService } from '../service/meta.service';
 import { Meta } from '../meta/meta.model';
 import { environment } from '../environments/environment';
+import { saveAs } from 'file-saver';
 
 @Component( {
     selector: 'jhi-trial',
@@ -330,5 +331,17 @@ export class TrialComponent implements OnInit, AfterViewInit {
             this.protocolNoMessage.content = '';
             this.protocolNoMessage.color = '';
         }
+    }
+    download() {
+        const content = [];
+        const headers = ['Nct Id', 'Protocol No', 'Status', 'Title', 'Curation Status', 'Archived'];
+        content.push(headers.join('\t'));
+        this.trialList.map((row) => {
+            content.push([row['nct_id'], row['protocol_no'], row['status'], row['short_title'].replace(/\n/g, ''), row['curation_status'], row['archived']].join('\t'));
+        });
+        const blob = new Blob([content.join('\n')], {
+            type: 'text/plain;charset=utf-8;',
+        });
+        saveAs(blob, 'TrialTable.xls');
     }
 }
