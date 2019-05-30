@@ -1,8 +1,5 @@
-@import '../../../../../node_modules/datatables.net-dt/css/jquery.dataTables.css';
-label {
-    font-weight:bold
-}
 .meta-container {
+    max-width: 2000px;
     min-height:500px;
 }
 .loading-bar {
@@ -10,8 +7,14 @@ label {
     text-align: center;
 }
 .radio-margin {
-    margin: 5px;
+    margin: 0 5px;
 }
-.a-no-hover{
-    font-weight: unset;
+.filter-input{
+    padding:8px;
+    margin:15px auto;
+    width:30%;
+}
+.download-button{
+    float: right;
+    margin: 15px 0;
 }

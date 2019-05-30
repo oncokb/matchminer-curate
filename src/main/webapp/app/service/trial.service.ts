@@ -243,8 +243,11 @@ export class TrialService {
         const metaList: Array<Meta> = [];
         return new Promise((resolve, reject) => {
             this.metaRef.snapshotChanges().subscribe( ( action ) => {
+                for (const id of _.keys(action.payload.val())) {
+                    metaList.push(action.payload.val()[id]);
+                }
                 this.authorizedSource.next( true );
-                resolve(action.payload.val());
+                resolve(metaList);
             }, ( error ) => {
                 this.authorizedSource.next( false );
                 reject(metaList);

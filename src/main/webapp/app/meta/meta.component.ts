@@ -1,16 +1,12 @@
-import { Component, ViewChild, AfterViewInit, OnInit, OnDestroy, HostListener } from '@angular/core';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/observable/combineLatest';
+import { Component, ViewChild, OnDestroy, HostListener } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import * as _ from 'lodash';
-import '../../../../../node_modules/jquery/dist/jquery.js';
-import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
-import { Subject } from 'rxjs/Subject';
-import { DataTableDirective } from 'angular-datatables';
 import { Meta } from './meta.model';
 import { MainutilService } from '../service/mainutil.service';
 import { MetaService } from '../service/meta.service';
 import { environment } from '../environments/environment';
+import { DatatableComponent } from '@swimlane/ngx-datatable';
+import { saveAs } from 'file-saver';
 
 @Component({
     selector: 'jhi-meta',
@@ -18,41 +14,24 @@ import { environment } from '../environments/environment';
     styleUrls: ['meta.scss']
 })
 
-export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
+export class MetaComponent implements OnDestroy {
     oncokb = environment['oncokb'] ? environment['oncokb'] : false;
-    @ViewChild(DataTableDirective) private dtElement: DataTableDirective;
-    isPermitted = this.trialService.isPermitted;
-    metaList: any = {};
-    protocolNoList: Array<string> = [];
-    dtOptions: DataTables.Settings = {};
-    dtTrigger: Subject<any> = new Subject();
-    dataLoaded = false;
-    tableDestroied = false;
+    @ViewChild(DatatableComponent) table: DatatableComponent;
+    loadingIndicator = true;
+    rows = [];
+    temp = [];
+    editing = {};
 
     constructor(private trialService: TrialService, public mainutilService: MainutilService, public metaService: MetaService) {
         this.trialService.fetchMetas().then((result) => {
-            if (!_.isEmpty(result)) {
-                this.metaList = result;
-                this.protocolNoList = Object.keys(result);
-                this.rerender();
-                this.dataLoaded = true;
+            if (Array.isArray(result)) {
+                this.rows = result;
+                this.temp = [...result];
+                this.loadingIndicator = false;
             }
         });
     }
-    ngOnInit(): void {
-        this.dtOptions = {
-            paging: false,
-            scrollY: '810px',
-            columns: [
-                { 'width': '20%' },
-                { 'width': '10%' },
-                { 'width': '15%' },
-                { 'width': '45%' },
-                { 'width': '5%' },
-                { 'width': '5%' }
-            ]
-        };
-    }
+
     ngOnDestroy(): void {
         // Update meta in firebase when a user redirects to another page.
         this.metaService.onDestroyEvent.emit('Meta');
@@ -63,28 +42,37 @@ export class MetaComponent implements OnInit, OnDestroy, AfterViewInit {
         this.metaService.onDestroyEvent.emit('Meta');
     }
 
-    ngAfterViewInit(): void {
-        this.dtTrigger.next();
-    }
-    rerender(): void {
-        this.tableDestroied = false;
-        if (!_.isUndefined(this.dtElement)) {
-            this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-                // Destroy the table first
-                if (!this.tableDestroied) {
-                    dtInstance.destroy();
-                    // Call the dtTrigger to rerender again
-                    this.dtTrigger.next();
-                    this.tableDestroied = true;
-                }
-            });
-        }
-    }
-    unCheckRadio(key: string, event: any, data: Meta) {
+    updatePrecisionMedicine(key: string, event: any, data: Meta, rowIndex) {
         const originalData = _.clone(data);
         data[key] = this.mainutilService.unCheckRadio(data[key], event.target.value);
         if (originalData[key] !== data[key]) {
             this.metaService.metasToUpdate[data['protocol_no']] = data;
         }
+        this.editing[rowIndex + '-' + key] = false;
+        this.rows[rowIndex][key] = data[key];
+        this.rows = [...this.rows];
+    }
+    updateFilter(event) {
+        const val = event.target.value.toLowerCase();
+        // filter our data
+        const temp = this.temp.filter(function(d) {
+            return JSON.stringify(d).toLowerCase().indexOf(val) !== -1 || !val;
+        });
+        // update the rows
+        this.rows = temp;
+        // Whenever the filter changes, always go back to the first page
+        this.table.offset = 0;
+    }
+    download() {
+        const content = [];
+        const headers = ['Protocol No', 'Nct Id', 'Status', 'Title', 'Precision Medicine', 'Curated'];
+        content.push(headers.join('\t'));
+        this.rows.map((row) => {
+            content.push([row['protocol_no'], row['nct_id'], row['status'], row['title'].replace(/\n/g, ''), row['precision_medicine'], row['curated']].join('\t'));
+        });
+        const blob = new Blob([content.join('\n')], {
+            type: 'text/plain;charset=utf-8;',
+        });
+        saveAs(blob, 'MetaTable.xls');
     }
 }
