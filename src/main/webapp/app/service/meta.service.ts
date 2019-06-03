@@ -16,14 +16,15 @@ export class MetaService {
         });
     }
 
-    setMetaCurated(metaId: string, data: object) {
+    setMetaCurated(data: Meta) {
+        const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
         this.db.object('Meta/' + metaId).set(data).then((result) => {
         }).catch((error) => {
             console.log('Failed to save Meta' + metaId + ' to DB ', error);
         });
     }
     updateMeta(data: Meta) {
-        const metaId = data['protocol_no'].length > 0 ? data['protocol_no'] : data['nct_id'];
+        const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
         this.db.object( 'Meta/' + metaId).set( data )
         .then((res) => {})
         .catch( ( error ) => {

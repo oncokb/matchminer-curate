@@ -185,8 +185,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                         precision_medicine: 'YES',
                         curated: 'YES'
                     };
-                    const metaId = metaRecord['protocol_no'].length > 0 ? metaRecord['protocol_no'] : metaRecord['nct_id'];
-                    this.metaService.setMetaCurated(metaId, metaRecord);
+                    this.metaService.setMetaCurated(metaRecord);
                 }
                 if ( setChosenTrial === false ) {
                     this.nctIdChosen = trialInfo[ 'nct_id' ];

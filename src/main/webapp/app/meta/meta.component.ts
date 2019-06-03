@@ -44,7 +44,7 @@ export class MetaComponent implements OnDestroy {
     }
 
     updateValue(key: string, event: any, data: Meta, rowIndex) {
-        const metaId = data['protocol_no'].length > 0 ? data['protocol_no'] : data['nct_id'];
+        const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
         if (key === 'precision_medicine') {
             const updatedValue = this.updatePrecisionMedicine(key, event, data, metaId);
             this.rows[rowIndex][key] = updatedValue;
