@@ -21,6 +21,7 @@ export class MetaComponent implements OnDestroy {
     rows = [];
     temp = [];
     editing = {};
+    statusOptions = this.trialService.statusOptions;
 
     constructor(private trialService: TrialService, public mainutilService: MainutilService, public metaService: MetaService) {
         this.trialService.fetchMetas().then((result) => {
@@ -42,15 +43,26 @@ export class MetaComponent implements OnDestroy {
         this.metaService.onDestroyEvent.emit('Meta');
     }
 
-    updatePrecisionMedicine(key: string, event: any, data: Meta, rowIndex) {
+    updateValue(key: string, event: any, data: Meta, rowIndex) {
+        if (key === 'precision_medicine') {
+            const updatedValue = this.updatePrecisionMedicine(key, event, data);
+            this.rows[rowIndex][key] = updatedValue;
+        } else if (data[key] !== event.target.value) {
+            data[key] = event.target.value;
+            this.metaService.metasToUpdate[data['protocol_no']] = data;
+            this.rows[rowIndex][key] = event.target.value;
+        }
+        this.editing[rowIndex + '-' + key] = false;
+        this.rows = [...this.rows];
+    }
+
+    updatePrecisionMedicine(key: string, event: any, data: Meta) {
         const originalData = _.clone(data);
         data[key] = this.mainutilService.unCheckRadio(data[key], event.target.value);
         if (originalData[key] !== data[key]) {
             this.metaService.metasToUpdate[data['protocol_no']] = data;
         }
-        this.editing[rowIndex + '-' + key] = false;
-        this.rows[rowIndex][key] = data[key];
-        this.rows = [...this.rows];
+        return data[key];
     }
     updateFilter(event) {
         const val = event.target.value.toLowerCase();
