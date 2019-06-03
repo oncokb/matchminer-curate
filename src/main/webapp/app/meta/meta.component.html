@@ -29,8 +29,24 @@
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="Status" [flexGrow]="1">
-                <ng-template let-value="value" ngx-datatable-cell-template>
-                    {{value}}
+                <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row" let-value="value">
+                    <span
+                        title="Double click to edit"
+                        (dblclick)="editing[rowIndex + '-status'] = true"
+                        *ngIf="!editing[rowIndex + '-status']">
+                      {{rows[rowIndex]['status']}}
+                    </span>
+                    <select class="status-select"
+                        *ngIf="editing[rowIndex + '-status']"
+                        (blur)="editing[rowIndex + '-status'] = false"
+                        (change)="updateValue('status', $event, row, rowIndex)"
+                        [value]="value">
+                        <option *ngFor="let option of statusOptions"
+                                [value]="option"
+                                [attr.selected]="option==rows[rowIndex]['status'] ? true : null">
+                            {{option}}
+                        </option>
+                    </select>
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="Title" [flexGrow]="3">
@@ -41,8 +57,8 @@
             <ngx-datatable-column prop="precision_medicine" name="Precision Medicine" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row" let-value="value">
                     <form>
-                        <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rowIndex]['precision_medicine']" (click)="updatePrecisionMedicine('precision_medicine', $event, row, rowIndex)">YES
-                        <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rowIndex]['precision_medicine']" (click)="updatePrecisionMedicine('precision_medicine', $event, row, rowIndex)">NO
+                        <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rowIndex]['precision_medicine']" (click)="updateValue('precision_medicine', $event, row, rowIndex)">YES
+                        <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rowIndex]['precision_medicine']" (click)="updateValue('precision_medicine', $event, row, rowIndex)">NO
                     </form>
                 </ng-template>
             </ngx-datatable-column>

@@ -22,8 +22,8 @@ export class MetaService {
             console.log('Failed to save Meta' + protocolNo + ' to DB ', error);
         });
     }
-    updateMeta(key: string, data: Meta) {
-        this.db.object( 'Meta/' + data['protocol_no'] + '/' + key ).set( data[key] )
+    updateMeta(data: Meta) {
+        this.db.object( 'Meta/' + data['protocol_no']).set( data )
         .then((res) => {})
         .catch( ( error ) => {
             console.log('Failed to update Meta ' + data['protocol_no'] + ' to DB ', error);
@@ -33,7 +33,7 @@ export class MetaService {
     onMetaDestory() {
         const self = this;
         _.forEach(this.metasToUpdate, function(meta){
-            self.updateMeta('precision_medicine', meta);
+            self.updateMeta(meta);
         });
     }
 
