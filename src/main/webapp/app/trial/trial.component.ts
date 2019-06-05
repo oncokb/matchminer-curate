@@ -176,7 +176,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             };
             this.db.object( 'Trials/' + trialInfo[ 'nct_id' ] ).set( trial ).then( ( response ) => {
                 this.messages.push( 'Successfully imported ' + trialInfo[ 'nct_id' ] );
-                if (this.oncokb && protocolNo.length > 0) {
+                if (this.oncokb) {
                     const metaRecord: Meta = {
                         protocol_no: protocolNo,
                         nct_id: trialInfo[ 'nct_id' ],
@@ -185,7 +185,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                         precision_medicine: 'YES',
                         curated: 'YES'
                     };
-                    this.metaService.setMetaCurated(protocolNo, metaRecord);
+                    this.metaService.setMetaCurated(metaRecord);
                 }
                 if ( setChosenTrial === false ) {
                     this.nctIdChosen = trialInfo[ 'nct_id' ];

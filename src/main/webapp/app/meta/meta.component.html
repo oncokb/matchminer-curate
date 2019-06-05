@@ -16,8 +16,10 @@
                        [limit]="15">
             <ngx-datatable-column prop="protocol_no" name="Protocol No" [flexGrow]="1">
                 <ng-template let-value="value" ngx-datatable-cell-template>
-                    <span class="button-margin">{{ value }}</span>
-                    <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{value}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                     <span *ngIf="value.length > 0">
+                        <span class="button-margin">{{ value }}</span>
+                        <a target="_blank" href="https://www.mskcc.org/cancer-care/clinical-trials/{{value}}"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+                     </span>
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column prop="nct_id" name="Nct Id" [flexGrow]="1">
@@ -29,21 +31,21 @@
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="Status" [flexGrow]="1">
-                <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row" let-value="value">
+                <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
                     <span
                         title="Double click to edit"
-                        (dblclick)="editing[rowIndex + '-status'] = true"
-                        *ngIf="!editing[rowIndex + '-status']">
-                      {{rows[rowIndex]['status']}}
+                        (dblclick)="editing[rows.indexOf(row) + '-status'] = true"
+                        *ngIf="!editing[rows.indexOf(row) + '-status']">
+                      {{rows[rows.indexOf(row)]['status']}}
                     </span>
                     <select class="status-select"
-                        *ngIf="editing[rowIndex + '-status']"
-                        (blur)="editing[rowIndex + '-status'] = false"
-                        (change)="updateValue('status', $event, row, rowIndex)"
+                        *ngIf="editing[rows.indexOf(row) + '-status']"
+                        (blur)="editing[rows.indexOf(row) + '-status'] = false"
+                        (change)="updateValue('status', $event, row, rows.indexOf(row))"
                         [value]="value">
                         <option *ngFor="let option of statusOptions"
                                 [value]="option"
-                                [attr.selected]="option==rows[rowIndex]['status'] ? true : null">
+                                [attr.selected]="option==rows[rows.indexOf(row)]['status'] ? true : null">
                             {{option}}
                         </option>
                     </select>
@@ -55,10 +57,10 @@
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column prop="precision_medicine" name="Precision Medicine" [flexGrow]="1">
-                <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row" let-value="value">
+                <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
                     <form>
-                        <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rowIndex]['precision_medicine']" (click)="updateValue('precision_medicine', $event, row, rowIndex)">YES
-                        <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rowIndex]['precision_medicine']" (click)="updateValue('precision_medicine', $event, row, rowIndex)">NO
+                        <input type="radio" value="YES" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rows.indexOf(row)]['precision_medicine']" (click)="updateValue('precision_medicine', $event, row, rows.indexOf(row))">YES
+                        <input type="radio" value="NO" name="precision-medicine" class="radio-margin" [(ngModel)]="rows[rows.indexOf(row)]['precision_medicine']" (click)="updateValue('precision_medicine', $event, row, rows.indexOf(row))">NO
                     </form>
                 </ng-template>
             </ngx-datatable-column>

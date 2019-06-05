@@ -44,23 +44,24 @@ export class MetaComponent implements OnDestroy {
     }
 
     updateValue(key: string, event: any, data: Meta, rowIndex) {
+        const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
         if (key === 'precision_medicine') {
-            const updatedValue = this.updatePrecisionMedicine(key, event, data);
+            const updatedValue = this.updatePrecisionMedicine(key, event, data, metaId);
             this.rows[rowIndex][key] = updatedValue;
         } else if (data[key] !== event.target.value) {
             data[key] = event.target.value;
-            this.metaService.metasToUpdate[data['protocol_no']] = data;
+            this.metaService.metasToUpdate[metaId] = data;
             this.rows[rowIndex][key] = event.target.value;
         }
         this.editing[rowIndex + '-' + key] = false;
         this.rows = [...this.rows];
     }
 
-    updatePrecisionMedicine(key: string, event: any, data: Meta) {
+    updatePrecisionMedicine(key: string, event: any, data: Meta, metaId: string) {
         const originalData = _.clone(data);
         data[key] = this.mainutilService.unCheckRadio(data[key], event.target.value);
         if (originalData[key] !== data[key]) {
-            this.metaService.metasToUpdate[data['protocol_no']] = data;
+            this.metaService.metasToUpdate[metaId] = data;
         }
         return data[key];
     }

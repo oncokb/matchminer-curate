@@ -16,17 +16,19 @@ export class MetaService {
         });
     }
 
-    setMetaCurated(protocolNo: string, data: object) {
-        this.db.object('Meta/' + protocolNo).set(data).then((result) => {
+    setMetaCurated(data: Meta) {
+        const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
+        this.db.object('Meta/' + metaId).set(data).then((result) => {
         }).catch((error) => {
-            console.log('Failed to save Meta' + protocolNo + ' to DB ', error);
+            console.log('Failed to save Meta' + metaId + ' to DB ', error);
         });
     }
     updateMeta(data: Meta) {
-        this.db.object( 'Meta/' + data['protocol_no']).set( data )
+        const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
+        this.db.object( 'Meta/' + metaId).set( data )
         .then((res) => {})
         .catch( ( error ) => {
-            console.log('Failed to update Meta ' + data['protocol_no'] + ' to DB ', error);
+            console.log('Failed to update Meta ' + metaId + ' to DB ', error);
         });
     }
 
