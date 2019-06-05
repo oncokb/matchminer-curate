@@ -84,7 +84,7 @@ export class TrialService {
     allSubTypesOptions = [];
     subToMainMapping = {};
     mainTypesOptions = ['All Solid Tumors', 'All Liquid Tumors', 'All Tumors', 'All Pediatric Tumors'];
-    statusOptions = ['Active', 'Administratively Complete', 'Approved', 'Closed to Accrual', 'Closed to Accrual and Intervention',
+    statusOptions = ['Active', 'Administratively Complete', 'Approved', 'Closed', 'Closed to Accrual', 'Closed to Accrual and Intervention',
     'Complete', 'Enrolling by Invitation', 'In Review', 'Open to Accrual', 'Temporarily Closed to Accrual', 'Temporarily Closed to Accrual and Intervention',
     'Withdrawn'];
     annotated_variants = {};
