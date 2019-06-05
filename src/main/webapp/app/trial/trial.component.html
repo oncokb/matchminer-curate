@@ -1,4 +1,4 @@
-<div class="container curation-container-height">
+<div class="container trial-container">
     <div class="input-group">
         <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Enter trial in the format: NCT02057133 or 14-085"
             size="100">
@@ -33,7 +33,7 @@
             <th>Status</th>
             <th>Title</th>
             <th>Curation Status</th>
-            <th [hidden]="true">Archived</th>
+            <th>Archived</th>
           </tr>
         </thead>
         <tbody>
@@ -51,7 +51,7 @@
             <td>{{ trial.status }}</td>
             <td>{{ trial.short_title }}</td>
             <td><span [ngStyle]="getStatus(trial.curation_status)">{{ trial.curation_status }}</span></td>
-            <td [hidden]="true">{{ trial.archived }}</td>
+            <td>{{ trial.archived }}</td>
           </tr>
         </tbody>
       </table>

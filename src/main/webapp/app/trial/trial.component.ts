@@ -67,24 +67,24 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
     ngOnInit(): void {
         $.fn[ 'dataTable' ].ext.search.push( ( settings, data ) => {
-            if ( this.hideArchived === 'Yes' && data[ 4 ] === 'Yes' ) {
+            if ( this.hideArchived === 'Yes' && data[ 5 ] === 'Yes' ) {
                 return false;
-            } else if ( this.hideArchived === 'No' && data[ 4 ] === 'No' ) {
+            } else if ( this.hideArchived === 'No' && data[ 5 ] === 'No' ) {
                 return false;
             } else {
                 return true;
             }
         } );
         this.dtOptions = {
-            paging: false,
+            paging: true,
             scrollY: '300',
             columns: [
-                { 'width': '16%' },
+                { 'width': '15%' },
                 { 'width': '10%' },
-                null,
-                null,
-                null,
-                null
+                { 'width': '15%' },
+                { 'width': '40%' },
+                { 'width': '10%' },
+                { 'width': '10%' }
             ]
         };
         this.nctIdChosen = '';
@@ -185,7 +185,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                         precision_medicine: 'YES',
                         curated: 'YES'
                     };
-                    this.metaService.setMetaCurated(metaRecord);
+                    this.metaService.createMetaRecord(metaRecord);
                 }
                 if ( setChosenTrial === false ) {
                     this.nctIdChosen = trialInfo[ 'nct_id' ];
