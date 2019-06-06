@@ -32,15 +32,7 @@
             </ngx-datatable-column>
             <ngx-datatable-column name="Status" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
-                    <span
-                        title="Double click to edit"
-                        (dblclick)="editing[rows.indexOf(row) + '-status'] = true"
-                        *ngIf="!editing[rows.indexOf(row) + '-status']">
-                      {{rows[rows.indexOf(row)]['status']}}
-                    </span>
                     <select class="status-select"
-                        *ngIf="editing[rows.indexOf(row) + '-status']"
-                        (blur)="editing[rows.indexOf(row) + '-status'] = false"
                         (change)="updateValue('status', $event, row, rows.indexOf(row))"
                         [value]="value">
                         <option *ngFor="let option of statusOptions"

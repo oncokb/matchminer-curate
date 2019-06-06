@@ -83,8 +83,4 @@ export class ConnectionService {
     getDrugs(query: string) {
         return this.http.get(this.getAPIUrl('Drugs') + `?name=${query}`);
     }
-
-    loadMongo(trial: any) {
-        return this.http.post('trials/create', trial, { observe: 'response' });
-    }
 }

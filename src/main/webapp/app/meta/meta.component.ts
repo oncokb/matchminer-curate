@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnDestroy, HostListener } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import * as _ from 'lodash';
 import { Meta } from './meta.model';
@@ -14,13 +14,12 @@ import { saveAs } from 'file-saver';
     styleUrls: ['meta.scss']
 })
 
-export class MetaComponent implements OnDestroy {
+export class MetaComponent {
     oncokb = environment['oncokb'] ? environment['oncokb'] : false;
     @ViewChild(DatatableComponent) table: DatatableComponent;
     loadingIndicator = true;
     rows = [];
     temp = [];
-    editing = {};
     statusOptions = this.trialService.statusOptions;
 
     constructor(private trialService: TrialService, public mainutilService: MainutilService, public metaService: MetaService) {
@@ -33,37 +32,20 @@ export class MetaComponent implements OnDestroy {
         });
     }
 
-    ngOnDestroy(): void {
-        // Update meta in firebase when a user redirects to another page.
-        this.metaService.onDestroyEvent.emit('Meta');
-    }
-
-    @HostListener('window:beforeunload', ['$event']) unloadHandler(event: Event) {
-        // Update meta in firebase when a user refreshes or closes the page.
-        this.metaService.onDestroyEvent.emit('Meta');
-    }
-
     updateValue(key: string, event: any, data: Meta, rowIndex) {
-        const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
         if (key === 'precision_medicine') {
-            const updatedValue = this.updatePrecisionMedicine(key, event, data, metaId);
-            this.rows[rowIndex][key] = updatedValue;
+            const originalData = _.clone(data);
+            data[key] = this.mainutilService.unCheckRadio(data[key], event.target.value);
+            if (originalData[key] !== data[key]) {
+                this.metaService.updateMeta(key, data);
+                this.rows[rowIndex][key] = data[key];
+            }
         } else if (data[key] !== event.target.value) {
             data[key] = event.target.value;
-            this.metaService.metasToUpdate[metaId] = data;
+            this.metaService.updateMeta(key, data);
             this.rows[rowIndex][key] = event.target.value;
         }
-        this.editing[rowIndex + '-' + key] = false;
         this.rows = [...this.rows];
-    }
-
-    updatePrecisionMedicine(key: string, event: any, data: Meta, metaId: string) {
-        const originalData = _.clone(data);
-        data[key] = this.mainutilService.unCheckRadio(data[key], event.target.value);
-        if (originalData[key] !== data[key]) {
-            this.metaService.metasToUpdate[metaId] = data;
-        }
-        return data[key];
     }
     updateFilter(event) {
         const val = event.target.value.toLowerCase();
