@@ -12,7 +12,6 @@ import { ConnectionService } from './connection.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs/observable/of';
 import { catchError, map } from 'rxjs/operators';
-import { Meta } from '../meta/meta.model';
 import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
 
 @Injectable()
@@ -93,7 +92,6 @@ export class TrialService {
     trialsRef: AngularFireObject<any>;
     additionalObject = {};
     additionalRef: AngularFireObject<any>;
-    metaRef: AngularFireObject<any>;
     nctIdChosen = '';
     errorList: Array<object> = [];
 
@@ -101,7 +99,6 @@ export class TrialService {
         this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
         this.additionalRef = db.object('Additional');
-        this.metaRef = db.object('Meta');
 
         // prepare main types list
         this.connectionService.getMainType().subscribe((res: Array<string>) => {
@@ -238,21 +235,6 @@ export class TrialService {
             this.setTrialChosen(this.nctIdChosen);
         }, (error) => {
             this.authorizedSource.next(false);
-        });
-    }
-    fetchMetas() {
-        const metaList: Array<Meta> = [];
-        return new Promise((resolve, reject) => {
-            this.metaRef.snapshotChanges().subscribe( ( action ) => {
-                for (const id of _.keys(action.payload.val())) {
-                    metaList.push(action.payload.val()[id]);
-                }
-                this.authorizedSource.next( true );
-                resolve(metaList);
-            }, ( error ) => {
-                this.authorizedSource.next( false );
-                reject(metaList);
-            } );
         });
     }
     fetchAdditional() {

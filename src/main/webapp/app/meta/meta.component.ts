@@ -23,11 +23,13 @@ export class MetaComponent {
     statusOptions = this.trialService.statusOptions;
 
     constructor(private trialService: TrialService, public mainutilService: MainutilService, public metaService: MetaService) {
-        this.trialService.fetchMetas().then((result) => {
-            if (Array.isArray(result)) {
-                this.rows = result;
+        this.metaService.metaListObs.subscribe( ( result ) => {
+            if (result.length > 0) {
+                this.rows = [...result];
                 this.temp = [...result];
-                this.loadingIndicator = false;
+                if (this.loadingIndicator) {
+                    this.loadingIndicator = false;
+                }
             }
         });
     }
