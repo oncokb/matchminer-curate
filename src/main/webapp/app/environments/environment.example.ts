@@ -1,11 +1,11 @@
 export const environment = {
     firebaseConfig: {
-        apiKey: '',
-        authDomain: '',
-        databaseURL: '',
-        projectId: '',
-        storageBucket: '',
-        messagingSenderId: ''
+        apiKey: "[API-KEY]",
+        authDomain: "[PROJECT-ID].firebaseapp.com",
+        databaseURL: "https://[PROJECT-ID].firebaseio.com",
+        projectId: "[PROJECT-ID]",
+        storageBucket: "[PROJECT-ID].appspot.com",
+        messagingSenderId: "[SENDER-ID]",
     },
     devEmail: '', // set development team email to receive error notifications
     oncotreeVersion: '', // set for using specific oncotree version. By default, it is "oncotree_latest_stable".

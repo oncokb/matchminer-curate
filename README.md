@@ -34,13 +34,15 @@ Note: **Please store all trials in a list named `Trials`.**
 2. Go to `Authentication` page in Firebase console, click `Web setup` button and Firebase config will pop up. Copy 
 required fields to `environments.ts`.
     ```
-    apiKey: "",
-    authDomain: "",
-    databaseURL: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: ""
+    apiKey: "[API-KEY]",
+    authDomain: "[PROJECT-ID].firebaseapp.com",
+    databaseURL: "https://[PROJECT-ID].firebaseio.com",
+    projectId: "[PROJECT-ID]",
+    storageBucket: "[PROJECT-ID].appspot.com",
+    messagingSenderId: "[SENDER-ID]",
     ```
+    
+For more information about setting up firebase - [Firebase Documentation](https://firebase.google.com/docs/web/setup)
     
 ### Run Project
 We use yarn scripts and [Webpack][] as our build system.
