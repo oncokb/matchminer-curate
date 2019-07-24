@@ -326,10 +326,6 @@
   dependencies:
     typescript "~2.6.2"
 
-"@swimlane/ngx-datatable@^11.3.2":
-  version "11.3.2"
-  resolved "https://registry.yarnpkg.com/@swimlane/ngx-datatable/-/ngx-datatable-11.3.2.tgz#cefeda7f75a6f69394e4f8e05b197942584f054d"
-
 "@sentry/browser@^4.6.5":
   version "4.6.5"
   resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-4.6.5.tgz#ecae280400117fef039db1b678e110a7d3e98a10"
@@ -381,6 +377,10 @@
   dependencies:
     "@sentry/types" "4.5.3"
     tslib "^1.9.3"
+
+"@swimlane/ngx-datatable@^11.3.2":
+  version "11.3.2"
+  resolved "https://registry.yarnpkg.com/@swimlane/ngx-datatable/-/ngx-datatable-11.3.2.tgz#cefeda7f75a6f69394e4f8e05b197942584f054d"
 
 "@types/datatables.net@^1.10.9":
   version "1.10.17"
@@ -8886,6 +8886,11 @@ tslib@1.9.0:
 tslib@^1.7.1, tslib@^1.8.1, tslib@^1.9.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
+
+tslib@^1.9.3:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
+  integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
 
 tslint-loader@3.5.3:
   version "3.5.3"
