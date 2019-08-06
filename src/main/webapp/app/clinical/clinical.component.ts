@@ -48,7 +48,7 @@ export class ClinicalComponent implements OnInit {
             const ageGroups = this.clinicalInput.age_numerical.split(',');
             // Age input cannot only accepts age range groups greater than 2.
             if (ageGroups.length === 2) {
-                const ageNumber = this.clinicalInput.age_numerical.match(/\d+(\.?\d+)?/g).map(function(v) { return parseFloat(v); });
+                const ageNumber = this.clinicalInput.age_numerical.match(/\d+(\.?\d+)?/g).map(function(v) { return Number(v); });
                 // Do no allow age range like '>15, >=30' or '<=60, <40' or '<10, >60' or '>50, <20'
                 if ((ageGroups[0].includes('>') && ageGroups[1].includes('>')) ||
                     (ageGroups[0].includes('<') && ageGroups[1].includes('<')) ||
@@ -87,7 +87,7 @@ export class ClinicalComponent implements OnInit {
     }
     validateSingleAgeStr(age_numerical: string) {
         if (age_numerical.match(/^(>|>=|<|<=)\d+(\.?\d+)?$/)) {
-            const ageNumber = age_numerical.match(/\d+(\.?\d+)?/g).map(function(v) { return parseFloat(v); });
+            const ageNumber = age_numerical.match(/\d+(\.?\d+)?/g).map(function(v) { return Number(v); });
             if ( ageNumber[0] >= 0 && ageNumber[0] <= 100 ) {
                 return true;
             }
