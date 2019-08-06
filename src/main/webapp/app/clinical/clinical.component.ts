@@ -48,13 +48,12 @@ export class ClinicalComponent implements OnInit {
             const ageGroups = this.clinicalInput.age_numerical.split(',');
             // Age input cannot only accepts age range groups greater than 2.
             if (ageGroups.length === 2) {
-                const ageNumber0 = Number(ageGroups[0].match(/\d\d?$/));
-                const ageNumber1 = Number(ageGroups[1].match(/\d\d?$/));
+                const ageNumber = this.clinicalInput.age_numerical.match(/\d+(\.?\d+)?/g).map(function(v) { return Number(v); });
                 // Do no allow age range like '>15, >=30' or '<=60, <40' or '<10, >60' or '>50, <20'
                 if ((ageGroups[0].includes('>') && ageGroups[1].includes('>')) ||
                     (ageGroups[0].includes('<') && ageGroups[1].includes('<')) ||
-                    (ageGroups[0].includes('<') && ageGroups[1].includes('>') && ageNumber0 <= ageNumber1) ||
-                    (ageGroups[0].includes('>') && ageGroups[1].includes('<') && ageNumber0 >= ageNumber1)) {
+                    (ageGroups[0].includes('<') && ageGroups[1].includes('>') && ageNumber[0] <= ageNumber[1]) ||
+                    (ageGroups[0].includes('>') && ageGroups[1].includes('<') && ageNumber[0] >= ageNumber[1])) {
                     this.setValidationMessage(false, 'Invalid Age Entry');
                     return;
                 }
@@ -87,11 +86,13 @@ export class ClinicalComponent implements OnInit {
         }
     }
     validateSingleAgeStr(age_numerical: string) {
-        if (age_numerical.match(/^(>|>=|<|<=)\d\d?$/)) {
-            return true;
-        } else {
-            return false;
+        if (age_numerical.match(/^(>|>=|<|<=)\d+(\.?\d+)?$/)) {
+            const ageNumber = age_numerical.match(/\d+(\.?\d+)?/g).map(function(v) { return Number(v); });
+            if ( ageNumber[0] >= 0 && ageNumber[0] <= 100 ) {
+                return true;
+            }
         }
+        return false;
     }
     setValidationMessage(isPassed: boolean, message: string) {
         this.validationMessage = message;

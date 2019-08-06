@@ -52,10 +52,10 @@ import { MetaService } from './service/meta.service';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-import * as Sentry from "@sentry/browser";
+import * as Sentry from '@sentry/browser';
 
 Sentry.init({
-    dsn: "https://73c005cfa16b49b9825b0ae57b7b9234@sentry.io/1423208"
+    dsn: 'https://73c005cfa16b49b9825b0ae57b7b9234@sentry.io/1423208'
 });
 
 @Injectable()
