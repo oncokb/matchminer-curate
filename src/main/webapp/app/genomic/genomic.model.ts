@@ -1,5 +1,6 @@
 export interface Genomic {
     hugo_symbol?: string,
+    pathway?: string,
     annotated_variant?: string,
     matching_examples?: string,
     germline?: string,

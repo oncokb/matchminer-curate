@@ -1,12 +1,20 @@
 <div *ngIf="type === 'add'; else editPanel">
     <div>
         <div class="row borderMargin">
+            <div class="col-sm-4">pathway:</div>
+            <div class="col-sm-8">
+                <ng-select class="selectStyle" [items]="pathwayOptions" [(ngModel)]="genomicInput.pathway" [clearable]="true"
+                           placeholder="Select Pathway" (change)="changePathway()">
+                </ng-select>
+            </div>
+        </div>
+        <div class="row borderMargin">
             <div class="col-sm-3">hugo_symbol:
                 <span [ngStyle]="getMessageStyle('gene')">{{ validationMessage['gene'] }}</span>
             </div>
             <div class="col-sm-1">
                 <label for="no_hugo_symbol1">Not</label>
-                <input id="no_hugo_symbol1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_hugo_symbol" />
+                <input id="no_hugo_symbol1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_hugo_symbol" [disabled]="disableHugoSymbol"/>
             </div>
             <div class="col-sm-8">
                 <input type="text" class="selectStyle" [(ngModel)]="genomicInput.hugo_symbol" size="36" (change)="validateGenomicGene()" />
@@ -166,12 +174,20 @@
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="operationPool['relocate'] !== true && operationPool['copy'] !== true && operationPool['currentPath'] === path; else panel">
         <div class="row borderMargin">
+            <div class="col-sm-4">pathway:</div>
+            <div class="col-sm-8">
+                <ng-select class="selectStyle" [items]="pathwayOptions" [(ngModel)]="genomicInput.pathway" [clearable]="true"
+                           placeholder="Select Pathway" (change)="changePathway()" >
+                </ng-select>
+            </div>
+        </div>
+        <div class="row borderMargin">
             <div class="col-sm-3">hugo_symbol:
                 <span [ngStyle]="getMessageStyle('gene')">{{ validationMessage['gene'] }}</span>
             </div>
             <div class="col-sm-1">
                 <label for="no_hugo_symbol2">Not</label>
-                <input id="no_hugo_symbol2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_hugo_symbol" />
+                <input id="no_hugo_symbol2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_hugo_symbol" [disabled]="disableHugoSymbol"/>
             </div>
             <div class="col-sm-8">
                 <input class="selectStyle" type="text" [(ngModel)]="genomicInput.hugo_symbol" size="36" (change)="validateGenomicGene()" />
@@ -324,20 +340,34 @@
     </div>
     <ng-template #panel>
         <div [ngStyle]="getStyle()">
-            <div class="row">
-                <div class="col-sm-4">
-                    <label>hugo_symbol: </label>
-                </div>
-                <div class="col-sm-8">
-                    <span>{{getDisplayContent('hugo_symbol')}}</span>
+            <div *ngIf="unit.genomic.pathway">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label>pathway: </label>
+                    </div>
+                    <div class="col-sm-8">
+                        <span>{{unit.genomic.pathway}}</span>
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-sm-4">
-                    <label>annotated_variant: </label>
+            <div *ngIf="unit.genomic.hugo_symbol">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label>hugo_symbol: </label>
+                    </div>
+                    <div class="col-sm-8">
+                        <span>{{getDisplayContent('hugo_symbol')}}</span>
+                    </div>
                 </div>
-                <div class="col-sm-8">
-                    <span>{{getDisplayContent('annotated_variant')}}</span>
+            </div>
+            <div *ngIf="unit.genomic.annotated_variant">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label>annotated_variant: </label>
+                    </div>
+                    <div class="col-sm-8">
+                        <span>{{getDisplayContent('annotated_variant')}}</span>
+                    </div>
                 </div>
             </div>
             <div *ngIf="unit.genomic.matching_examples">

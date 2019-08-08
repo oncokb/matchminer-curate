@@ -22,6 +22,7 @@ export class GenomicComponent implements OnInit {
     indent = 1.2; // the relative indent between the genomic content with the title
     operationPool: {};
     genomicInput: Genomic;
+    originalGenomic: Genomic;
     variant_categorys = ['Mutation', 'Copy Number Variation', 'Structural Variation', 'Any Variation'];
     variant_classifications = ['In_Frame_Del', 'In_Frame_Ins', 'Missense_Mutation', 'Nonsense_Mutation', 'Nonstop_Mutation',
     'Del_Ins', 'Frameshift', 'Frame_Shift_Del', 'Frame_Shift_Ins', 'Frameshift_mutation',
@@ -38,6 +39,8 @@ export class GenomicComponent implements OnInit {
     };
     geneValidation = false;
     exampleValidation = false;
+    pathwayOptions = ['A', 'B', 'C'];
+    disableHugoSymbol = false;
 
     search = (text$: Observable<string>) =>
         text$
@@ -61,6 +64,10 @@ export class GenomicComponent implements OnInit {
     ngOnInit() {
         this.trialService.genomicInputObs.subscribe((message) => {
             this.genomicInput = message;
+            this.originalGenomic = _.clone(message);
+            if (this.originalGenomic.pathway) {
+                this.disableHugoSymbol = true;
+            }
         });
         this.trialService.operationPoolObs.subscribe((message) => {
             this.operationPool = message;
@@ -115,5 +122,17 @@ export class GenomicComponent implements OnInit {
     }
     unCheckRadio(key, event) {
         this.genomicInput[key] = MainUtil.uncheckRadio(this.genomicInput[key], event.target.value);
+    }
+    changePathway() {
+        if (this.genomicInput.pathway) {
+            this.disableHugoSymbol = true;
+            this.genomicInput.hugo_symbol = '';
+            this.validationMessage['gene'] = 'Pathway is a category of genes so specific genes aren\'t allowed.';
+        } else {
+            this.disableHugoSymbol = false;
+            if (this.originalGenomic.hugo_symbol) {
+                this.genomicInput.hugo_symbol = this.originalGenomic.hugo_symbol;
+            }
+        }
     }
 }
