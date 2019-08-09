@@ -39,12 +39,12 @@ export class MetaComponent {
             const originalData = _.clone(data);
             data[key] = this.mainutilService.unCheckRadio(data[key], event.target.value);
             if (originalData[key] !== data[key]) {
-                this.metaService.updateMeta(key, data);
+                this.metaService.updateMetaRecord(key, data);
                 this.rows[rowIndex][key] = data[key];
             }
         } else if (data[key] !== event.target.value) {
             data[key] = event.target.value;
-            this.metaService.updateMeta(key, data);
+            this.metaService.updateMetaRecord(key, data);
             this.rows[rowIndex][key] = event.target.value;
         }
         this.rows = [...this.rows];

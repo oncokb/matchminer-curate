@@ -89,6 +89,7 @@ export class TrialService {
         'Temporarily Closed to Accrual and Intervention', 'Withdrawn'];
     annotated_variants = {};
     trialList: Array<Trial> = [];
+    trialListIds: string[] = [];
     trialsRef: AngularFireObject<any>;
     additionalObject = {};
     additionalRef: AngularFireObject<any>;
@@ -228,8 +229,10 @@ export class TrialService {
         this.trialsRef.snapshotChanges().subscribe((action) => {
             this.authorizedSource.next(true);
             this.trialList = [];
-            for (const nctId of _.keys(action.payload.val())) {
-                this.trialList.push(action.payload.val()[nctId]);
+            this.trialListIds = [];
+            for (const id of _.keys(action.payload.val())) {
+                this.trialListIds.push(id);
+                this.trialList.push(action.payload.val()[id]);
             }
             this.trialListSource.next(this.trialList);
             this.setTrialChosen(this.nctIdChosen);

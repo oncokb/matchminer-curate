@@ -36,7 +36,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
     additionalChosen: Additional;
     additionalsObject = {};
     noteEditable = false;
-    nctIdList = [];
+    trialListIds: string[] = [];
     dtOptions: DataTables.Settings = {};
     dtTrigger: Subject<any> = new Subject();
     hideArchived = 'Yes';
@@ -55,9 +55,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.trialService.trialChosenObs.subscribe( ( message ) => this.trialChosen = message );
         this.trialService.trialListObs.subscribe( ( message ) => {
             this.trialList = message;
-            this.nctIdList = _.map( this.trialList, function( trial ) {
-                return trial.nct_id;
-            } );
+            this.trialListIds = this.trialService.trialListIds;
             this.rerender();
         } );
         this.trialService.additionalChosenObs.subscribe( ( message ) => this.additionalChosen = message );
@@ -97,7 +95,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             if (urlArray.length > 3) {
                 protocolNo = urlArray[ 3 ];
             }
-            if (this.nctIdList.includes(nctId)) {
+            if (this.trialListIds.includes(nctId)) {
                 this.curateTrial( nctId );
             } else {
                 this.importTrialsFromNct(nctId, protocolNo);
@@ -107,31 +105,31 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
     importTrials() {
         this.messages = [];
-        // this.mongoMessage.content = '';
         this.protocolNoMessage.content = '';
         const newTrials: Array<string> = this.trialsToImport.split( ',' );
-        let result = true;
         let nctId = '';
         let protocolNo = '';
         for ( const newTrial of newTrials ) {
             const tempTrial = newTrial.trim();
             if ( tempTrial.length === 0 ) {
                 continue;
-            }
-            if ( this.nctIdList.indexOf( tempTrial ) !== - 1 ) {
-                result = confirm( 'Trial ' + tempTrial + ' has been loaded in database. ' +
-                    'Are you sure you want to overwrite this trial by loading file ' + tempTrial + '?' );
-            }
-            if ( ! result ) {
-                continue;
-            }
-            if ( tempTrial.match( /NCT[0-9]+/g ) ) {
+            } else if ( tempTrial.match( /NCT[0-9]+/g ) ) {
                 nctId = tempTrial;
+                if ( this.trialListIds.includes( tempTrial ) ) {
+                    if (!this.isRedownloadTrial(tempTrial)) {
+                        continue;
+                    }
+                }
                 this.importTrialsFromNct(nctId, '');
             } else if ( tempTrial.match( /^\d+-\d+$/g ) ) {
                 this.connectionService.getTrialByProtocolNo( tempTrial ).subscribe( ( res ) => {
                     protocolNo = res['msk_id'];
                     nctId = res['tds_data']['nct_id'];
+                    if ( this.trialListIds.includes( nctId ) ) {
+                        if (!this.isRedownloadTrial(tempTrial + '/' + nctId)) {
+                            return;
+                        }
+                    }
                     this.importTrialsFromNct(nctId, protocolNo);
                 }, ( error ) => {
                     this.messages.push( tempTrial + ' not found' );
@@ -142,6 +140,11 @@ export class TrialComponent implements OnInit, AfterViewInit {
             }
         }
         this.trialsToImport = '';
+    }
+
+    isRedownloadTrial(id: string) {
+        return confirm( 'Trial ' + id + ' has been loaded in database. ' +
+                'Are you sure you want to overwrite this trial by loading file ' + id + '?' );
     }
 
     importTrialsFromNct(nctId: string, protocolNo: string) {
@@ -185,7 +188,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                         precision_medicine: 'YES',
                         curated: 'YES'
                     };
-                    this.metaService.createMetaRecord(metaRecord);
+                    this.metaService.setMetaRecord(metaRecord);
                 }
                 if ( setChosenTrial === false ) {
                     this.nctIdChosen = trialInfo[ 'nct_id' ];

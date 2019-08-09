@@ -8,6 +8,7 @@ import { MetaService } from '../service/meta.service';
 @Component({
     selector: 'jhi-login',
     templateUrl: './login.component.html',
+    styleUrls: [ 'login.scss' ]
 })
 export class LoginComponent {
     public user: Observable<firebase.User>;
