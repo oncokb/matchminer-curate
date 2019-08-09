@@ -1,8 +1,8 @@
 <div *ngIf="afAuth.authState | async as user; else showLogin" style="min-width:250px;">
-  <div style="font-size:15px;color:white"> {{ user.email }}</div>
-  <div style="font-size:15px;color:white"><u><a (click)="logout()">Logout</a></u></div>
-  <div><img src="{{user.photoURL}}" style="width:50px;height:50px;float:right;margin-top:-50px;"/></div>
+  <div class="login-panel"> {{ user.email }}</div>
+  <div class="login-panel"><u><a (click)="logout()">Logout</a></u></div>
+  <div><img src="{{user.photoURL}}" class="login-photo"/></div>
 </div>
 <ng-template #showLogin>
-  <button class="btn btn-default" (click)="login()">Login in with Google</button>
+  <button class="btn btn-primary login-panel" (click)="login()">Login with Google</button>
 </ng-template>

@@ -11,6 +11,7 @@ export class MetaService {
     metaListObs = this.metaListSource.asObservable();
     metaRef: AngularFireObject<any>;
     metaList: Array<Meta> = [];
+    metaListIds: string[] = [];
 
     constructor(public db: AngularFireDatabase) {
         this.metaRef = db.object('Meta');
@@ -21,6 +22,7 @@ export class MetaService {
             this.authorizedSource.next(true);
             this.metaList = [];
             for (const id of _.keys(action.payload.val())) {
+                this.metaListIds.push(id);
                 this.metaList.push(action.payload.val()[id]);
             }
             this.metaListSource.next(this.metaList);
@@ -29,8 +31,15 @@ export class MetaService {
         } );
     }
 
-    createMetaRecord(data: Meta) {
-        const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
+    setMetaRecord(data: Meta) {
+        let metaId = '';
+        if (this.metaListIds.includes(data.protocol_no)) {
+            metaId = data.protocol_no;
+        } else if (this.metaListIds.includes(data.nct_id)) {
+            metaId = data.nct_id;
+        } else {
+            metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
+        }
         this.db.object( 'Meta/' + metaId).set( data )
         .then((res) => {})
         .catch( ( error ) => {
@@ -38,7 +47,7 @@ export class MetaService {
         });
     }
 
-    updateMeta(key: string, data: Meta) {
+    updateMetaRecord(key: string, data: Meta) {
         const metaId = data.protocol_no.length > 0 ? data.protocol_no : data.nct_id;
         this.db.object( 'Meta/' + metaId + '/' + key).set( data[key] )
         .then((res) => {})
