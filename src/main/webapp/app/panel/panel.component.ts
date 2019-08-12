@@ -498,6 +498,8 @@ export class PanelComponent implements OnInit {
         return keys.indexOf(Object.keys(a)[0]) - keys.indexOf(Object.keys(b)[0]);
     }
     editNode() {
+        // Reset hasErrorInputField to false so "save/add" button won't be disabled for previous check result.
+        this.trialService.setHasErrorInputField(false);
         this.operationPool['currentPath'] = this.path;
         this.operationPool['editing'] = true;
         if (this.unit.hasOwnProperty('genomic')) {
