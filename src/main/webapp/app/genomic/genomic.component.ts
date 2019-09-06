@@ -8,7 +8,7 @@ import { Genomic } from './genomic.model';
 import * as _ from 'lodash';
 import { ConnectionService } from '../service/connection.service';
 import { MainutilService } from '../service/mainutil.service';
-import { Geneset } from './geneset.model';
+import { Geneset, GenesetOption } from './geneset.model';
 
 @Component({
     selector: 'jhi-genomic',
@@ -40,7 +40,7 @@ export class GenomicComponent implements OnInit {
     geneValidation = false;
     exampleValidation = false;
     genesetOptions = this.trialService.getGenesetsOptions();
-    disableHugoSymbol = false;
+    selectedGenesetOption: GenesetOption;
 
     search = (text$: Observable<string>) =>
         text$
@@ -62,11 +62,11 @@ export class GenomicComponent implements OnInit {
     constructor(private trialService: TrialService, public connectionService: ConnectionService) {}
 
     ngOnInit() {
+        if (this.unit['genomic']['geneset_id']) {
+            this.selectedGenesetOption = _.find(this.genesetOptions, { id: this.unit['genomic']['geneset_id'] });
+        }
         this.trialService.genomicInputObs.subscribe((message) => {
             this.genomicInput = message;
-            if (this.genomicInput.geneset_id) {
-                this.disableHugoSymbol = true;
-            }
         });
         this.trialService.operationPoolObs.subscribe((message) => {
             this.operationPool = message;
@@ -124,25 +124,17 @@ export class GenomicComponent implements OnInit {
     }
     changeGeneset() {
         if (this.genomicInput.geneset_id) {
-            this.disableHugoSymbol = true;
-            const selectedGenesetOption = _.some(this.genesetOptions, (option) => option.id === this.genomicInput.geneset_id);
-            this.genomicInput.hugo_symbol = selectedGenesetOption.genes.join(', ');
-            this.genomicInput.geneset = selectedGenesetOption.name;
-            this.genomicInput.annotated_variant = 'Oncogenic Mutations';
+            this.selectedGenesetOption = _.find(this.genesetOptions, { id: this.genomicInput.geneset_id });
+            this.genomicInput.hugo_symbol = this.selectedGenesetOption.genes.join(', ');
+            this.genomicInput.geneset = this.selectedGenesetOption.name;
+            if (_.isEmpty(this.genomicInput.annotated_variant)) {
+                this.genomicInput.annotated_variant = 'Oncogenic Mutations';
+            }
         } else {
-            this.disableHugoSymbol = false;
             this.genomicInput.geneset = null;
+            this.selectedGenesetOption = null;
             this.genomicInput.hugo_symbol = '';
             this.genomicInput.annotated_variant = '';
         }
-    }
-    getGenesetById(id: number, key: string) {
-        this.connectionService.getGenesetById(id).subscribe((res: Geneset) => {
-            if (key === 'genes') {
-                const selectedGenesetOption = _.some(this.genesetOptions, (option) => option.id === id);
-                return selectedGenesetOption.genes.join(', ');
-            }
-            return res[key];
-        });
     }
 }
