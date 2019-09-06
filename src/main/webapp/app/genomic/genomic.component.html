@@ -1,10 +1,10 @@
 <div *ngIf="type === 'add'; else editPanel">
     <div>
         <div class="row borderMargin">
-            <div class="col-sm-4">pathway:</div>
+            <div class="col-sm-4">geneset:</div>
             <div class="col-sm-8">
-                <ng-select class="selectStyle" [items]="pathwayOptions" [(ngModel)]="genomicInput.pathway" [clearable]="true"
-                           placeholder="Select Pathway" (change)="changePathway()">
+                <ng-select class="selectStyle" [items]="genesetOptions" bindLabel="name" bindValue="id" [(ngModel)]="genomicInput.geneset_id" [clearable]="true"
+                           placeholder="Select Geneset" (change)="changeGeneset()">
                 </ng-select>
             </div>
         </div>
@@ -174,10 +174,10 @@
     <br/>
     <div [ngStyle]="getStyle()" *ngIf="operationPool['relocate'] !== true && operationPool['copy'] !== true && operationPool['currentPath'] === path; else panel">
         <div class="row borderMargin">
-            <div class="col-sm-4">pathway:</div>
+            <div class="col-sm-4">geneset:</div>
             <div class="col-sm-8">
-                <ng-select class="selectStyle" [items]="pathwayOptions" [(ngModel)]="genomicInput.pathway" [clearable]="true"
-                           placeholder="Select Pathway" (change)="changePathway()" >
+                <ng-select class="selectStyle" [items]="genesetOptions" bindLabel="name" bindValue="id" [(ngModel)]="genomicInput.geneset_id" [clearable]="true"
+                           placeholder="Select Geneset" (change)="changeGeneset()" >
                 </ng-select>
             </div>
         </div>
@@ -340,17 +340,25 @@
     </div>
     <ng-template #panel>
         <div [ngStyle]="getStyle()">
-            <div *ngIf="unit.genomic.pathway">
+            <div *ngIf="unit.genomic.geneset_id">
                 <div class="row">
                     <div class="col-sm-4">
-                        <label>pathway: </label>
+                        <label>geneset: </label>
                     </div>
                     <div class="col-sm-8">
-                        <span>{{unit.genomic.pathway}}</span>
+                        <span>{{getGenesetById(unit.genomic.geneset_id, 'name')}}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label>hugo_symbol: </label>
+                    </div>
+                    <div class="col-sm-8">
+                        <span>{{getGenesetById(unit.genomic.geneset_id, 'genes')}}</span>
                     </div>
                 </div>
             </div>
-            <div *ngIf="unit.genomic.hugo_symbol">
+            <div *ngIf="!unit.genomic.geneset_id && unit.genomic.hugo_symbol">
                 <div class="row">
                     <div class="col-sm-4">
                         <label>hugo_symbol: </label>
