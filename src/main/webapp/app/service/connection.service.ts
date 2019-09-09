@@ -22,7 +22,7 @@ export class ConnectionService {
                 case 'OncoKBVariant':
                     return 'http://oncokb.org/api/v1/variants';
                 case 'Genesets':
-                    return 'http://oncokb.org/public/api/v1/genesets';
+                    return 'http://oncokb.org/api/v1/genesets';
                 case 'GeneValidation':
                     return 'http://mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
