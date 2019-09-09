@@ -12,7 +12,6 @@ export interface Gene {
     curatedIsoform: string,
     curatedRefSeq: string,
     geneAliases: string[],
-    genesets: string[],
     tsg: boolean
 }
 
