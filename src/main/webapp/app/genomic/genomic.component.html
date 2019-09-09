@@ -8,13 +8,13 @@
                 </ng-select>
             </div>
         </div>
-        <div class="row borderMargin" *ngIf="genomicInput.geneset_id">
+        <div class="row borderMargin" *ngIf="selectedGenesetOption">
             <div class="col-sm-4">hugo_symbol:</div>
             <div class="col-sm-8">
                 <span>{{selectedGenesetOption.genes.join(', ')}}</span>
             </div>
         </div>
-        <div class="row borderMargin" *ngIf="!genomicInput.geneset_id">
+        <div class="row borderMargin" *ngIf="!selectedGenesetOption">
             <div class="col-sm-3">hugo_symbol:
                 <span [ngStyle]="getMessageStyle('gene')">{{ validationMessage['gene'] }}</span>
             </div>

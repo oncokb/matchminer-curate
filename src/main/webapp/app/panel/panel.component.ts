@@ -544,14 +544,14 @@ export class PanelComponent implements OnInit {
     setNotLogic(type: string) {
         if (type === 'clinical') {
             for (const key of _.keys(this.clinicalInput)) {
-                if (!_.isUndefined(this.clinicalInput[key]) && this.clinicalInput[key].startsWith('!')) {
+                if (!_.isUndefined(this.clinicalInput[key])  && _.isString(this.genomicInput[key]) && this.clinicalInput[key].startsWith('!')) {
                     this.clinicalInput['no_' + key] = true;
                     this.clinicalInput[key] = this.clinicalInput[key].substr(1);
                 }
             }
         } else if (type === 'genomic') {
             for (const key of _.keys(this.genomicInput)) {
-                if (!_.isUndefined(this.genomicInput[key]) && this.genomicInput[key].startsWith('!')) {
+                if (!_.isUndefined(this.genomicInput[key]) && _.isString(this.genomicInput[key]) && this.genomicInput[key].startsWith('!')) {
                     this.genomicInput['no_' + key] = true;
                     this.genomicInput[key] = this.genomicInput[key].substr(1);
                 }

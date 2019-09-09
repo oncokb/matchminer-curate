@@ -41,6 +41,7 @@ export class GenomicComponent implements OnInit {
     exampleValidation = false;
     genesetOptions = this.trialService.getGenesetsOptions();
     selectedGenesetOption: GenesetOption;
+    disableHugoSymbol = false;
 
     search = (text$: Observable<string>) =>
         text$
@@ -62,7 +63,7 @@ export class GenomicComponent implements OnInit {
     constructor(private trialService: TrialService, public connectionService: ConnectionService) {}
 
     ngOnInit() {
-        if (this.unit['genomic']['geneset_id']) {
+        if (!_.isUndefined(this.unit['genomic']) && !_.isUndefined(this.unit['genomic']['geneset_id'])) {
             this.selectedGenesetOption = _.find(this.genesetOptions, { id: this.unit['genomic']['geneset_id'] });
         }
         this.trialService.genomicInputObs.subscribe((message) => {
@@ -124,6 +125,7 @@ export class GenomicComponent implements OnInit {
     }
     changeGeneset() {
         if (this.genomicInput.geneset_id) {
+            this.disableHugoSymbol = true;
             this.selectedGenesetOption = _.find(this.genesetOptions, { id: this.genomicInput.geneset_id });
             this.genomicInput.hugo_symbol = this.selectedGenesetOption.genes.join(', ');
             this.genomicInput.geneset = this.selectedGenesetOption.name;
@@ -131,6 +133,7 @@ export class GenomicComponent implements OnInit {
                 this.genomicInput.annotated_variant = 'Oncogenic Mutations';
             }
         } else {
+            this.disableHugoSymbol = false;
             this.genomicInput.geneset = null;
             this.selectedGenesetOption = null;
             this.genomicInput.hugo_symbol = '';
