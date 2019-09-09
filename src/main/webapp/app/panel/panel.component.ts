@@ -347,8 +347,8 @@ export class PanelComponent implements OnInit {
     }
     getOncotree() {
         let oncotree_primary_diagnosis = '';
-        if (this.clinicalInput.sub_type) {
-            oncotree_primary_diagnosis = this.clinicalInput.sub_type;
+        if (this.clinicalInput.subtype) {
+            oncotree_primary_diagnosis = this.clinicalInput.subtype;
         }else if (this.clinicalInput.main_type) {
             oncotree_primary_diagnosis = this.clinicalInput.main_type;
         }
@@ -504,7 +504,9 @@ export class PanelComponent implements OnInit {
         } else if (this.unit.hasOwnProperty('clinical')) {
             this.trialService.setClinicalInput(_.clone(this.unit['clinical']));
             this.setNotLogic('clinical');
-            // this.setOncotree();
+            if (_.isUndefined(this.clinicalInput.main_type) && _.isUndefined(this.clinicalInput.subtype)) {
+                this.setOncotree();
+            }
         } else if (this.unit.hasOwnProperty('arm_description')) {
             const armToAdd: Arm = {
                 arm_code: this.unit['arm_code'],
@@ -523,12 +525,12 @@ export class PanelComponent implements OnInit {
     }
     setOncotree() {
         const oncotree_primary_diagnosis = this.clinicalInput['oncotree_primary_diagnosis'];
-        this.clinicalInput['sub_type'] = '';
+        this.clinicalInput['subtype'] = '';
         this.clinicalInput['main_type'] = '';
         let isSubtype = false;
         for (const item of this.allSubTypesOptions) {
             if (item === oncotree_primary_diagnosis) {
-                this.clinicalInput['sub_type'] = oncotree_primary_diagnosis;
+                this.clinicalInput['subtype'] = oncotree_primary_diagnosis;
                 this.clinicalInput['main_type'] = this.subToMainMapping[oncotree_primary_diagnosis];
                 isSubtype = true;
             }
@@ -544,7 +546,7 @@ export class PanelComponent implements OnInit {
     setNotLogic(type: string) {
         if (type === 'clinical') {
             for (const key of _.keys(this.clinicalInput)) {
-                if (!_.isUndefined(this.clinicalInput[key])  && _.isString(this.genomicInput[key]) && this.clinicalInput[key].startsWith('!')) {
+                if (!_.isUndefined(this.clinicalInput[key])  && _.isString(this.clinicalInput[key]) && this.clinicalInput[key].startsWith('!')) {
                     this.clinicalInput['no_' + key] = true;
                     this.clinicalInput[key] = this.clinicalInput[key].substr(1);
                 }
