@@ -3,7 +3,7 @@
         <div class="row borderMargin">
             <div class="col-sm-4">geneset:</div>
             <div class="col-sm-8">
-                <ng-select class="selectStyle" [items]="genesetOptions" bindLabel="name" bindValue="id" [(ngModel)]="genomicInput.geneset_id" [clearable]="true"
+                <ng-select class="selectStyle" [items]="genesetOptions" bindLabel="name" bindValue="uuid" [(ngModel)]="genomicInput.geneset_uuid" [clearable]="true"
                            placeholder="Select Geneset" (change)="changeGeneset()">
                 </ng-select>
             </div>
@@ -182,18 +182,18 @@
         <div class="row borderMargin">
             <div class="col-sm-4">geneset:</div>
             <div class="col-sm-8">
-                <ng-select class="selectStyle" [items]="genesetOptions" bindLabel="name" bindValue="id" [(ngModel)]="genomicInput.geneset_id" [clearable]="true"
+                <ng-select class="selectStyle" [items]="genesetOptions" bindLabel="name" bindValue="uuid" [(ngModel)]="genomicInput.geneset_uuid" [clearable]="true"
                            placeholder="Select Geneset" (change)="changeGeneset()" >
                 </ng-select>
             </div>
         </div>
-        <div class="row borderMargin" *ngIf="genomicInput.geneset_id">
+        <div class="row borderMargin" *ngIf="genomicInput.geneset_uuid">
             <div class="col-sm-4">hugo_symbol:</div>
             <div class="col-sm-8">
                 <span>{{selectedGenesetOption.genes.join(', ')}}</span>
             </div>
         </div>
-        <div class="row borderMargin" *ngIf="!genomicInput.geneset_id">
+        <div class="row borderMargin" *ngIf="!genomicInput.geneset_uuid">
             <div class="col-sm-3">hugo_symbol:
                 <span [ngStyle]="getMessageStyle('gene')">{{ validationMessage['gene'] }}</span>
             </div>
@@ -352,7 +352,7 @@
     </div>
     <ng-template #panel>
         <div [ngStyle]="getStyle()">
-            <div *ngIf="unit.genomic.geneset_id">
+            <div *ngIf="unit.genomic.geneset_uuid">
                 <div class="row">
                     <div class="col-sm-4">
                         <label>geneset: </label>
@@ -370,7 +370,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="!unit.genomic.geneset_id && unit.genomic.hugo_symbol">
+            <div *ngIf="!unit.genomic.geneset_uuid && unit.genomic.hugo_symbol">
                 <div class="row">
                     <div class="col-sm-4">
                         <label>hugo_symbol: </label>

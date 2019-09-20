@@ -62,8 +62,8 @@ export class GenomicComponent implements OnInit {
     constructor(private trialService: TrialService, public connectionService: ConnectionService) {}
 
     ngOnInit() {
-        if (!_.isUndefined(this.unit['genomic']) && !_.isUndefined(this.unit['genomic']['geneset_id'])) {
-            this.selectedGenesetOption = _.find(this.genesetOptions, { id: this.unit['genomic']['geneset_id'] });
+        if (!_.isUndefined(this.unit['genomic']) && !_.isUndefined(this.unit['genomic']['geneset_uuid'])) {
+            this.selectedGenesetOption = _.find(this.genesetOptions, { uuid: this.unit['genomic']['geneset_uuid'] });
         }
         this.trialService.genomicInputObs.subscribe((message) => {
             this.genomicInput = message;
@@ -123,8 +123,8 @@ export class GenomicComponent implements OnInit {
         this.genomicInput[key] = MainUtil.uncheckRadio(this.genomicInput[key], event.target.value);
     }
     changeGeneset() {
-        if (this.genomicInput.geneset_id) {
-            this.selectedGenesetOption = _.find(this.genesetOptions, { id: this.genomicInput.geneset_id });
+        if (this.genomicInput.geneset_uuid) {
+            this.selectedGenesetOption = _.find(this.genesetOptions, { uuid: this.genomicInput.geneset_uuid });
             if (_.isEmpty(this.genomicInput.annotated_variant)) {
                 this.genomicInput.annotated_variant = 'Oncogenic Mutations';
             }

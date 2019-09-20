@@ -152,7 +152,7 @@ export class TrialService {
         this.connectionService.getGenesets().subscribe((res: Geneset[]) => {
             for (const geneset of res) {
                 const genesetOption: GenesetOption = {
-                    id: geneset.id,
+                    uuid: geneset.uuid,
                     name: geneset.name,
                     genes: _.map(geneset.genes, (gene: Gene) => gene.hugoSymbol)
                 };

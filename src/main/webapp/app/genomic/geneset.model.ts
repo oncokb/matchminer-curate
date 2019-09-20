@@ -1,6 +1,6 @@
 export interface Geneset {
     name: string,
-    id: number,
+    uuid: number,
     genes: Gene[]
 }
 
@@ -17,6 +17,6 @@ export interface Gene {
 
 export interface GenesetOption {
     name: string,
-    id: number,
+    uuid: number,
     genes: string[]
 }

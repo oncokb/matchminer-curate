@@ -180,7 +180,7 @@ export class PanelComponent implements OnInit {
     }
     hasEmptyFields(obj: any) {
         for (const key of _.keys(obj)) {
-            if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
+            if (!_.isUndefined(obj[key]) && obj[key] && obj[key].length > 0) {
                 return false;
             }
         }

@@ -89,7 +89,7 @@ export class ConnectionService {
     getGenesets() {
         return this.http.get(this.getAPIUrl('Genesets'));
     }
-    getGenesetById(id: number) {
-        return this.http.get(this.getAPIUrl('Genesets') + `/${id}`);
+    getGenesetById(uuid: number) {
+        return this.http.get(this.getAPIUrl('Genesets') + `/${uuid}`);
     }
 }
