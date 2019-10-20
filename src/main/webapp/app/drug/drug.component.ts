@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Drug, NcitDrug } from '../drug/drug.model';
 import { debounceTime, switchMap } from 'rxjs/operators';
+import { Arm } from '../arm/arm.model';
 
 @Component({
     selector: 'jhi-drug',
@@ -10,7 +11,10 @@ import { debounceTime, switchMap } from 'rxjs/operators';
 })
 
 export class DrugComponent implements OnInit {
-    @Input() armInput = {};
+    @Input() armInput: Arm = {
+        arm_description: ''
+    };
+    @Input() drugGroupIndex = 0;
     drugsOptionsLoading = false;
     selectedDrugs: Array<any> = [];
     drugInput = new EventEmitter<string>();
@@ -40,13 +44,13 @@ export class DrugComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.trialService.armInputObs.subscribe((message) => {
+        this.trialService.armInputObs.subscribe((message: Arm) => {
             this.armInput = message;
-            this.selectedDrugs = this.armInput['drugs'];
+            this.selectedDrugs = this.armInput.drugs[this.drugGroupIndex];
         });
     }
 
     saveDrugs() {
-        this.armInput['drugs'] = this.selectedDrugs.map((drug: any) => typeof drug === 'string' ? { 'name': drug } : drug);
+        this.armInput.drugs[this.drugGroupIndex] = this.selectedDrugs.map((drug: any) => typeof drug === 'string' ? { 'name': drug } : drug);
     }
 }

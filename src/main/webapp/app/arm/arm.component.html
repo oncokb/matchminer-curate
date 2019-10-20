@@ -40,9 +40,14 @@
         <div class="armContent">
             <textarea id="arm-eligibility" rows="3" cols="100" [(ngModel)]="armInput.arm_eligibility"></textarea>
         </div>
-        <span class="indent1">-drugs: </span>
+        <span class="indent1">-drugs: <i class="fa fa-plus addIcon" aria-hidden="true" (click)="addDrugGroup()"></i></span>
         <div class="armContent">
-            <jhi-drug [armInput]="armInput"></jhi-drug>
+            <div *ngFor="let drug of armInput.drugs; index as i">
+                <span class="drug-container">
+                    <jhi-drug [armInput]="armInput" [drugGroupIndex]="i"></jhi-drug>
+                    <i class="fa fa-trash-o deleteIcon" aria-hidden="true" (click)="removeDrugGroup(i)"></i>
+                </span>
+            </div>
         </div>
     </div>
 </div>
@@ -62,7 +67,11 @@
         <span class="indent1">-arm eligibility: </span>
         <div class="armContent">{{unit.arm_eligibility}}</div>
         <span class="indent1">-drugs: </span>
-        <div class="armContent">{{displayDrugName(unit.drugs)}}</div>
+        <div class="armContent">
+            <div *ngFor="let drugGroup of unit.drugs">
+                <span *ngIf="drugGroup.length > 0">- {{displayDrugName(drugGroup)}}</span>
+            </div>
+        </div>
     </div>
 </ng-template>
 

@@ -3,6 +3,8 @@ import { TrialService } from '../service/trial.service';
 import { Arm } from '../arm/arm.model';
 import { Drug } from '../drug/drug.model';
 import { MainutilService } from '../service/mainutil.service';
+import * as _ from 'lodash';
+
 @Component({
     selector: 'jhi-arm',
     templateUrl: './arm.component.html',
@@ -31,9 +33,13 @@ export class ArmComponent implements OnInit {
     unCheckRadio(key, event) {
         this.armInput[key] = this.mainutilService.unCheckRadio(this.armInput[key], event.target.value);
     }
-    displayDrugName(drugs: Array<Drug>) {
-        if (drugs && drugs.length > 0) {
-            return drugs.map( (drug) => drug.name).join(', ');
-        }
+    displayDrugName(drugGroup: Array<Drug>) {
+        return drugGroup.map((drug) => drug.name).join(' + ');
+    }
+    addDrugGroup() {
+        this.armInput.drugs.push([]);
+    }
+    removeDrugGroup(index: number) {
+        this.armInput.drugs.splice(index, 1);
     }
 }

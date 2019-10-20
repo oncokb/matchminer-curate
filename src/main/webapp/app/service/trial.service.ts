@@ -281,6 +281,9 @@ export class TrialService {
                             if (_.isUndefined(armItem.match)) {
                                 armItem.match = [];
                             }
+                            if (_.isUndefined(armItem.drugs)) {
+                                armItem.drugs = [[]];
+                            }
                         });
                     }
                     if (_.isUndefined(trial['treatment_list'].step[0].match)) {

@@ -157,6 +157,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                     armsInfo.push( {
                         arm_description: arm.arm_name,
                         arm_info: arm.arm_description,
+                        drugs: [[]],
                         match: []
                     } );
                 }
