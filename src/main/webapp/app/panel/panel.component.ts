@@ -767,7 +767,7 @@ export class PanelComponent implements OnInit {
                     arm_type: '',
                     arm_eligibility: '',
                     arm_info: '',
-                    drugs: [],
+                    drugs: [[]],
                     match: []
                 };
                 this.prepareArmData(this.armInput, armToAdd);

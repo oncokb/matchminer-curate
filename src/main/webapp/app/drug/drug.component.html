@@ -1,11 +1,14 @@
-<ng-select class="drug-select" [items]="drugsOptions" [(ngModel)]="selectedDrugs" [typeahead]="drugInput"
-           [searchable]="true" [hideSelected]="true" [multiple]="true" [clearable]="true" [addTag]="true"
-           [loading]="drugsOptionsLoading" bindLabel="name" placeholder="Search Drug" (blur)="saveDrugs()">
-    <ng-template ng-option-tmp let-item="item">
-        <div>
-            <span class="drug-name">{{item.name}}</span>
-            <span class="drug-synonyms">{{'NCIT Code: ' + item.ncit_code}}</span>
-        </div>
-        <div *ngIf="item.synonyms" class="drug-synonyms">{{'Also known as ' + item.synonyms}}</div>
-    </ng-template>
-</ng-select>
+<div class="drug-container">
+    <ng-select class="drug-select" [items]="drugsOptions" [(ngModel)]="selectedDrugs" [typeahead]="drugInput"
+               [searchable]="true" [hideSelected]="true" [multiple]="true" [clearable]="true" [addTag]="true"
+               [loading]="drugsOptionsLoading" bindLabel="name" placeholder="Search Drug" (blur)="saveDrugs()">
+        <ng-template ng-option-tmp let-item="item">
+            <div>
+                <span class="drug-name">{{item.name}}</span>
+                <span class="drug-synonyms">{{'NCIT Code: ' + item.ncit_code}}</span>
+            </div>
+            <div *ngIf="item.synonyms" class="drug-synonyms">{{'Also known as ' + item.synonyms}}</div>
+        </ng-template>
+    </ng-select>
+</div>
+
