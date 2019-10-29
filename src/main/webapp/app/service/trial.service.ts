@@ -215,7 +215,10 @@ export class TrialService {
             short_title: '',
             phase: '',
             status: '',
-            treatment_list: { step: [] }
+            treatment_list: { step: [] },
+            principal_investigator: {
+                full_name: ''
+            }
         };
         return trial;
     }

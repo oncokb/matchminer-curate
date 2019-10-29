@@ -3,11 +3,18 @@ export interface Trial {
     archived: string;
     protocol_no: string;
     nct_id: string;
+    principal_investigator?: PrincipalInvestigator;
     long_title: string;
     short_title: string;
     phase: string;
     status: string;
     treatment_list: { step: Array<Step> };
+}
+interface PrincipalInvestigator {
+    full_name: string;
+    credentials?: string;
+    email?: string;
+    url?: string;
 }
 interface Step {
     match?: Array<Match>;

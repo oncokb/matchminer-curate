@@ -98,7 +98,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             if (this.trialListIds.includes(nctId)) {
                 this.curateTrial( nctId );
             } else {
-                this.importTrialsFromNct(nctId, protocolNo);
+                this.importTrialsFromNct(nctId, {protocol_no : protocolNo});
             }
 
         }
@@ -108,7 +108,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.protocolNoMessage.content = '';
         const newTrials: Array<string> = this.trialsToImport.split( ',' );
         let nctId = '';
-        let protocolNo = '';
         for ( const newTrial of newTrials ) {
             const tempTrial = newTrial.trim();
             if ( tempTrial.length === 0 ) {
@@ -120,17 +119,25 @@ export class TrialComponent implements OnInit, AfterViewInit {
                         continue;
                     }
                 }
-                this.importTrialsFromNct(nctId, '');
-            } else if ( tempTrial.match( /^\d+-\d+$/g ) ) {
+                this.importTrialsFromNct(nctId);
+            } else if ( tempTrial.match( /^\d+-\d+$/g ) && this.oncokb) {
                 this.connectionService.getTrialByProtocolNo( tempTrial ).subscribe( ( res ) => {
-                    protocolNo = res['msk_id'];
                     nctId = res['tds_data']['nct_id'];
                     if ( this.trialListIds.includes( nctId ) ) {
                         if (!this.isRedownloadTrial(tempTrial + '/' + nctId)) {
                             return;
                         }
                     }
-                    this.importTrialsFromNct(nctId, protocolNo);
+                    const mskInfo = {
+                        protocol_no: res['msk_id'],
+                        principal_investigator: {
+                            full_name: res['tds_data']['primary_investigator']['full_name'],
+                            credentials: res['tds_data']['primary_investigator']['credentials'],
+                            email: res['tds_data']['primary_investigator']['email'],
+                            url: res['tds_data']['primary_investigator']['msk_url']
+                        }
+                    };
+                    this.importTrialsFromNct(nctId, mskInfo);
                 }, ( error ) => {
                     this.messages.push( tempTrial + ' not found' );
                 });
@@ -147,7 +154,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 'Are you sure you want to overwrite this trial by loading file ' + id + '?' );
     }
 
-    importTrialsFromNct(nctId: string, protocolNo: string) {
+    importTrialsFromNct(nctId: string, extraInfo?: object) {
         let setChosenTrial = false;
         this.connectionService.importTrials( nctId ).subscribe( ( res ) => {
             const trialInfo = res;
@@ -165,8 +172,11 @@ export class TrialComponent implements OnInit, AfterViewInit {
             const trial: Trial = {
                 curation_status: 'In progress',
                 archived: 'No',
-                protocol_no: protocolNo,
+                protocol_no: '',
                 nct_id: trialInfo[ 'nct_id' ],
+                principal_investigator: {
+                    full_name: trialInfo[ 'principal_investigator' ]
+                },
                 long_title: trialInfo[ 'official_title' ],
                 short_title: trialInfo[ 'brief_title' ],
                 phase: trialInfo[ 'phase' ][ 'phase' ],
@@ -178,21 +188,26 @@ export class TrialComponent implements OnInit, AfterViewInit {
                     } ]
                 }
             };
-            this.db.object( 'Trials/' + trialInfo[ 'nct_id' ] ).set( trial ).then( ( response ) => {
-                this.messages.push( 'Successfully imported ' + trialInfo[ 'nct_id' ] );
+            if (extraInfo) {
+                _.forEach(extraInfo, (value, key) => {
+                    trial[key] = value;
+                });
+            }
+            this.db.object( 'Trials/' + trial.nct_id ).set( trial ).then( ( response ) => {
+                this.messages.push( 'Successfully imported ' + trial.nct_id );
                 if (this.oncokb) {
                     const metaRecord: Meta = {
-                        protocol_no: protocolNo,
-                        nct_id: trialInfo[ 'nct_id' ],
-                        title: trialInfo[ 'official_title' ],
-                        status: trialInfo[ 'current_trial_status' ],
+                        protocol_no: trial.protocol_no,
+                        nct_id: trial.nct_id,
+                        title: trial.long_title,
+                        status: trial.status,
                         precision_medicine: 'YES',
                         curated: 'YES'
                     };
                     this.metaService.setMetaRecord(metaRecord);
                 }
                 if ( setChosenTrial === false ) {
-                    this.nctIdChosen = trialInfo[ 'nct_id' ];
+                    this.nctIdChosen = trial.nct_id;
                     this.trialService.setTrialChosen( this.nctIdChosen );
                     this.originalTrial = _.clone(this.trialChosen);
                     setChosenTrial = true;
@@ -310,24 +325,26 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.noteEditable = false;
     }
     updateProtocolNo() {
-        if ( this.trialChosen['protocol_no'].match( /^\d+-\d+$/g ) ) {
-            const result = confirm('Are you sure to update Protocol No. to ' + this.trialChosen['protocol_no'] + '?');
-            if (result) {
-                this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( {protocol_no: this.trialChosen['protocol_no']} )
-                .then((res) => {
-                    this.protocolNoMessage.content = 'Update Protocol No. successfully.';
-                    this.protocolNoMessage.color = 'green';
-                })
-                .catch( ( error ) => {
-                    this.protocolNoMessage.content = 'Failed to update Protocol No.';
-                    this.protocolNoMessage.color = 'red';
-                    this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
-                } );
+        if (this.originalTrial['protocol_no'] !== this.trialChosen['protocol_no']) {
+            if ( this.trialChosen['protocol_no'].match( /^\d+-\d+$/g ) ) {
+                const result = confirm('Are you sure to update Protocol No. to ' + this.trialChosen['protocol_no'] + '?');
+                if (result) {
+                    this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( {protocol_no: this.trialChosen['protocol_no']} )
+                    .then((res) => {
+                        this.protocolNoMessage.content = 'Update Protocol No. successfully.';
+                        this.protocolNoMessage.color = 'green';
+                    })
+                    .catch( ( error ) => {
+                        this.protocolNoMessage.content = 'Failed to update Protocol No.';
+                        this.protocolNoMessage.color = 'red';
+                        this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
+                    } );
+                }
+            } else {
+                this.protocolNoMessage.content = 'Protocol No. should follow the format: number-number.';
+                this.protocolNoMessage.color = 'red';
+                this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
             }
-        } else {
-            this.protocolNoMessage.content = 'Protocol No. should follow the format: number-number.';
-            this.protocolNoMessage.color = 'red';
-            this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
         }
     }
     clearMessage(type: string) {
