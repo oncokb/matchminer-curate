@@ -93,6 +93,13 @@
                 <span *ngIf="protocolNoMessage.content" class="load-span" [style.color]="protocolNoMessage.color"> {{protocolNoMessage.content}} </span>
             </span>
             <br/>
+            <div *ngIf="trialChosen.principal_investigator">
+                <label for="pi">Principal Investigator: </label>
+                <span id="pi" class="noteEdit">
+                    <a *ngIf="trialChosen.principal_investigator.url" target="_blank" href="{{trialChosen.principal_investigator.url}}">{{ trialChosen.principal_investigator.full_name }}</a>
+                    <span *ngIf="!trialChosen.principal_investigator.url">{{ trialChosen.principal_investigator.full_name }}</span>
+                </span>
+            </div>
             <label for="phase">Phase: </label>
             <span id="phase" class="noteEdit">{{ trialChosen.phase }}</span>
             <br/>
