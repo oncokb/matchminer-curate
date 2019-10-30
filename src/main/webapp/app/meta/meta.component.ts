@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import * as _ from 'lodash';
 import { Meta } from './meta.model';
-import { MainutilService } from '../service/mainutil.service';
+import MainUtil from '../service/mainutil';
 import { MetaService } from '../service/meta.service';
 import { environment } from '../environments/environment';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
@@ -22,7 +22,7 @@ export class MetaComponent {
     temp = [];
     statusOptions = this.trialService.statusOptions;
 
-    constructor(private trialService: TrialService, public mainutilService: MainutilService, public metaService: MetaService) {
+    constructor(private trialService: TrialService, public metaService: MetaService) {
         this.metaService.metaListObs.subscribe( ( result ) => {
             if (result.length > 0) {
                 this.rows = [...result];
@@ -37,7 +37,7 @@ export class MetaComponent {
     updateValue(key: string, event: any, data: Meta, rowIndex) {
         if (key === 'precision_medicine') {
             const originalData = _.clone(data);
-            data[key] = this.mainutilService.unCheckRadio(data[key], event.target.value);
+            data[key] = MainUtil.uncheckRadio(data[key], event.target.value);
             if (originalData[key] !== data[key]) {
                 this.metaService.updateMetaRecord(key, data);
                 this.rows[rowIndex][key] = data[key];

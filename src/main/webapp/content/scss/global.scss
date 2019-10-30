@@ -225,6 +225,9 @@ ui bootstrap tweaks
 /* jhipster-needle-scss-add-main JHipster will add new css style */
 
 /* common css classes start */
+input[type="radio"], input[type="checkbox"] {
+    margin-right: 5px;
+}
 .addIcon {
     color: green;
     margin-right:8px

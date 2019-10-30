@@ -2,8 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Arm } from '../arm/arm.model';
 import { Drug } from '../drug/drug.model';
-import { MainutilService } from '../service/mainutil.service';
-import * as _ from 'lodash';
+import MainUtil from '../service/mainutil';
 
 @Component({
     selector: 'jhi-arm',
@@ -18,7 +17,7 @@ export class ArmComponent implements OnInit {
     armInput: Arm;
     oncokb: boolean;
 
-    constructor(private trialService: TrialService, public mainutilService: MainutilService) {
+    constructor(private trialService: TrialService) {
         this.oncokb = this.trialService.oncokb;
     }
 
@@ -31,7 +30,7 @@ export class ArmComponent implements OnInit {
         });
     }
     unCheckRadio(key, event) {
-        this.armInput[key] = this.mainutilService.unCheckRadio(this.armInput[key], event.target.value);
+        this.armInput[key] = MainUtil.uncheckRadio(this.armInput[key], event.target.value);
     }
     displayDrugName(drugGroup: Array<Drug>) {
         return drugGroup.map((drug) => drug.name).join(' + ');

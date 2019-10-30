@@ -3,6 +3,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
+import MainUtil from '../service/mainutil';
 import * as _ from 'lodash';
 import { Additional, Trial } from './trial.model';
 import '../../../../../node_modules/jquery/dist/jquery.js';
@@ -112,7 +113,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             const tempTrial = newTrial.trim();
             if ( tempTrial.length === 0 ) {
                 continue;
-            } else if ( tempTrial.match( /NCT[0-9]+/g ) ) {
+            } else if ( tempTrial.match( /(NCT|nct)[0-9]+/g ) ) {
                 nctId = tempTrial;
                 if ( this.trialListIds.includes( tempTrial ) ) {
                     if (!this.isRedownloadTrial(tempTrial)) {
@@ -162,7 +163,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             _.forEach( trialInfo[ 'arms' ], function( arm ) {
                 if ( arm.arm_description !== null ) {
                     armsInfo.push( {
-                        arm_description: arm.arm_name,
+                        arm_description: MainUtil.normalizeText(arm.arm_name),
                         arm_info: arm.arm_description,
                         drugs: [[]],
                         match: []
