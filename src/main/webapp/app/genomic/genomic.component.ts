@@ -7,7 +7,7 @@ import 'rxjs/add/operator/distinctUntilChanged';
 import { Genomic } from './genomic.model';
 import * as _ from 'lodash';
 import { ConnectionService } from '../service/connection.service';
-import { MainutilService } from '../service/mainutil.service';
+import MainUtil from '../service/mainutil';
 
 @Component({
     selector: 'jhi-genomic',
@@ -56,7 +56,7 @@ export class GenomicComponent implements OnInit {
         }
     }
 
-    constructor(private trialService: TrialService, public connectionService: ConnectionService, public mainutilService: MainutilService) {
+    constructor(private trialService: TrialService, public connectionService: ConnectionService) {
     }
     ngOnInit() {
         this.trialService.genomicInputObs.subscribe((message) => {
@@ -114,6 +114,6 @@ export class GenomicComponent implements OnInit {
         return this.trialService.getNodeDisplayContent(key, this.unit['genomic']);
     }
     unCheckRadio(key, event) {
-        this.genomicInput[key] = this.mainutilService.unCheckRadio(this.genomicInput[key], event.target.value);
+        this.genomicInput[key] = MainUtil.uncheckRadio(this.genomicInput[key], event.target.value);
     }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import { Clinical } from './clinical.model';
 import * as _ from 'lodash';
-import { MainutilService } from '../service/mainutil.service';
+import MainUtil from '../service/mainutil';
 
 @Component({
     selector: 'jhi-clinical',
@@ -22,7 +22,7 @@ export class ClinicalComponent implements OnInit {
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
 
-    constructor(private trialService: TrialService, public mainutilService: MainutilService) { }
+    constructor(private trialService: TrialService) { }
 
     ngOnInit() {
         this.trialService.clinicalInputObs.subscribe((message) => {
@@ -119,6 +119,6 @@ export class ClinicalComponent implements OnInit {
         return this.trialService.getNodeDisplayContent(key, this.unit['clinical']);
     }
     unCheckRadio(key, event) {
-        this.clinicalInput[key] = this.mainutilService.unCheckRadio(this.clinicalInput[key], event.target.value);
+        this.clinicalInput[key] = MainUtil.uncheckRadio(this.clinicalInput[key], event.target.value);
     }
 }
