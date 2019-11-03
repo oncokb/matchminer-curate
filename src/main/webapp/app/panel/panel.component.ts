@@ -1,15 +1,20 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter } from '@angular/core';
 import { TrialService } from '../service/trial.service';
 import * as _ from 'lodash';
 import { Genomic } from '../genomic/genomic.model';
 import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from './movingPath.model';
 import { Arm } from '../arm/arm.model';
+import MainUtil from '../service/mainutil';
+import { Drug, NcitDrug } from '../drug/drug.model';
+import { debounceTime, switchMap } from 'rxjs/operators';
+
 @Component({
     selector: 'jhi-panel',
     templateUrl: './panel.component.html',
     styleUrls: ['panel.scss']
 })
+
 export class PanelComponent implements OnInit {
     @Input() path = '';
     // used to manage the icons to be displayed
@@ -31,13 +36,15 @@ export class PanelComponent implements OnInit {
     armInput: Arm;
     originalMatch = [];
     originalArms = [];
+    originalArmDrug: Drug[][];
     dataToModify = [];
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
     statusOptions = this.trialService.getStatusOptions();
     nctIdChosen: string;
-    isPermitted = this.trialService.isPermitted;
+    oncokb = MainUtil.oncokb;
+    isPermitted = MainUtil.isPermitted;
     trialChosen: {};
     genomicInput: Genomic;
     clinicalInput: Clinical;
@@ -45,11 +52,33 @@ export class PanelComponent implements OnInit {
     genomicFields = ['hugo_symbol', 'annotated_variant', 'matching_examples', 'germline', 'protein_change', 'wildcard_protein_change',
     'variant_classification', 'variant_category', 'exon', 'cnv_call', 'wildtype', 'ms_status', 'mmr_status'];
     oncokbGenomicFields = ['hugo_symbol', 'annotated_variant', 'germline'];
-    oncokb: boolean;
     hasErrorInputField: boolean;
     copyMatch = false;
+    drugInput = new EventEmitter<string>();
+    drugsOptions: Drug[] = [];
+    drugsOptionsLoading = false;
 
     constructor(private trialService: TrialService) {
+        this.drugInput.pipe(
+            debounceTime(200),
+            switchMap((term) => {
+                this.drugsOptionsLoading = true;
+                return this.trialService.loadDrugsOptions(term);
+            })
+        ).subscribe((items) => {
+            this.drugsOptions = items.map((drug: NcitDrug) => {
+                const drugOption: Drug = {
+                    ncit_code: drug.codes.join(', '),
+                    name: drug.name,
+                    synonyms: drug.synonyms.join(', ')
+                };
+                return drugOption;
+            });
+            this.drugsOptionsLoading = false;
+        }, (err) => {
+            this.drugsOptions = [];
+            this.drugsOptionsLoading = false;
+        });
     }
 
     ngOnInit() {
@@ -80,7 +109,6 @@ export class PanelComponent implements OnInit {
         this.trialService.hasErrorInputFieldObs.subscribe((message) => {
             this.hasErrorInputField = message;
         });
-        this.oncokb = this.trialService.oncokb;
     }
     preparePath(pathParameter?: string) {
         const pathStr = pathParameter ? pathParameter : this.path;
@@ -139,7 +167,7 @@ export class PanelComponent implements OnInit {
         }
 
         if (result && (type === 'delete' || !hasEmptySections)) {
-            if (this.arm === true) {
+            if (this.arm) {
                 this.modifyArmGroup(type);
             } else {
                 this.preparePath();
@@ -321,24 +349,17 @@ export class PanelComponent implements OnInit {
         this.clearNodeInput();
     }
     clearNodeInput() {
-        this.trialService.setGenomicInput(this.trialService.createGenomic());
-        this.trialService.setClinicalInput(this.trialService.createClinical());
+        this.trialService.setGenomicInput(MainUtil.createGenomic());
+        this.trialService.setClinicalInput(MainUtil.createClinical());
+        this.trialService.setArmInput(MainUtil.createArm());
     }
-    clearInputForm(keys: Array<string>, type: string) {
+    clearInputForm(type: string) {
         if (type === 'Genomic') {
-            for (const key of keys) {
-                this.genomicInput[key] = '';
-                this.genomicInput['no_' + key] = false;
-            }
+            this.genomicInput = MainUtil.createGenomic();
         } else if (type === 'Clinical') {
-            for (const key of keys) {
-                this.clinicalInput[key] = '';
-                this.clinicalInput['no_' + key] = false;
-            }
-        } else if (type === 'arm') {
-            for (const key of keys) {
-                this.armInput[key] = '';
-            }
+            this.clinicalInput = MainUtil.createClinical();
+        } else if (type === 'Arm') {
+            this.armInput = MainUtil.createArm();
         }
     }
     getOncotree() {
@@ -521,6 +542,7 @@ export class PanelComponent implements OnInit {
                 drugs: this.unit['drugs'],
                 match: this.unit['match']
             };
+            this.originalArmDrug = _.cloneDeep(this.unit['drugs']);
             this.trialService.setArmInput(armToAdd);
         }
     }
@@ -563,17 +585,12 @@ export class PanelComponent implements OnInit {
     }
     preAddNode() {
         this.addNode = true;
-        if (this.arm === true) {
-            if (this.trialService.oncokb) {
-                this.clearInputForm(['arm_code', 'arm_description', 'arm_internal_id', 'arm_suspended', 'match', 'arm_type',
-                    'arm_info', 'arm_eligibility', 'drugs'], 'arm');
-            } else {
-                this.clearInputForm(['arm_code', 'arm_description', 'arm_internal_id', 'arm_suspended', 'match'], 'arm');
-            }
+        if (this.arm) {
+            this.clearInputForm('Arm');
         }
     }
     moveNode() {
-        if (this.operationPool['relocate'] === true) {
+        if (this.operationPool['relocate']) {
             this.operationPool['currentPath'] = '';
             this.operationPool['relocate'] = false;
         } else {
@@ -583,7 +600,7 @@ export class PanelComponent implements OnInit {
         }
     }
     copyNode() {
-        if (this.operationPool['copy'] === true) {
+        if (this.operationPool['copy']) {
             // click twice for canceling copy operation
             this.operationPool['currentPath'] = '';
             this.operationPool['copy'] = false;
@@ -594,6 +611,10 @@ export class PanelComponent implements OnInit {
         }
     }
     cancelModification() {
+        if (this.arm) {
+            this.armInput.drugs = this.originalArmDrug;
+            this.unit['drugs'] = this.originalArmDrug;
+        }
         this.operationPool['currentPath'] = '';
         this.operationPool['editing'] = false;
     }
@@ -642,7 +663,7 @@ export class PanelComponent implements OnInit {
     removeOriginalNode(match: Array<any>) {
         const itemsToRemove = [];
         for (const item of match) {
-            if (item.toBeRemoved === true) {
+            if (item.toBeRemoved) {
                 itemsToRemove.push(item);
             }
         }
@@ -759,17 +780,7 @@ export class PanelComponent implements OnInit {
     modifyArmGroup(type, arm?: Arm) {
         if (type === 'add') {
             if (_.isUndefined(arm)) {
-                const armToAdd: Arm = {
-                    arm_code: '',
-                    arm_description: '',
-                    arm_internal_id: '',
-                    arm_suspended: '',
-                    arm_type: '',
-                    arm_eligibility: '',
-                    arm_info: '',
-                    drugs: [[]],
-                    match: []
-                };
+                const armToAdd: Arm = MainUtil.createArm();
                 this.prepareArmData(this.armInput, armToAdd);
                 arm = armToAdd;
             }
@@ -783,6 +794,15 @@ export class PanelComponent implements OnInit {
         }
     }
     prepareArmData(armInput: Arm, armToSave: Arm) {
+        this.armInput.drugs = this.armInput.drugs.map((drugGroup: any[]) => drugGroup.map((drug: Drug| string) => {
+            if (typeof drug === 'string') {
+                const newDrug: Drug = {
+                    name: drug,
+                };
+                return newDrug;
+            }
+            return drug;
+        }));
         const keys = _.keys(armInput);
         _.forEach(keys, function(key) {
             if (!_.isUndefined(armInput[key])) {
@@ -804,5 +824,11 @@ export class PanelComponent implements OnInit {
         } else {
             this.armInput.arm_type = '';
         }
+    }
+    addDrugGroup() {
+        this.armInput.drugs.push([]);
+    }
+    removeDrugGroup(index: number) {
+        this.armInput.drugs.splice(index, 1);
     }
 }

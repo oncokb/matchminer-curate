@@ -1,6 +1,7 @@
 export interface Trial {
     curation_status: string;
     archived: string;
+    protocol_accessed?: number;
     protocol_no: string;
     nct_id: string;
     principal_investigator?: PrincipalInvestigator;
@@ -36,4 +37,9 @@ interface Match { }
 
 export interface Additional {
     note?: string;
+}
+
+export interface Message {
+    content: string;
+    color: string;
 }

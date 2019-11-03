@@ -6,7 +6,7 @@
                 <span [ngStyle]="getMessageStyle()">{{ validationMessage }}</span>
             </div>
             <div class="col-sm-8">
-                <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
+                <input class="selectStyle" type="text" [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
             </div>
         </div>
         <div class="row">
@@ -54,7 +54,7 @@
                 </label>
             </div>
             <div class="col-sm-8">
-                <input [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
+                <input class="selectStyle" type="text" [(ngModel)]="clinicalInput.age_numerical" size="35" (change)="validateAgeInput()" />
             </div>
         </div>
         <div class="row">

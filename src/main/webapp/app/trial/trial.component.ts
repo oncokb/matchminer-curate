@@ -5,7 +5,7 @@ import 'rxjs/add/observable/combineLatest';
 import { TrialService } from '../service/trial.service';
 import MainUtil from '../service/mainutil';
 import * as _ from 'lodash';
-import { Additional, Trial } from './trial.model';
+import { Additional, Message, Trial } from './trial.model';
 import '../../../../../node_modules/jquery/dist/jquery.js';
 import '../../../../../node_modules/datatables.net/js/jquery.dataTables.js';
 import { Subject } from 'rxjs/Subject';
@@ -15,7 +15,6 @@ import { Router } from '@angular/router';
 import { ConnectionService } from '../service/connection.service';
 import { MetaService } from '../service/meta.service';
 import { Meta } from '../meta/meta.model';
-import { environment } from '../environments/environment';
 import { saveAs } from 'file-saver';
 
 @Component( {
@@ -25,14 +24,15 @@ import { saveAs } from 'file-saver';
 } )
 
 export class TrialComponent implements OnInit, AfterViewInit {
-    oncokb = environment['oncokb'] ? environment['oncokb'] : false;
+    oncokb = MainUtil.oncokb;
+    isPermitted = MainUtil.isPermitted;
     @ViewChild( DataTableDirective )
     dtElement: DataTableDirective;
     trialsToImport = '';
     nctIdChosen = '';
-    messages: Array<string> = [];
-    trialList: Array<Trial> = [];
-    trialChosen = {};
+    messages: string[] = [];
+    trialList: Trial[] = [];
+    trialChosen: Trial;
     additionalInput: Additional;
     additionalChosen: Additional;
     additionalsObject = {};
@@ -43,8 +43,11 @@ export class TrialComponent implements OnInit, AfterViewInit {
     hideArchived = 'Yes';
     statusOptions = this.trialService.getStatusOptions();
     originalTrial = {};
-    isPermitted = this.trialService.isPermitted;
-    protocolNoMessage = {
+    protocolNoMessage: Message = {
+        content: '',
+        color: ''
+    };
+    protocolAccessedMessage: Message = {
         content: '',
         color: ''
     };
@@ -87,7 +90,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
             ]
         };
         this.nctIdChosen = '';
-        this.trialChosen = {};
+        this.trialChosen = MainUtil.createTrial();
         this.messages = [];
         if ( this.router.url.includes( 'NCT' ) ) {
             const urlArray = this.router.url.split( '/' );
@@ -106,7 +109,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
     }
     importTrials() {
         this.messages = [];
-        this.protocolNoMessage.content = '';
+        this.clearMessages();
         const newTrials: Array<string> = this.trialsToImport.split( ',' );
         let nctId = '';
         for ( const newTrial of newTrials ) {
@@ -247,7 +250,7 @@ export class TrialComponent implements OnInit, AfterViewInit {
         }
     }
     curateTrial( nctId: string ) {
-        this.protocolNoMessage.content = '';
+        this.clearMessages();
         this.clearAdditional();
         this.trialService.setTrialChosen( nctId );
         this.trialService.setAdditionalChosen( nctId );
@@ -332,26 +335,47 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 if (result) {
                     this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( {protocol_no: this.trialChosen['protocol_no']} )
                     .then((res) => {
-                        this.protocolNoMessage.content = 'Update Protocol No. successfully.';
-                        this.protocolNoMessage.color = 'green';
+                        this.protocolNoMessage = {
+                            content: 'Update Protocol No. successfully.',
+                            color: 'green'
+                        };
                     })
                     .catch( ( error ) => {
-                        this.protocolNoMessage.content = 'Failed to update Protocol No.';
-                        this.protocolNoMessage.color = 'red';
+                        this.protocolNoMessage = {
+                            content: 'Failed to update Protocol No.',
+                            color: 'red'
+                        };
                         this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
                     } );
                 }
             } else {
-                this.protocolNoMessage.content = 'Protocol No. should follow the format: number-number.';
-                this.protocolNoMessage.color = 'red';
+                this.protocolNoMessage = {
+                    content: 'Protocol No. should follow the format: number-number.',
+                    color: 'red'
+                };
                 this.trialChosen['protocol_no'] = this.originalTrial['protocol_no'];
             }
         }
     }
-    clearMessage(type: string) {
-        if (type === 'protocol_no') {
-            this.protocolNoMessage.content = '';
-            this.protocolNoMessage.color = '';
+    clearMessages() {
+        const emptyMessage: Message = {
+            content: '',
+            color: ''
+        };
+        this.protocolAccessedMessage = emptyMessage;
+        this.protocolNoMessage = emptyMessage;
+    }
+    clearMessageByName(name: string) {
+        if (name === 'protocolAccessed') {
+            this.protocolAccessedMessage = {
+                content: '',
+                color: ''
+            };
+        } else if (name === 'protocolNo') {
+            this.protocolNoMessage = {
+                content: '',
+                color: ''
+            };
         }
     }
     download() {
@@ -365,5 +389,19 @@ export class TrialComponent implements OnInit, AfterViewInit {
             type: 'text/plain;charset=utf-8;',
         });
         saveAs(blob, 'TrialTable.xls');
+    }
+    updateProtocolAccessedDate() {
+        const nowTimestamp = MainUtil.updateTimestampByToday();
+        this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( {protocol_accessed: nowTimestamp} )
+        .then((res) => {
+            this.trialChosen.protocol_accessed = nowTimestamp;
+            this.clearMessageByName('protocolAccessed');
+        })
+        .catch( ( error ) => {
+            this.protocolAccessedMessage = {
+                content: 'Failed to update Last Update.',
+                color: 'red'
+            };
+        });
     }
 }

@@ -9,7 +9,7 @@
                 <input id="no_hugo_symbol1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_hugo_symbol" />
             </div>
             <div class="col-sm-8">
-                <input [(ngModel)]="genomicInput.hugo_symbol" size="36" (change)="validateGenomicGene()" />
+                <input type="text" class="selectStyle" [(ngModel)]="genomicInput.hugo_symbol" size="36" (change)="validateGenomicGene()" />
             </div>
         </div>
         <div class="row borderMargin">
@@ -19,7 +19,7 @@
                 <input id="no_annotated_variant1" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_annotated_variant" />
             </div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search" (selectItem)="selectAnnotatedVariant($event)"/>
+                <input type="text" class="selectStyle" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search" (selectItem)="selectAnnotatedVariant($event)"/>
             </div>
         </div>
         <div class="row borderMargin">
@@ -27,7 +27,7 @@
                 <span [ngStyle]="getMessageStyle('example')">{{ validationMessage['example'] }}</span>
             </div>
             <div class="col-sm-8">
-                <input [(ngModel)]="genomicInput.matching_examples" size="36" (change)="validateGenomicExample()" />
+                <input type="text" class="selectStyle" [(ngModel)]="genomicInput.matching_examples" size="36" (change)="validateGenomicExample()" />
             </div>
         </div>
         <div class="row borderMargin">
@@ -174,7 +174,7 @@
                 <input id="no_hugo_symbol2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_hugo_symbol" />
             </div>
             <div class="col-sm-8">
-                <input [(ngModel)]="genomicInput.hugo_symbol" size="36" (change)="validateGenomicGene()" />
+                <input class="selectStyle" type="text" [(ngModel)]="genomicInput.hugo_symbol" size="36" (change)="validateGenomicGene()" />
             </div>
         </div>
         <div class="row borderMargin">
@@ -184,7 +184,7 @@
                 <input id="no_annotated_variant2" type="checkbox" class="notLabel" [(ngModel)]="genomicInput.no_annotated_variant" />
             </div>
             <div class="col-sm-8">
-                <input type="text" size="36" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search" (selectItem)="selectAnnotatedVariant($event)"/>
+                <input type="text" size="36" class="selectStyle" [(ngModel)]="genomicInput.annotated_variant" [ngbTypeahead]="search" (selectItem)="selectAnnotatedVariant($event)"/>
             </div>
         </div>
         <div class="row borderMargin">
@@ -192,7 +192,7 @@
                 <span [ngStyle]="getMessageStyle('example')">{{ validationMessage['example'] }}</span>
             </div>
             <div class="col-sm-8">
-                <input [(ngModel)]="genomicInput.matching_examples" size="36" (change)="validateGenomicExample()" />
+                <input type="text" class="selectStyle" [(ngModel)]="genomicInput.matching_examples" size="36" (change)="validateGenomicExample()" />
             </div>
         </div>
         <div class="row borderMargin">

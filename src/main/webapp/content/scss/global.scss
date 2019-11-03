@@ -228,6 +228,9 @@ ui bootstrap tweaks
 input[type="radio"], input[type="checkbox"] {
     margin-right: 5px;
 }
+input[type="text"], textarea {
+    width: 100%;
+}
 .addIcon {
     color: green;
     margin-right:8px
@@ -256,4 +259,17 @@ input[type="radio"], input[type="checkbox"] {
     color: green;
     margin-right:8px
 }
+.drug-wrapper{
+    display: inline-flex;
+    width: 100%;
+
+    .drug-container{
+        width: 50%;
+        margin-bottom: 10px;
+    }
+    .deleteIcon {
+        margin: 10px;
+    }
+}
+
 /* common css classes end */

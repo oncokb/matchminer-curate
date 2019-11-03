@@ -31,7 +31,7 @@ export class GenomicComponent implements OnInit {
     'protein_altering', 'splice site_mutation', 'stop_retained', 'synonymous', '3\'UTR', '3_prime_UTR',
     '5\'Flank', '5\'UTR', '5\'UTR_mutation', '5_prime_UTR'];
     annotated_variants = this.trialService.getOncokbVariants();
-    oncokb = this.trialService.oncokb;
+    oncokb = MainUtil.oncokb;
     validationMessage = {
         gene: '',
         example: ''
@@ -56,8 +56,8 @@ export class GenomicComponent implements OnInit {
         }
     }
 
-    constructor(private trialService: TrialService, public connectionService: ConnectionService) {
-    }
+    constructor(private trialService: TrialService, public connectionService: ConnectionService) {}
+
     ngOnInit() {
         this.trialService.genomicInputObs.subscribe((message) => {
             this.genomicInput = message;
@@ -67,7 +67,7 @@ export class GenomicComponent implements OnInit {
         });
     }
     getStyle() {
-        return this.trialService.getStyle(this.indent);
+        return MainUtil.getStyle(this.indent);
     }
     // This validation function will be executed the moment the input box lose focus
     validateGenomicGene() {

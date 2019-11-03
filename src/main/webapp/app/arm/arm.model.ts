@@ -9,7 +9,7 @@ export interface Arm {
     arm_type?: string, // Arm type(Control Arm)
     arm_eligibility?: string, // Store in Firebase and do not send to MongoDB.
     arm_info?: string, // Real arm description. Store in Firebase and do not send to MongoDB.
-    drugs?: Array<Array<Drug>>,
-    match?: Array<object>
+    drugs?: Drug[][],
+    match?: object[]
 }
 

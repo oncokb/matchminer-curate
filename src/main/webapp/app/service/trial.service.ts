@@ -6,31 +6,28 @@ import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from '../panel/movingPath.model';
 import { Arm } from '../arm/arm.model';
 import * as _ from 'lodash';
-import { environment } from '../environments/environment';
 import { EmailService } from './email.service';
 import { ConnectionService } from './connection.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs/observable/of';
 import { catchError, map } from 'rxjs/operators';
 import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
+import MainUtil from './mainutil';
 
 @Injectable()
 export class TrialService {
-    oncokb = environment['oncokb'] ? environment['oncokb'] : false;
-    oncotreeVersion = environment.oncotreeVersion ? environment.oncotreeVersion : 'oncotree_latest_stable';
-    isPermitted = environment.isPermitted ? environment.isPermitted : false;
 
     private nctIdChosenSource = new BehaviorSubject<string>('');
     nctIdChosenObs = this.nctIdChosenSource.asObservable();
 
-    trial = this.createTrial();
+    trial = MainUtil.createTrial();
     private trialChosenSource = new BehaviorSubject<Trial>(this.trial);
     trialChosenObs = this.trialChosenSource.asObservable();
 
     private trialListSource = new BehaviorSubject<Array<Trial>>([]);
     trialListObs = this.trialListSource.asObservable();
 
-    additional = this.createAdditional();
+    additional = MainUtil.createAdditional();
     private additionalChosenSource = new BehaviorSubject<Additional>(this.additional);
     additionalChosenObs = this.additionalChosenSource.asObservable();
 
@@ -53,11 +50,11 @@ export class TrialService {
     private movingPathSource = new BehaviorSubject<MovingPath>(this.movingPath);
     movingPathObs = this.movingPathSource.asObservable();
 
-    genomicInput = this.createGenomic();
+    genomicInput = MainUtil.createGenomic();
     private genomicInputSource = new BehaviorSubject<Genomic>(this.genomicInput);
     genomicInputObs = this.genomicInputSource.asObservable();
 
-    clinicalInput = this.createClinical();
+    clinicalInput = MainUtil.createClinical();
     private clinicalInputSource = new BehaviorSubject<Clinical>(this.clinicalInput);
     clinicalInputObs = this.clinicalInputSource.asObservable();
 
@@ -65,17 +62,7 @@ export class TrialService {
     private hasErrorInputFieldSource = new BehaviorSubject<boolean>(this.hasErrorInputField);
     hasErrorInputFieldObs = this.hasErrorInputFieldSource.asObservable();
 
-    armInput: Arm = {
-        arm_code: '',
-        arm_description: '',
-        arm_internal_id: '',
-        arm_suspended: '',
-        arm_type: '',
-        arm_eligibility: '',
-        arm_info: '',
-        drugs: [],
-        match: []
-    };
+    armInput = MainUtil.createArm();
     private armInputSource = new BehaviorSubject<Arm>(this.armInput);
     armInputObs = this.armInputSource.asObservable();
 
@@ -108,7 +95,7 @@ export class TrialService {
             for (const item of res) {
                 mainTypeQueries.push({
                     'query': item,
-                    'version': this.oncotreeVersion,
+                    'version': MainUtil.oncotreeVersion,
                     'type': 'mainType'
                 });
             }
@@ -158,75 +145,6 @@ export class TrialService {
                 this.annotated_variants[key].sort();
            }
         });
-    }
-    createGenomic() {
-        let genomicInput: Genomic;
-        if (this.oncokb === true) {
-            genomicInput = {
-                hugo_symbol: '',
-                annotated_variant: '',
-                matching_examples: '',
-                germline: '',
-                no_hugo_symbol: false,
-                no_annotated_variant: false,
-            };
-        } else {
-            genomicInput = {
-                hugo_symbol: '',
-                annotated_variant: '',
-                matching_examples: '',
-                germline: '',
-                protein_change: '',
-                wildcard_protein_change: '',
-                variant_classification: '',
-                variant_category: '',
-                exon: '',
-                cnv_call: '',
-                wildtype: '',
-                no_hugo_symbol: false,
-                no_annotated_variant: false,
-                no_protein_change: false,
-                no_wildcard_protein_change: false,
-                no_variant_classification: false,
-                no_variant_category: false,
-                no_exon: false,
-                no_cnv_call: false
-            };
-        }
-        return genomicInput;
-    }
-    createClinical() {
-        const clinicalInput: Clinical = {
-            age_numerical: '',
-            oncotree_primary_diagnosis: '',
-            main_type: '',
-            sub_type: '',
-            no_oncotree_primary_diagnosis: false
-        };
-        return clinicalInput;
-    }
-    createTrial() {
-        const trial: Trial = {
-            curation_status: '',
-            archived: '',
-            nct_id: '',
-            protocol_no: '',
-            long_title: '',
-            short_title: '',
-            phase: '',
-            status: '',
-            treatment_list: { step: [] },
-            principal_investigator: {
-                full_name: ''
-            }
-        };
-        return trial;
-    }
-    createAdditional() {
-        const additional: Additional = {
-            note: ''
-        };
-        return additional;
     }
     fetchTrials() {
         this.trialsRef.snapshotChanges().subscribe((action) => {
@@ -315,9 +233,6 @@ export class TrialService {
     setHasErrorInputField(hasErrorInputField: boolean) {
         this.hasErrorInputFieldSource.next(hasErrorInputField);
     }
-    getStyle(indent: number) {
-        return { 'margin-left': (indent * 40) + 'px' };
-    }
     getStatusOptions() {
         return this.statusOptions;
     }
@@ -361,7 +276,7 @@ export class TrialService {
     saveErrors(info: string, content: object, error: object) {
         if (info.includes('failed') && info.includes('database')) {
             this.emailService.sendEmail({
-                sendTo: environment.devEmail,
+                sendTo: MainUtil.devEmail,
                 subject: info,
                 content: 'Content: \n' + JSON.stringify(content) + '\n\n Error: \n' + JSON.stringify(error)
             });
@@ -392,7 +307,7 @@ export class TrialService {
             alert('Sorry, required data source is unavailable now.');
         } else {
             this.emailService.sendEmail({
-                sendTo: environment.devEmail,
+                sendTo: MainUtil.devEmail,
                 subject: 'Matchminer Curate http request failed.',
                 content: 'Error: \n' + JSON.stringify(error)
             });
