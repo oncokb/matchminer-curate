@@ -72,7 +72,8 @@
                 <label for="import" class="importStatus">Ready to import </label>
                 <input id="import" type="radio" value="Ready to import" name="curation" [(ngModel)]="trialChosen.curation_status" (change)="updateStatus('curation')">
             </span>
-            <br/>
+        </div>
+        <div>
             <label for="archive_status">Archive:</label>
                 <span *ngIf="!isPermitted" class="noteEdit">{{ trialChosen.archived }}</span>
                 <span *ngIf="isPermitted" id="archive_status">
@@ -81,28 +82,39 @@
                     <label for="retrieve" class="noteAdd">No </label>
                     <input id="retrieve" type="radio" value="No" name="archive" [(ngModel)]="trialChosen.archived" (change)="updateStatus('archive')">
                 </span>
-            <br/><br/>
+        </div>
+        <div>
+            <label for="last-update">Protocol Accessed on: </label>
+            <span id="last-update" class="noteEdit"> {{ trialChosen.protocol_accessed | date: 'yyyy-MM-dd' }}
+                <button *ngIf="isPermitted" class="btn btn-primary noteEdit" (click)="updateProtocolAccessedDate()">Update</button>
+                <span *ngIf="protocolAccessedMessage.content" class="load-span" [style.color]="protocolAccessedMessage.color"> {{protocolAccessedMessage.content}} </span>
+            </span>
+        </div>
+        <div class="trial-margin">
             <label for="nctId">NCT ID: </label>
             <span id="nctId" class="noteEdit">
                 <a target="_blank" href="https://clinicaltrials.gov/ct2/show/{{trialChosen.nct_id}}">{{ trialChosen.nct_id }}</a>
             </span>
-            <br/>
+        </div>
+        <div>
             <label for="protocolNo">Protocol No: </label>
             <span id="protocolNo" class="noteEdit">
-                <input [(ngModel)]="trialChosen.protocol_no" (blur)="updateProtocolNo()" (keypress)="clearMessage('protocol_no')"/>
+                <input [(ngModel)]="trialChosen.protocol_no" (blur)="updateProtocolNo()" (keypress)="clearMessageByName('protocolNo')"/>
                 <span *ngIf="protocolNoMessage.content" class="load-span" [style.color]="protocolNoMessage.color"> {{protocolNoMessage.content}} </span>
             </span>
-            <br/>
-            <div *ngIf="trialChosen.principal_investigator">
-                <label for="pi">Principal Investigator: </label>
-                <span id="pi" class="noteEdit">
-                    <a *ngIf="trialChosen.principal_investigator.url" target="_blank" href="{{trialChosen.principal_investigator.url}}">{{ trialChosen.principal_investigator.full_name }}</a>
-                    <span *ngIf="!trialChosen.principal_investigator.url">{{ trialChosen.principal_investigator.full_name }}</span>
-                </span>
-            </div>
+        </div>
+        <div *ngIf="trialChosen.principal_investigator">
+            <label for="pi">Principal Investigator: </label>
+            <span id="pi" class="noteEdit">
+                <a *ngIf="trialChosen.principal_investigator.url" target="_blank" href="{{trialChosen.principal_investigator.url}}">{{ trialChosen.principal_investigator.full_name }}</a>
+                <span *ngIf="!trialChosen.principal_investigator.url">{{ trialChosen.principal_investigator.full_name }}</span>
+            </span>
+        </div>
+        <div>
             <label for="phase">Phase: </label>
             <span id="phase" class="noteEdit">{{ trialChosen.phase }}</span>
-            <br/>
+        </div>
+        <div>
             <label for="status">Status: </label>
             <span *ngIf="!isPermitted" class="noteEdit">{{ trialChosen.status }}</span>
             <span  *ngIf="isPermitted" id="status" class="noteEdit">
@@ -111,13 +123,16 @@
                                [clearable]="false" (change)="updateTrialStatusInDB()"></ng-select>
                 </div>
             </span>
-            <br/>
+        </div>
+        <div>
             <label for="shortTitle">Short Title: </label>
             <span id="shortTitle" class="noteEdit">{{ trialChosen.short_title }}</span>
-            <br/>
+        </div>
+        <div>
             <label for="longTitle">Long Title: </label>
             <span id="longTitle" class="noteEdit">{{ trialChosen.long_title }}</span>
-            <br/>
+        </div>
+        <div>
             <label for="treatmentList">Treatment List:</label>
             <div id="treatmentList">
                 <span>-arm: <jhi-panel [type]="'add,copyArm'" [arm]="true" [path]="'arms'"></jhi-panel></span>

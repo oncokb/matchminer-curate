@@ -3,6 +3,7 @@ import { TrialService } from '../service/trial.service';
 import { Drug, NcitDrug } from '../drug/drug.model';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { Arm } from '../arm/arm.model';
+import MainUtil from '../service/mainutil';
 
 @Component({
     selector: 'jhi-drug',
@@ -11,14 +12,11 @@ import { Arm } from '../arm/arm.model';
 })
 
 export class DrugComponent implements OnInit {
-    @Input() armInput: Arm = {
-        arm_description: ''
-    };
+    @Input() armInput: Arm = MainUtil.createArm();
     @Input() drugGroupIndex = 0;
     drugsOptionsLoading = false;
-    selectedDrugs: Array<any> = [];
     drugInput = new EventEmitter<string>();
-    drugsOptions: Array<Drug> = [];
+    drugsOptions: Drug[] = [];
 
     constructor(private trialService: TrialService) {
         this.drugInput.pipe(
@@ -46,11 +44,10 @@ export class DrugComponent implements OnInit {
     ngOnInit() {
         this.trialService.armInputObs.subscribe((message: Arm) => {
             this.armInput = message;
-            this.selectedDrugs = this.armInput.drugs[this.drugGroupIndex];
         });
     }
 
-    saveDrugs() {
-        this.armInput.drugs[this.drugGroupIndex] = this.selectedDrugs.map((drug: any) => typeof drug === 'string' ? { 'name': drug } : drug);
+    removeDrugGroup() {
+        this.armInput.drugs.splice(this.drugGroupIndex, 1);
     }
 }

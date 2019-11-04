@@ -33,7 +33,7 @@ export class ClinicalComponent implements OnInit {
         });
     }
     getStyle() {
-        return this.trialService.getStyle(this.indent);
+        return MainUtil.getStyle(this.indent);
     }
     getMessageStyle() {
         if (this.validation === true) {
@@ -48,7 +48,7 @@ export class ClinicalComponent implements OnInit {
             const ageGroups = this.clinicalInput.age_numerical.split(',');
             // Age input cannot only accepts age range groups greater than 2.
             if (ageGroups.length === 2) {
-                const ageNumber = this.clinicalInput.age_numerical.match(/\d+(\.?\d+)?/g).map(function(v) { return Number(v); });
+                const ageNumber = this.clinicalInput.age_numerical.match(/\d+(\.?\d+)?/g).map((v: string) => Number(v));
                 // Do no allow age range like '>15, >=30' or '<=60, <40' or '<10, >60' or '>50, <20'
                 if ((ageGroups[0].includes('>') && ageGroups[1].includes('>')) ||
                     (ageGroups[0].includes('<') && ageGroups[1].includes('<')) ||

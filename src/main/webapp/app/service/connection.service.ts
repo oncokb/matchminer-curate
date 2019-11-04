@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../environments/environment';
 import { SERVER_API_URL } from '../app.constants';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import MainUtil from './mainutil';
 
 @Injectable()
 export class ConnectionService {
-    frontEndOnly = environment.frontEndOnly ? environment.frontEndOnly : false;
-    oncotreeVersion = environment.oncotreeVersion ? environment.oncotreeVersion : 'oncotree_latest_stable';
 
     constructor(private http: HttpClient) { }
 
@@ -15,10 +13,10 @@ export class ConnectionService {
         if (type === 'Drugs') {
             return 'https://clinicaltrialsapi.cancer.gov/v1/interventions';
         }
-        if (this.frontEndOnly) {
+        if (MainUtil.frontEndOnly) {
             switch (type) {
                 case 'MainType':
-                    return 'http://oncotree.mskcc.org/api/mainTypes?version=' + this.oncotreeVersion;
+                    return 'http://oncotree.mskcc.org/api/mainTypes?version=' + MainUtil.oncotreeVersion;
                 case 'SubType':
                     return 'http://oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
@@ -35,7 +33,7 @@ export class ConnectionService {
         } else {
             switch (type) {
                 case 'MainType':
-                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes?version=' + this.oncotreeVersion;
+                    return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes?version=' + MainUtil.oncotreeVersion;
                 case 'SubType':
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':

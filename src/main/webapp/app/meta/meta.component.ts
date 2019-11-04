@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 import { Meta } from './meta.model';
 import MainUtil from '../service/mainutil';
 import { MetaService } from '../service/meta.service';
-import { environment } from '../environments/environment';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
 import { saveAs } from 'file-saver';
 
@@ -15,7 +14,7 @@ import { saveAs } from 'file-saver';
 })
 
 export class MetaComponent {
-    oncokb = environment['oncokb'] ? environment['oncokb'] : false;
+    oncokb = MainUtil.oncokb;
     @ViewChild(DatatableComponent) table: DatatableComponent;
     loadingIndicator = true;
     rows = [];

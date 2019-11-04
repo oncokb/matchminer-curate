@@ -15,11 +15,9 @@ export class ArmComponent implements OnInit {
     @Input() path = '';
     operationPool: {};
     armInput: Arm;
-    oncokb: boolean;
+    oncokb = MainUtil.oncokb;
 
-    constructor(private trialService: TrialService) {
-        this.oncokb = this.trialService.oncokb;
-    }
+    constructor(private trialService: TrialService) {}
 
     ngOnInit() {
         this.trialService.operationPoolObs.subscribe((message) => {
@@ -32,13 +30,10 @@ export class ArmComponent implements OnInit {
     unCheckRadio(key, event) {
         this.armInput[key] = MainUtil.uncheckRadio(this.armInput[key], event.target.value);
     }
-    displayDrugName(drugGroup: Array<Drug>) {
+    displayDrugName(drugGroup: Drug[]) {
         return drugGroup.map((drug) => drug.name).join(' + ');
     }
     addDrugGroup() {
         this.armInput.drugs.push([]);
-    }
-    removeDrugGroup(index: number) {
-        this.armInput.drugs.splice(index, 1);
     }
 }

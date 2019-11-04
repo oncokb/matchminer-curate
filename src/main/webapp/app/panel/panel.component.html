@@ -12,7 +12,7 @@
     <button class="btn btn-warning editButtonStyle" (click)="cancelModification()">Cancel</button>
 </span>
 
-<div *ngIf="addNode" style="border-style: solid;border-width:1px;margin:10px;padding:10px">
+<div *ngIf="addNode" style="border-style: solid;border-width:1px;margin:10px;padding:10px;max-width:1200px;">
     <div *ngIf="arm === false; else armSection">
         <br/>
         <label>Specify criterion type
@@ -53,7 +53,7 @@
                 <label>arm code: </label>
             </div>
             <div class="col-md-10">
-                <input [(ngModel)]="armInput.arm_code" size="100"/>
+                <input type="text" [(ngModel)]="armInput.arm_code" size="100"/>
             </div>
         </div>
         <div class="row arm-row">
@@ -69,7 +69,7 @@
                 <span class="indent1">arm internal id: </span>
             </div>
             <div class="col-md-10">
-                <input [(ngModel)]="armInput.arm_internal_id" size="100"/>
+                <input type="text" [(ngModel)]="armInput.arm_internal_id" size="100"/>
             </div>
         </div>
         <div class="row arm-row">
@@ -116,10 +116,27 @@
             </div>
             <div class="row arm-row">
                 <div class="col-md-2">
-                    <label>drugs: </label>
+                    <span>drugs:  <i class="fa fa-plus addIcon" aria-hidden="true" (click)="addDrugGroup()"></i></span>
                 </div>
                 <div class="col-md-10">
-                    <jhi-drug [armInput]="armInput"></jhi-drug>
+                    <div *ngFor="let drug of armInput.drugs; index as i">
+                        <span class="drug-wrapper">
+                            <div class="drug-container">
+                                <ng-select [items]="drugsOptions" [(ngModel)]="armInput.drugs[i]" [typeahead]="drugInput"
+                                           [searchable]="true" [hideSelected]="true" [multiple]="true" [clearable]="true" [addTag]="true"
+                                           [loading]="drugsOptionsLoading" bindLabel="name" placeholder="Search Drug">
+                                    <ng-template ng-option-tmp let-item="item">
+                                        <div>
+                                            <span class="drug-name">{{item.name}}</span>
+                                            <span class="drug-synonyms">{{'NCIT Code: ' + item.ncit_code}}</span>
+                                        </div>
+                                        <div *ngIf="item.synonyms" class="drug-synonyms">{{'Also known as ' + item.synonyms}}</div>
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                            <i class="fa fa-trash-o deleteIcon" aria-hidden="true" (click)="removeDrugGroup(i)"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
