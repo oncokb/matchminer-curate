@@ -11,4 +11,5 @@ export const environment = {
     oncotreeVersion: '', // set for using specific oncotree version. By default, it is "oncotree_latest_stable".
     frontEndOnly: true, // set to true if doing frontend development
     isPermitted: true, // set to false for building read-only website
+    sentry_dsn: '' // set Sentry dsn for tracking issues
 };

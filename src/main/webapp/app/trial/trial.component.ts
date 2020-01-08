@@ -41,8 +41,9 @@ export class TrialComponent implements OnInit, AfterViewInit {
     dtOptions: DataTables.Settings = {};
     dtTrigger: Subject<any> = new Subject();
     hideArchived = 'Yes';
+    displayPencil = true;
     statusOptions = this.trialService.getStatusOptions();
-    originalTrial = {};
+    originalTrial: Trial;
     protocolNoMessage: Message = {
         content: '',
         color: ''
@@ -56,7 +57,10 @@ export class TrialComponent implements OnInit, AfterViewInit {
     constructor( private trialService: TrialService, private metaService: MetaService, public db: AngularFireDatabase,
         private connectionService: ConnectionService, private router: Router ) {
         this.trialService.nctIdChosenObs.subscribe( ( message ) => this.nctIdChosen = message );
-        this.trialService.trialChosenObs.subscribe( ( message ) => this.trialChosen = message );
+        this.trialService.trialChosenObs.subscribe( ( message ) => {
+            this.trialChosen = message;
+            this.originalTrial = _.clone(message);
+        } );
         this.trialService.trialListObs.subscribe( ( message ) => {
             this.trialList = message;
             this.trialListIds = this.trialService.trialListIds;
@@ -254,7 +258,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
         this.clearAdditional();
         this.trialService.setTrialChosen( nctId );
         this.trialService.setAdditionalChosen( nctId );
-        this.originalTrial = _.clone(this.trialChosen);
         document.querySelector( '#trialDetail' ).scrollIntoView();
     }
     clearAdditional() {
@@ -403,5 +406,24 @@ export class TrialComponent implements OnInit, AfterViewInit {
                 color: 'red'
             };
         });
+    }
+    togglePencilIcon() {
+        this.displayPencil = !this.displayPencil;
+    }
+    saveModification(key: string) {
+        const objectToUpdate = {};
+        objectToUpdate[key] = this.trialChosen[key];
+        this.trialService.getRef( 'Trials/' + this.nctIdChosen ).update( objectToUpdate )
+        .then((res) => {
+            this.displayPencil = true;
+            this.trialService.setTrialChosen(this.nctIdChosen);
+        })
+        .catch( ( error ) => {
+            this.trialChosen.short_title = this.originalTrial.short_title;
+        } );
+    }
+    cancelModification() {
+        this.trialChosen.short_title = this.originalTrial.short_title;
+        this.displayPencil = true;
     }
 }
