@@ -59,7 +59,7 @@
         <button class="btn btn-primary button-margin" (click)="download()">Download</button>
     </div>
     <div id="trialDetail"><br/></div>
-    <div *ngIf="nctIdChosen" class="trial-bottom">
+    <div *ngIf="nctIdChosen" class="trial-bottom form-group">
         <hr>
         <div>
             <label for="curation_status">Curation Status:</label>
@@ -126,7 +126,15 @@
         </div>
         <div>
             <label for="shortTitle">Short Title: </label>
-            <span id="shortTitle" class="noteEdit">{{ trialChosen.short_title }}</span>
+            <span *ngIf="displayPencil">
+                <span id="shortTitle" class="noteEdit">{{ trialChosen.short_title }}</span>
+                <i class="fa fa-pencil editIcon" aria-hidden="true"  (click)="togglePencilIcon()"></i>
+            </span>
+            <span *ngIf="!displayPencil">
+                <textarea rows="3" cols="100" class="max-input" [(ngModel)]="trialChosen.short_title"></textarea>
+                <button class="btn btn-success editButtonStyle" (click)="saveModification('short_title')">Save</button>
+                <button class="btn btn-warning editButtonStyle" (click)="cancelModification()">Cancel</button>
+            </span>
         </div>
         <div>
             <label for="longTitle">Long Title: </label>

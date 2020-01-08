@@ -53,11 +53,10 @@ import { AngularFireModule } from '@angular/fire';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import * as Sentry from '@sentry/browser';
 
-if (!environment.frontEndOnly) {
-    Sentry.init({
-        dsn: 'https://73c005cfa16b49b9825b0ae57b7b9234@sentry.io/1423208'
-    });
-}
+Sentry.init({
+    dsn: environment.sentry_dsn,
+    blacklistUrls: [new RegExp('.*localhost.*')]
+});
 
 @Injectable()
 export class SentryErrorHandler implements ErrorHandler {
