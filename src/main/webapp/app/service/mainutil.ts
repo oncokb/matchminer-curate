@@ -20,7 +20,6 @@ export default class MainUtil {
         return value;
     }
     static normalizeText(content: string) {
-        content = 'GROUP A: CABOZANTINIB IN PATIENTS WITH RET FUSION-POSITIVE LUNG CANCERS';
         if (MainUtil.isAllUpperCase(content)) {
             return content.split(' ').map((str) => _.capitalize(str)).join(' ');
         }
