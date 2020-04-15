@@ -15,7 +15,7 @@ It is necessary to install and configure the following dependencies:
 After installing Node, you should be able to run the following command to install development tools.
 You will only need to run this command when dependencies change in [package.json](package.json).
 
-    npm install
+    yarn install
 
 ### Prepare Firebase Realtime Database
 1. Go to [Firebase Console] and login with your Google account.
