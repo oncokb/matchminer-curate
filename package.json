@@ -32,7 +32,7 @@
     "font-awesome": "4.7.0",
     "jquery": "^3.4.0",
     "js-yaml": "^3.13.1",
-    "jszip": "^3.1.5",
+    "jszip": "^3.7.0",
     "lodash": "^4.17.11",
     "ng-jhipster": "0.4.0",
     "ng2-webstorage": "^2.0.0",
