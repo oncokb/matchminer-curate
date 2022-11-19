@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.io.File;
+import java.nio.file.Files;
 
 /**
  * @author jingsu
@@ -85,7 +86,7 @@ public class TrialsController implements TrialsApi {
                 }
 
                 if (curationStatus.equals("Completed")) {
-                    File tempFile = File.createTempFile("trial", ".json");
+                    File tempFile = Files.createTempFile("trial", ".json").toFile();
                     String trialPath = FileUtil.buildJsonTempFile(json, tempFile);
 
                     ProcessBuilder pb = new ProcessBuilder("python", this.matchenginePath + "/matchengine.py",
