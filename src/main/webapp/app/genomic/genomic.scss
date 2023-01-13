@@ -1,6 +1,9 @@
 label {
     min-width:180px;
 }
+input:disabled {
+    background-color: #cccccc;
+}
 .selectStyle {
     max-width:300px;
 }
@@ -12,6 +15,9 @@ label {
     margin-top: -25px;
     margin-left: 30px;
 }
-.icon-margin{
+.icon-margin {
     margin-left: 20px;
+}
+.germline-radio {
+    margin-right: 5px;
 }

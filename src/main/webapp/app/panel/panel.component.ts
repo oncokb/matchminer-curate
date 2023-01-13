@@ -24,7 +24,6 @@ export class PanelComponent implements OnInit {
     finalPath = [];
     message = '';
     addNode = false;
-    moving = false;
     nodeOptions: Array<string> = ['Genomic', 'Clinical', 'And', 'Or'];
     nodeType = '';
     selectedItems = [];
@@ -41,7 +40,6 @@ export class PanelComponent implements OnInit {
     allSubTypesOptions = this.trialService.getAllSubTypesOptions();
     subToMainMapping = this.trialService.getSubToMainMapping();
     mainTypesOptions = this.trialService.getMainTypesOptions();
-    statusOptions = this.trialService.getStatusOptions();
     nctIdChosen: string;
     oncokb = MainUtil.oncokb;
     isPermitted = MainUtil.isPermitted;
@@ -180,24 +178,9 @@ export class PanelComponent implements OnInit {
             });
         }
     }
-    hasEmptyGenomicFields(obj: any) {
-        let genomicFieldsToCheck = this.oncokbGenomicFields;
-        if (!this.oncokb) {
-            genomicFieldsToCheck = _.without(this.genomicFields, 'matching_examples');
-        }
-        for (const key of genomicFieldsToCheck) {
-            if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-    hasEmptyClinicalFields(obj: any) {
-        // Check clinical input fields
-        // TODO: Use clinicalFields to replace the array after we remove main_type input field
-        const clinicalFieldsToCheck = ['age_numerical', 'sub_type', 'main_type'];
-        for (const key of clinicalFieldsToCheck) {
-            if (!_.isUndefined(obj[key]) && obj[key].length > 0) {
+    hasEmptyFields(obj: any) {
+        for (const key of _.keys(obj)) {
+            if (!_.isUndefined(obj[key]) && obj[key] && obj[key].length > 0) {
                 return false;
             }
         }
@@ -212,12 +195,12 @@ export class PanelComponent implements OnInit {
     getEmptySectionNames(type: string, emptySections: Array<string>) {
         switch (type) {
         case 'Genomic':
-            if (this.hasEmptyGenomicFields(this.genomicInput)) {
+            if (this.hasEmptyFields(this.genomicInput)) {
                 emptySections.push('Genomic');
             }
             break;
         case 'Clinical':
-            if (this.hasEmptyClinicalFields(this.clinicalInput)) {
+            if (this.hasEmptyFields(this.clinicalInput)) {
                 emptySections.push('Clinical');
             }
             break;
@@ -364,8 +347,8 @@ export class PanelComponent implements OnInit {
     }
     getOncotree() {
         let oncotree_primary_diagnosis = '';
-        if (this.clinicalInput.sub_type) {
-            oncotree_primary_diagnosis = this.clinicalInput.sub_type;
+        if (this.clinicalInput.subtype) {
+            oncotree_primary_diagnosis = this.clinicalInput.subtype;
         }else if (this.clinicalInput.main_type) {
             oncotree_primary_diagnosis = this.clinicalInput.main_type;
         }
@@ -374,8 +357,6 @@ export class PanelComponent implements OnInit {
     prepareClinicalData() {
         this.clinicalInput['oncotree_primary_diagnosis'] = this.getOncotree();
         const clinicalToSave = _.clone(this.clinicalInput);
-        delete clinicalToSave['main_type'];
-        delete clinicalToSave['sub_type'];
         this.prepareSectionByField('clinical', clinicalToSave);
         return clinicalToSave;
     }
@@ -385,15 +366,9 @@ export class PanelComponent implements OnInit {
         return genomicToSave;
     }
     prepareSectionByField(type: string, nodeData: object) {
-        let keysToCheck = [];
-        if (type === 'clinical') {
-            keysToCheck = this.clinicalFields;
-        } else if (type === 'genomic') {
-            keysToCheck = this.genomicFields;
-        }
-        for (const key of keysToCheck) {
+        for (const key of _.keys(nodeData)) {
             // remove empty fields
-            if (!_.isUndefined(nodeData[key]) && nodeData[key].length === 0) {
+            if (_.isUndefined(nodeData[key]) || nodeData[key] === null || nodeData[key].length === 0) {
                 delete nodeData[key];
             }
             // apply not logic
@@ -529,7 +504,9 @@ export class PanelComponent implements OnInit {
         } else if (this.unit.hasOwnProperty('clinical')) {
             this.trialService.setClinicalInput(_.clone(this.unit['clinical']));
             this.setNotLogic('clinical');
-            this.setOncotree();
+            if (_.isUndefined(this.clinicalInput.main_type) && _.isUndefined(this.clinicalInput.subtype)) {
+                this.setOncotree();
+            }
         } else if (this.unit.hasOwnProperty('arm_description')) {
             const armToAdd: Arm = {
                 arm_code: this.unit['arm_code'],
@@ -548,12 +525,12 @@ export class PanelComponent implements OnInit {
     }
     setOncotree() {
         const oncotree_primary_diagnosis = this.clinicalInput['oncotree_primary_diagnosis'];
-        this.clinicalInput['sub_type'] = '';
+        this.clinicalInput['subtype'] = '';
         this.clinicalInput['main_type'] = '';
         let isSubtype = false;
         for (const item of this.allSubTypesOptions) {
             if (item === oncotree_primary_diagnosis) {
-                this.clinicalInput['sub_type'] = oncotree_primary_diagnosis;
+                this.clinicalInput['subtype'] = oncotree_primary_diagnosis;
                 this.clinicalInput['main_type'] = this.subToMainMapping[oncotree_primary_diagnosis];
                 isSubtype = true;
             }
@@ -568,15 +545,15 @@ export class PanelComponent implements OnInit {
     }
     setNotLogic(type: string) {
         if (type === 'clinical') {
-            for (const key of this.clinicalFields) {
-                if (!_.isUndefined(this.clinicalInput[key]) && this.clinicalInput[key].startsWith('!')) {
+            for (const key of _.keys(this.clinicalInput)) {
+                if (!_.isUndefined(this.clinicalInput[key])  && _.isString(this.clinicalInput[key]) && this.clinicalInput[key].startsWith('!')) {
                     this.clinicalInput['no_' + key] = true;
                     this.clinicalInput[key] = this.clinicalInput[key].substr(1);
                 }
             }
         } else if (type === 'genomic') {
-            for (const key of this.genomicFields) {
-                if (!_.isUndefined(this.genomicInput[key]) && this.genomicInput[key].startsWith('!')) {
+            for (const key of _.keys(this.genomicInput)) {
+                if (!_.isUndefined(this.genomicInput[key]) && _.isString(this.genomicInput[key]) && this.genomicInput[key].startsWith('!')) {
                     this.genomicInput['no_' + key] = true;
                     this.genomicInput[key] = this.genomicInput[key].substr(1);
                 }

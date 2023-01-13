@@ -13,6 +13,7 @@ import { of } from 'rxjs/observable/of';
 import { catchError, map } from 'rxjs/operators';
 import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
 import MainUtil from './mainutil';
+import { Gene, Geneset, GenesetOption } from '../genomic/geneset.model';
 
 @Injectable()
 export class TrialService {
@@ -68,6 +69,7 @@ export class TrialService {
 
     subTypesOptions = {};
     allSubTypesOptions = [];
+    genesetsOptions: GenesetOption[] = [];
     subToMainMapping = {};
     mainTypesOptions = ['All Solid Tumors', 'All Liquid Tumors', 'All Tumors', 'All Pediatric Tumors'];
     statusOptions = ['Active', 'Administratively Complete', 'Approved', 'Closed', 'Closed to Accrual',
@@ -144,6 +146,18 @@ export class TrialService {
            for (const key of _.keys(this.annotated_variants)) {
                 this.annotated_variants[key].sort();
            }
+        });
+
+        // prepare genesets list
+        this.connectionService.getGenesets().subscribe((res: Geneset[]) => {
+            for (const geneset of res) {
+                const genesetOption: GenesetOption = {
+                    uuid: geneset.uuid,
+                    name: geneset.name,
+                    genes: _.map(geneset.genes, (gene: Gene) => gene.hugoSymbol)
+                };
+                this.genesetsOptions.push(genesetOption);
+            }
         });
     }
     fetchTrials() {
@@ -238,6 +252,9 @@ export class TrialService {
     }
     getSubTypesOptions() {
         return this.subTypesOptions;
+    }
+    getGenesetsOptions() {
+        return this.genesetsOptions;
     }
     loadDrugsOptions(query: string) {
         // prepare drugs list

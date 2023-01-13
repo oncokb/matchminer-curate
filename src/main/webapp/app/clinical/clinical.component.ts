@@ -106,13 +106,13 @@ export class ClinicalComponent implements OnInit {
     }
     onSingleSelected(option) {
         if (_.isUndefined(option)) {
-            this.clinicalInput.sub_type = '';
+            this.clinicalInput.subtype = '';
         } else if (option && this.clinicalInput.main_type !== this.subToMainMapping[option]) {
             this.clinicalInput.main_type = this.subToMainMapping[option];
         }
     }
     onSingleDeselectedMaintype() {
-        this.clinicalInput.sub_type = '';
+        this.clinicalInput.subtype = '';
         this.clinicalInput.main_type = '';
     }
     getDisplayContent(key: string) {

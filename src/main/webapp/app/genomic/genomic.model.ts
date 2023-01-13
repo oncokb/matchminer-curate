@@ -1,5 +1,7 @@
 export interface Genomic {
     hugo_symbol?: string,
+    geneset?: string,
+    geneset_uuid?: number,
     annotated_variant?: string,
     matching_examples?: string,
     germline?: string,

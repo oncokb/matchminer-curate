@@ -21,6 +21,8 @@ export class ConnectionService {
                     return 'http://oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return 'http://oncokb.org/api/v1/variants';
+                case 'Genesets':
+                    return 'http://oncokb.org/api/v1/genesets';
                 case 'GeneValidation':
                     return 'http://mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
@@ -38,6 +40,8 @@ export class ConnectionService {
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
                 case 'OncoKBVariant':
                     return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
+                case 'Genesets':
+                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/genesets';
                 case 'GeneValidation':
                     return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
@@ -80,5 +84,12 @@ export class ConnectionService {
 
     getDrugs(query: string) {
         return this.http.get(this.getAPIUrl('Drugs') + `?name=${query}`);
+    }
+
+    getGenesets() {
+        return this.http.get(this.getAPIUrl('Genesets'));
+    }
+    getGenesetById(uuid: number) {
+        return this.http.get(this.getAPIUrl('Genesets') + `/${uuid}`);
     }
 }

@@ -7,7 +7,8 @@ import 'rxjs/add/operator/distinctUntilChanged';
 import { Genomic } from './genomic.model';
 import * as _ from 'lodash';
 import { ConnectionService } from '../service/connection.service';
-import MainUtil from '../service/mainutil';
+import { MainutilService } from '../service/mainutil.service';
+import { Geneset, GenesetOption } from './geneset.model';
 
 @Component({
     selector: 'jhi-genomic',
@@ -38,6 +39,8 @@ export class GenomicComponent implements OnInit {
     };
     geneValidation = false;
     exampleValidation = false;
+    genesetOptions = this.trialService.getGenesetsOptions();
+    selectedGenesetOption: GenesetOption;
 
     search = (text$: Observable<string>) =>
         text$
@@ -59,6 +62,9 @@ export class GenomicComponent implements OnInit {
     constructor(private trialService: TrialService, public connectionService: ConnectionService) {}
 
     ngOnInit() {
+        if (!_.isUndefined(this.unit['genomic']) && !_.isUndefined(this.unit['genomic']['geneset_uuid'])) {
+            this.selectedGenesetOption = _.find(this.genesetOptions, { uuid: this.unit['genomic']['geneset_uuid'] });
+        }
         this.trialService.genomicInputObs.subscribe((message) => {
             this.genomicInput = message;
         });
@@ -115,5 +121,16 @@ export class GenomicComponent implements OnInit {
     }
     unCheckRadio(key, event) {
         this.genomicInput[key] = MainUtil.uncheckRadio(this.genomicInput[key], event.target.value);
+    }
+    changeGeneset() {
+        if (this.genomicInput.geneset_uuid) {
+            this.selectedGenesetOption = _.find(this.genesetOptions, { uuid: this.genomicInput.geneset_uuid });
+            if (_.isEmpty(this.genomicInput.annotated_variant)) {
+                this.genomicInput.annotated_variant = 'Oncogenic Mutations';
+            }
+        } else {
+            this.selectedGenesetOption = null;
+            this.genomicInput.annotated_variant = '';
+        }
     }
 }
