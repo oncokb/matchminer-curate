@@ -19,16 +19,10 @@ export class ConnectionService {
                     return 'http://oncotree.mskcc.org/api/mainTypes?version=' + MainUtil.oncotreeVersion;
                 case 'SubType':
                     return 'http://oncotree.mskcc.org/api/tumorTypes/search';
-                case 'OncoKBVariant':
-                    return 'http://oncokb.org/api/v1/variants';
                 case 'GeneValidation':
                     return 'http://mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
                     return 'https://clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-                case 'MskTrials':
-                    return 'https://discover.mskcc.org:443/api/trials/';
-                case 'ExampleValidation':
-                    return 'http://oncokb.org/api/v1/utils/match/variant?';
             }
         } else {
             switch (type) {
@@ -36,16 +30,10 @@ export class ConnectionService {
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/mainTypes?version=' + MainUtil.oncotreeVersion;
                 case 'SubType':
                     return SERVER_API_URL + 'proxy/http/oncotree.mskcc.org/api/tumorTypes/search';
-                case 'OncoKBVariant':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/variants';
                 case 'GeneValidation':
                     return SERVER_API_URL + 'proxy/http/mygene.info/v3/query?species=human&q=symbol:';
                 case 'ClinicalTrials':
                     return SERVER_API_URL + 'proxy/https/clinicaltrialsapi.cancer.gov/v1/clinical-trial/';
-                case 'MskTrials':
-                    return SERVER_API_URL + 'proxy/https/discover.mskcc.org:443/api/trials/';
-                case 'ExampleValidation':
-                    return SERVER_API_URL + 'proxy/http/oncokb.org/api/v1/utils/match/variant?';
             }
         }
     }
@@ -54,16 +42,8 @@ export class ConnectionService {
         return this.http.get(this.getAPIUrl('GeneValidation') + hugoSymbol);
     }
 
-    validateGenomicExample(variantsTobeValidated: string) {
-        return this.http.get(this.getAPIUrl('ExampleValidation') + variantsTobeValidated);
-    }
-
     importTrials(tempTrial: string) {
         return this.http.get(this.getAPIUrl('ClinicalTrials') + tempTrial);
-    }
-
-    getTrialByProtocolNo(protocolNo: string) {
-        return this.http.get(this.getAPIUrl('MskTrials') + protocolNo);
     }
 
     getMainType() {
@@ -72,10 +52,6 @@ export class ConnectionService {
 
     getSubType(query: any) {
         return this.http.post(this.getAPIUrl('SubType'), query);
-    }
-
-    getOncoKBVariant(): Observable<Array<any>> {
-        return this.http.get<Array<any>>(this.getAPIUrl('OncoKBVariant'));
     }
 
     getDrugs(query: string) {

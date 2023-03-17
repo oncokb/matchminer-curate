@@ -1,6 +1,6 @@
 <div class="container trial-container">
     <div class="input-group">
-        <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Enter trial in the format: NCT02057133 or 14-085"
+        <input type="text" class="form-control" [(ngModel)]="trialsToImport" placeholder="Enter trial in the format: NCT02057133"
             size="100">
         <span class="input-group-btn">
             <button class="btn btn-primary" [disabled]="!trialsToImport" (click)="importTrials()">Import New Trials</button>

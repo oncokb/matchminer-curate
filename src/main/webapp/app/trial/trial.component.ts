@@ -128,27 +128,6 @@ export class TrialComponent implements OnInit, AfterViewInit {
                     }
                 }
                 this.importTrialsFromNct(nctId);
-            } else if ( tempTrial.match( /^\d+-\d+$/g ) && this.oncokb) {
-                this.connectionService.getTrialByProtocolNo( tempTrial ).subscribe( ( res ) => {
-                    nctId = res['tds_data']['nct_id'];
-                    if ( this.trialListIds.includes( nctId ) ) {
-                        if (!this.isRedownloadTrial(tempTrial + '/' + nctId)) {
-                            return;
-                        }
-                    }
-                    const mskInfo = {
-                        protocol_no: res['msk_id'],
-                        principal_investigator: {
-                            full_name: res['tds_data']['primary_investigator']['full_name'],
-                            credentials: res['tds_data']['primary_investigator']['credentials'],
-                            email: res['tds_data']['primary_investigator']['email'],
-                            url: res['tds_data']['primary_investigator']['msk_url']
-                        }
-                    };
-                    this.importTrialsFromNct(nctId, mskInfo);
-                }, ( error ) => {
-                    this.messages.push( tempTrial + ' not found' );
-                });
             } else {
                 this.messages.push( tempTrial + ' is invalid trial format' );
                 continue;

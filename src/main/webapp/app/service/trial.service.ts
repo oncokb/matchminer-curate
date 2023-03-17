@@ -6,7 +6,6 @@ import { Clinical } from '../clinical/clinical.model';
 import { MovingPath } from '../panel/movingPath.model';
 import { Arm } from '../arm/arm.model';
 import * as _ from 'lodash';
-import { EmailService } from './email.service';
 import { ConnectionService } from './connection.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs/observable/of';
@@ -83,7 +82,7 @@ export class TrialService {
     nctIdChosen = '';
     errorList: Array<object> = [];
 
-    constructor(public connectionService: ConnectionService, public db: AngularFireDatabase, private emailService: EmailService) {
+    constructor(public connectionService: ConnectionService, public db: AngularFireDatabase) {
         this.nctIdChosenObs.subscribe((message) => this.nctIdChosen = message);
         this.trialsRef = db.object('Trials');
         this.additionalRef = db.object('Additional');
@@ -128,22 +127,6 @@ export class TrialService {
             });
         }, (error: HttpErrorResponse) => {
             this.getErrorResponse(error, 'main type');
-        });
-        // prepare oncokb variant list
-        this.connectionService.getOncoKBVariant().subscribe((res) => {
-           const allAnnotatedVariants = res;
-           for (const item of  allAnnotatedVariants) {
-                if (item['gene']['hugoSymbol']) {
-                    if (this.annotated_variants[item['gene']['hugoSymbol']]) {
-                        this.annotated_variants[item['gene']['hugoSymbol']].push(item['alteration']);
-                    } else {
-                        this.annotated_variants[item['gene']['hugoSymbol']] = [item['alteration']];
-                    }
-                }
-           }
-           for (const key of _.keys(this.annotated_variants)) {
-                this.annotated_variants[key].sort();
-           }
         });
     }
     fetchTrials() {
@@ -274,19 +257,11 @@ export class TrialService {
         });
     }
     saveErrors(info: string, content: object, error: object) {
-        if (info.includes('failed') && info.includes('database')) {
-            this.emailService.sendEmail({
-                sendTo: MainUtil.devEmail,
-                subject: info,
-                content: 'Content: \n' + JSON.stringify(content) + '\n\n Error: \n' + JSON.stringify(error)
-            });
-        } else {
-            this.errorList.push({
-                'info': info,
-                'content': content,
-                'error': error
-            });
-        }
+        this.errorList.push({
+            'info': info,
+            'content': content,
+            'error': error
+        });
     }
     getNodeDisplayContent(key: string, node: object) {
         let result = '';
@@ -306,11 +281,6 @@ export class TrialService {
         } else if (error.status === 503) {
             alert('Sorry, required data source is unavailable now.');
         } else {
-            this.emailService.sendEmail({
-                sendTo: MainUtil.devEmail,
-                subject: 'Matchminer Curate http request failed.',
-                content: 'Error: \n' + JSON.stringify(error)
-            });
             alert('Sorry, unexpected error happens. Our development team has been notified.');
         }
     }
