@@ -42,7 +42,6 @@ import {
     PageRibbonComponent,
     ErrorComponent
 } from './layouts';
-import { EmailService } from './service/email.service';
 import { ConverterComponent } from './converter/converter.component';
 import { ConnectionService } from './service/connection.service';
 import { DrugComponent } from './drug/drug.component';
@@ -108,7 +107,6 @@ export class SentryErrorHandler implements ErrorHandler {
         UserRouteAccessService,
         TrialService,
         ConnectionService,
-        EmailService,
         MetaService,
         UserRouteAccessService,
         {

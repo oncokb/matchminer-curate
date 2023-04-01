@@ -92,19 +92,7 @@ export class GenomicComponent implements OnInit {
         });
     }
     validateGenomicExample() {
-        if (this.genomicInput.hugo_symbol && this.genomicInput.annotated_variant && this.genomicInput.matching_examples) {
-            const variantsTobeValidated = 'hugoSymbol=' + this.genomicInput.hugo_symbol + '&variant=' +
-                this.genomicInput.annotated_variant + '&examples=' + this.genomicInput.matching_examples;
-            this.connectionService.validateGenomicExample(variantsTobeValidated).subscribe((result) => {
-                if (result[this.genomicInput.matching_examples] === true) {
-                    this.validationMessage['example'] = 'Valid';
-                    this.exampleValidation = true;
-                } else {
-                    this.validationMessage['example'] = 'Invalid';
-                    this.exampleValidation = false;
-                }
-            });
-        }
+        // TODO: generate new logics to validate genomic variant format
     }
     getMessageStyle(type) {
         const result = (type === 'gene' ? this.geneValidation : this.exampleValidation);
